@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>GLB Model Viewer with Metadata</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+      #infoPanel {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+        z-index: 100;
+      }
+      #centerButton {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 128, 255, 0.9);
+        color: white;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 100;
+        opacity: 0.5; /* Initially disabled */
+        pointer-events: none;
+      }
+      #centerButton.enabled {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      #centerButton:hover {
+        background: rgba(0, 128, 255, 1);
+      }
+      #filenameBox {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 12px;
+        font-size: 18px;
+        border-radius: 5px;
+        z-index: 100;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@v0.149.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.149.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="infoPanel">Click on an object to see details</div>
+    <button id="centerButton">Center Model</button>
+    <div id="filenameBox">Viewing: {{ glb_filename }}</div>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+      const modelUrl = "{{ url_for('outputted_file', filename=glb_filename) }}";
+      const metadataUrl =
+        "{{ url_for('get_metadata', metadata_filename=metadata_filename) }}";
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(0, 0, 5);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      scene.add(ambientLight);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(10, 10, 10);
+      scene.add(dirLight);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+
+      let metadataMap = {};
+      let model = null; // Store loaded model reference
+      let selectedObject = null; // Tracks currently selected object
+
+      // Fetch metadata from Flask
+      fetch(metadataUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.objects) {
+            data.objects.forEach((obj) => {
+              metadataMap[obj.globalid] = obj;
+            });
+          }
+        })
+        .catch((error) => console.error("Error loading metadata:", error));
+
+      // Load the GLB Model
+      const loader = new GLTFLoader();
+      loader.load(
+        modelUrl,
+        function (gltf) {
+          const model = gltf.scene;
+          scene.add(model);
+
+          // Assign metadata from backend to matching objects by globalid
+          model.traverse((child) => {
+            if (child.isMesh && metadataMap.hasOwnProperty(child.name)) {
+              // Only assign metadata if a match is found
+              child.userData = metadataMap[child.name];
+            }
+          });
+
+          // Automatically center the model after loading
+          centerModel(model, camera);
+
+          // Enable the button only after the model is loaded
+          const centerButton = document.getElementById("centerButton");
+          centerButton.classList.add("enabled"); // Make the button clickable
+          centerButton.addEventListener("click", function () {
+            centerModel(model, camera);
+          });
+        },
+        undefined,
+        function (error) {
+          console.error("Error loading model:", error);
+        }
+      );
+
+      function onClick(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        if (intersects.length > 0) {
+          const clickedObject = intersects[0].object;
+
+          // Highlight only this specific object
+          highlightObject(clickedObject);
+
+          // Display metadata if available
+          if (clickedObject.userData) {
+            displayMetadata(clickedObject.userData);
+          }
+        } else {
+          // If clicking the background, remove highlight
+          highlightObject(null);
+        }
+      }
+
+      function highlightObject(object) {
+        // Remove highlight from the previous selection
+        if (selectedObject) {
+          // Restore original material
+          selectedObject.material = selectedObject.userData.originalMaterial;
+        }
+
+        if (object && object.isMesh) {
+          if (selectedObject !== object) {
+            // Store original material if not already saved
+            if (!object.userData.originalMaterial) {
+              object.userData.originalMaterial = object.material;
+            }
+
+            // Clone material and apply to object
+            object.material = object.material.clone();
+            object.material.emissive.setHex(0xffff00); // Yellow highlight
+
+            selectedObject = object;
+          }
+        } else {
+          selectedObject = null; // No object selected
+        }
+      }
+
+      function displayMetadata(data) {
+        const infoPanel = document.getElementById("infoPanel");
+        infoPanel.innerHTML = `
+            <strong>IFC Metadata</strong> <br>
+            <strong>Class:</strong> ${data.class} <br>
+            <strong>GlobalId:</strong> ${data.globalid} <br>
+            <strong>Name:</strong> ${data.name} <br>
+            <strong>Description:</strong> ${data.description} <br>
+            <strong>ObjectType:</strong> ${data.objecttype} <br><br>
+            <strong>Other Metadata</strong> <br>
+            <strong>Requirement:</strong> ${data.requirement}
+        `;
+        infoPanel.style.display = "block";
+      }
+
+      window.addEventListener("click", onClick);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Updated Center Model Function to Accept "model" and "camera"
+      function centerModel(model, camera) {
+        if (!model || !camera) return;
+
+        // Compute bounding box of the entire model
+        const bbox = new THREE.Box3().setFromObject(model);
+        if (bbox.isEmpty()) return; // Prevent errors if model is empty
+
+        // Calculate the center of the bounding box
+        const center = new THREE.Vector3();
+        bbox.getCenter(center);
+
+        // Move the model so that its center is at the origin
+        model.position.sub(center);
+
+        // Compute size of the model for proper camera distance
+        const size = bbox.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const cameraDistance = maxDim; // Adjust distance factor if needed
+
+        // Set camera position directly in front of the model
+        camera.position.set(center.x, center.y, center.z + cameraDistance);
+        camera.lookAt(center); // Ensure camera faces the model
+
+        // Update OrbitControls to focus on the new model center
+        controls.target.set(center.x, center.y, center.z);
+        controls.update();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Column-129",
+    "class": "IfcColumn",
+    "guid": "39XEtXwSH4NxNHY3QFxu8M",
+    "parent_guid": "0z$TjLdsz8ihQPqr5aDRcP",
+    "depth": 4,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Column-159",
+    "class": "IfcColumn",
+    "guid": "0Nyvg_TCX6xgWDWlZ1DObW",
+    "parent_guid": "0z$TjLdsz8ihQPqr5aDRcP",
+    "depth": 4,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Wall-191",
+    "class": "IfcWall",
+    "guid": "1LIffO5r14ChGMjc8Ot45v",
+    "parent_guid": "0z$TjLdsz8ihQPqr5aDRcP",
+    "depth": 4,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Slab-224",
+    "class": "IfcSlab",
+    "guid": "3726upaUzDXgyPqwzghF6P",
+    "parent_guid": "0z$TjLdsz8ihQPqr5aDRcP",
+    "depth": 4,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Small Structure in ReferenceView",
+    "class": "IfcProject",
+    "guid": "1YSU7RXiX7xP2C9ZPZ6ojF",
+    "parent_guid": "None",
+    "depth": 0,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Building-01",
+    "class": "IfcBuilding",
+    "guid": "1r5jgqRPj5SejP3c0oYkE$",
+    "parent_guid": "0Gm6V5f8H0p87$MMFqLpLN",
+    "depth": 2,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Storey-01",
+    "class": "IfcBuildingStorey",
+    "guid": "0z$TjLdsz8ihQPqr5aDRcP",
+    "parent_guid": "1r5jgqRPj5SejP3c0oYkE$",
+    "depth": 3,
+    "psets_and_qtos": {}
+  },
+  {
+    "name": "Site-01",
+    "class": "IfcSite",
+    "guid": "0Gm6V5f8H0p87$MMFqLpLN",
+    "parent_guid": "1YSU7RXiX7xP2C9ZPZ6ojF",
+    "depth": 1,
+    "psets_and_qtos": {}
+  }
+]

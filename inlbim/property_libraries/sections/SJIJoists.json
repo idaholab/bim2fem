@@ -1,0 +1,1368 @@
+{
+    "STEEL_ANGLE": {},
+    "STEEL_BOX": {},
+    "STEEL_CHANNEL": {},
+    "STEEL_I_SECTION": {},
+    "STEEL_PIPE": {},
+    "STEEL_TEE": {},
+    "JOIST_STANDARD": {
+        "8K1": {
+            "JoistType": "K",
+            "Depth": 0.2032,
+            "UnitWeight": 74.42888614142196,
+            "MomentOfInertiaY": 2.7649250484872297e-06
+        },
+        "10K1": {
+            "JoistType": "K",
+            "Depth": 0.254,
+            "UnitWeight": 72.96950205464005,
+            "MomentOfInertiaY": 5.540851926015918e-06
+        },
+        "12K1": {
+            "JoistType": "K",
+            "Depth": 0.30479999999999996,
+            "UnitWeight": 72.96950205464005,
+            "MomentOfInertiaY": 9.738899649903677e-06
+        },
+        "12K3": {
+            "JoistType": "K",
+            "Depth": 0.30479999999999996,
+            "UnitWeight": 83.1852256874716,
+            "MomentOfInertiaY": 9.738899649903677e-06
+        },
+        "12K5": {
+            "JoistType": "K",
+            "Depth": 0.30479999999999996,
+            "UnitWeight": 103.61667295313471,
+            "MomentOfInertiaY": 9.738899649903677e-06
+        },
+        "14K1": {
+            "JoistType": "K",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 75.88827022820387,
+            "MomentOfInertiaY": 1.5653186086339403e-05
+        },
+        "14K3": {
+            "JoistType": "K",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 87.56339546049642,
+            "MomentOfInertiaY": 1.5653186086339403e-05
+        },
+        "14K4": {
+            "JoistType": "K",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 97.77911909332798,
+            "MomentOfInertiaY": 1.5653186086339403e-05
+        },
+        "14K6": {
+            "JoistType": "K",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 112.37303001186345,
+            "MomentOfInertiaY": 1.5653186086339403e-05
+        },
+        "16K2": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 80.26644000122869,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "16K3": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 91.94156523352125,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "16K4": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 102.1572888663528,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "16K5": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 109.45424432562052,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "16K6": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 118.21058387167018,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "16K7": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 125.50752181825882,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "16K9": {
+            "JoistType": "K",
+            "Depth": 0.4064,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 2.3577853659166106e-05
+        },
+        "18K3": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 96.31973500654607,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "18K4": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 105.0760745525957,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "18K5": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 112.37303001186345,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "18K6": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 124.04813773147691,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "18K7": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 131.34509319074465,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "18K9": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 148.8577722828439,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "18K10": {
+            "JoistType": "K",
+            "Depth": 0.4572,
+            "UnitWeight": 170.748621147968,
+            "MomentOfInertiaY": 3.380701981834125e-05
+        },
+        "20K3": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 97.77911909332798,
+            "MomentOfInertiaY": 4.383674452762591e-05
+        },
+        "20K4": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 110.91362841240243,
+            "MomentOfInertiaY": 4.663481866307935e-05
+        },
+        "20K5": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 119.66996795845209,
+            "MomentOfInertiaY": 4.663481866307935e-05
+        },
+        "20K6": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 129.88570910396274,
+            "MomentOfInertiaY": 4.663481866307935e-05
+        },
+        "20K7": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 135.72326296376946,
+            "MomentOfInertiaY": 4.663481866307935e-05
+        },
+        "20K9": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 157.61411182889356,
+            "MomentOfInertiaY": 4.663481866307935e-05
+        },
+        "20K10": {
+            "JoistType": "K",
+            "Depth": 0.508,
+            "UnitWeight": 178.04562914527304,
+            "MomentOfInertiaY": 4.663481866307935e-05
+        },
+        "22K4": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 116.75119978488826,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "22K5": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 128.42630750450172,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "22K6": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 134.26387887698755,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "22K7": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 141.5608168235762,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "22K9": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 164.9110672881613,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "22K10": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 183.8831304670425,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "22K11": {
+            "JoistType": "K",
+            "Depth": 0.5588,
+            "UnitWeight": 201.39580955914175,
+            "MomentOfInertiaY": 6.21286588727563e-05
+        },
+        "24K4": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 122.58875364469499,
+            "MomentOfInertiaY": 7.62393204320219e-05
+        },
+        "24K5": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 135.72326296376946,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "24K6": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 141.5608168235762,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "24K7": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 147.39837068338292,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "24K8": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 167.8298354617251,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "24K9": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 175.12679092099285,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "24K10": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 191.1801384643475,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "24K12": {
+            "JoistType": "K",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 233.50232951906017,
+            "MomentOfInertiaY": 8.037632781734542e-05
+        },
+        "26K5": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 143.0202184230372,
+            "MomentOfInertiaY": 0.00010082448743965405
+        },
+        "26K6": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 154.69532614265066,
+            "MomentOfInertiaY": 0.00010195522173043902
+        },
+        "26K7": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 159.07351342835454,
+            "MomentOfInertiaY": 0.00010195522173043902
+        },
+        "26K8": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 176.58612246973746,
+            "MomentOfInertiaY": 0.00010195522173043902
+        },
+        "26K9": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 178.04562914527304,
+            "MomentOfInertiaY": 0.00010195522173043902
+        },
+        "26K10": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 201.39580955914175,
+            "MomentOfInertiaY": 0.00010195522173043902
+        },
+        "26K12": {
+            "JoistType": "K",
+            "Depth": 0.6604,
+            "UnitWeight": 242.25866906510979,
+            "MomentOfInertiaY": 0.00010195522173043902
+        },
+        "28K6": {
+            "JoistType": "K",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 166.3704513749432,
+            "MomentOfInertiaY": 0.0001276907275290019
+        },
+        "28K7": {
+            "JoistType": "K",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 172.20800523474992,
+            "MomentOfInertiaY": 0.00012816277558877487
+        },
+        "28K8": {
+            "JoistType": "K",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 185.3424620157871,
+            "MomentOfInertiaY": 0.00012816277558877487
+        },
+        "28K9": {
+            "JoistType": "K",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 189.72063178881197,
+            "MomentOfInertiaY": 0.00012816277558877487
+        },
+        "28K10": {
+            "JoistType": "K",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 208.69281755644678,
+            "MomentOfInertiaY": 0.00012816277558877487
+        },
+        "28K12": {
+            "JoistType": "K",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 249.55567706241482,
+            "MomentOfInertiaY": 0.00012816277558877487
+        },
+        "30K7": {
+            "JoistType": "K",
+            "Depth": 0.762,
+            "UnitWeight": 179.50496069401765,
+            "MomentOfInertiaY": 0.00015801089761112108
+        },
+        "30K8": {
+            "JoistType": "K",
+            "Depth": 0.762,
+            "UnitWeight": 192.63947001309214,
+            "MomentOfInertiaY": 0.00015801089761112108
+        },
+        "30K9": {
+            "JoistType": "K",
+            "Depth": 0.762,
+            "UnitWeight": 195.55830823737233,
+            "MomentOfInertiaY": 0.00015801089761112108
+        },
+        "30K10": {
+            "JoistType": "K",
+            "Depth": 0.762,
+            "UnitWeight": 218.90848865124104,
+            "MomentOfInertiaY": 0.00015801089761112108
+        },
+        "30K11": {
+            "JoistType": "K",
+            "Depth": 0.762,
+            "UnitWeight": 239.34000596762056,
+            "MomentOfInertiaY": 0.00015801089761112108
+        },
+        "30K12": {
+            "JoistType": "K",
+            "Depth": 0.762,
+            "UnitWeight": 256.8526850597198,
+            "MomentOfInertiaY": 0.00015801089761112108
+        },
+        "18LH02": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 4.531798730190863e-05
+        },
+        "18LH03": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 160.53289751513645,
+            "MomentOfInertiaY": 5.038552166230351e-05
+        },
+        "18LH04": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 175.12679092099285,
+            "MomentOfInertiaY": 5.834873642745503e-05
+        },
+        "18LH05": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 218.90848865124104,
+            "MomentOfInertiaY": 6.57328067870267e-05
+        },
+        "18LH06": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 218.90848865124104,
+            "MomentOfInertiaY": 7.615740608746382e-05
+        },
+        "18LH07": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 248.09634551367014,
+            "MomentOfInertiaY": 8.006661001355646e-05
+        },
+        "18LH08": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 277.2840272493084,
+            "MomentOfInertiaY": 8.35414764470355e-05
+        },
+        "18LH09": {
+            "JoistType": "LH",
+            "Depth": 0.4572,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 8.918811358986766e-05
+        },
+        "20LH02": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 4.654495429829231e-05
+        },
+        "20LH03": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 160.53289751513645,
+            "MomentOfInertiaY": 5.126031524948703e-05
+        },
+        "20LH04": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 175.12679092099285,
+            "MomentOfInertiaY": 6.510209130781503e-05
+        },
+        "20LH05": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 204.31464778342195,
+            "MomentOfInertiaY": 6.981745225900974e-05
+        },
+        "20LH06": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 218.90848865124104,
+            "MomentOfInertiaY": 9.217727957281406e-05
+        },
+        "20LH07": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 248.09634551367014,
+            "MomentOfInertiaY": 9.841371664572141e-05
+        },
+        "20LH08": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 277.2840272493084,
+            "MomentOfInertiaY": 0.00010176009243811774
+        },
+        "20LH09": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.00011088654916839358
+        },
+        "20LH10": {
+            "JoistType": "LH",
+            "Depth": 0.508,
+            "UnitWeight": 335.6597409741666,
+            "MomentOfInertiaY": 0.00011955669138678415
+        },
+        "24LH03": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 160.53289751513645,
+            "MomentOfInertiaY": 7.926973494924526e-05
+        },
+        "24LH04": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 175.12679092099285,
+            "MomentOfInertiaY": 9.714758227218878e-05
+        },
+        "24LH05": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 189.72063178881197,
+            "MomentOfInertiaY": 0.0001038939444645987
+        },
+        "24LH06": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 233.50232951906017,
+            "MomentOfInertiaY": 0.00013863769726856702
+        },
+        "24LH07": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 248.09634551367014,
+            "MomentOfInertiaY": 0.00015246773560069309
+        },
+        "24LH08": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 262.6901863814893,
+            "MomentOfInertiaY": 0.00016191265099469546
+        },
+        "24LH09": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.00018957272765894766
+        },
+        "24LH10": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 335.6597409741666,
+            "MomentOfInertiaY": 0.0002010415267367875
+        },
+        "24LH11": {
+            "JoistType": "LH",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.00021048644213078987
+        },
+        "28LH05": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 189.72063178881197,
+            "MomentOfInertiaY": 0.00013430160639237902
+        },
+        "28LH06": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 233.50232951906017,
+            "MomentOfInertiaY": 0.00017722909337078172
+        },
+        "28LH07": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 248.09634551367014,
+            "MomentOfInertiaY": 0.00019991932519022732
+        },
+        "28LH08": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 262.6901863814893,
+            "MomentOfInertiaY": 0.00021341080088077034
+        },
+        "28LH09": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.00026247075032196553
+        },
+        "28LH10": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 335.6597409741666,
+            "MomentOfInertiaY": 0.0002857742159007476
+        },
+        "28LH11": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.0003053982373003683
+        },
+        "28LH12": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 394.0352795722339,
+            "MomentOfInertiaY": 0.00033422093158260634
+        },
+        "28LH13": {
+            "JoistType": "LH",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 437.8169773024821,
+            "MomentOfInertiaY": 0.0003489389164149649
+        },
+        "32LH06": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 204.31464778342195,
+            "MomentOfInertiaY": 0.00021281771272243293
+        },
+        "32LH07": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 233.50232951906017,
+            "MomentOfInertiaY": 0.00023702448374105214
+        },
+        "32LH08": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 248.09634551367014,
+            "MomentOfInertiaY": 0.00025719676517447305
+        },
+        "32LH09": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.00032174809905993415
+        },
+        "32LH10": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.0003550324196163212
+        },
+        "32LH11": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 350.2535818419857,
+            "MomentOfInertiaY": 0.00038831669854956567
+        },
+        "32LH12": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 394.0352795722339,
+            "MomentOfInertiaY": 0.0004538766444255407
+        },
+        "32LH13": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 437.8169773024821,
+            "MomentOfInertiaY": 0.0005043072439512368
+        },
+        "32LH14": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 481.59867503273034,
+            "MomentOfInertiaY": 0.0005194364238089455
+        },
+        "32LH15": {
+            "JoistType": "LH",
+            "Depth": 0.8128,
+            "UnitWeight": 510.78653189515944,
+            "MomentOfInertiaY": 0.0005365830773865375
+        },
+        "36LH07": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 233.50232951906017,
+            "MomentOfInertiaY": 0.00026687647671565646
+        },
+        "36LH08": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 262.6901863814893,
+            "MomentOfInertiaY": 0.0002925086738743854
+        },
+        "36LH09": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.0003724208620290442
+        },
+        "36LH10": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.0004116230361251844
+        },
+        "36LH11": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 335.6597409741666,
+            "MomentOfInertiaY": 0.0004478096551659951
+        },
+        "36LH12": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.0005337531199238831
+        },
+        "36LH13": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 437.8169773024821,
+            "MomentOfInertiaY": 0.0006257273618072895
+        },
+        "36LH14": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 525.3803727629786,
+            "MomentOfInertiaY": 0.0006875460531374014
+        },
+        "36LH15": {
+            "JoistType": "LH",
+            "Depth": 0.9144,
+            "UnitWeight": 525.3803727629786,
+            "MomentOfInertiaY": 0.0007237327970476398
+        },
+        "40LH08": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 233.50232951906017,
+            "MomentOfInertiaY": 0.000329278308273034
+        },
+        "40LH09": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.00043025717594844307
+        },
+        "40LH10": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.00047416085048930545
+        },
+        "40LH11": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 321.0657249795566,
+            "MomentOfInertiaY": 0.0005136741159529391
+        },
+        "40LH12": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.0006256287149594222
+        },
+        "40LH13": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 437.8169773024821,
+            "MomentOfInertiaY": 0.0007331929048886766
+        },
+        "40LH14": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 510.78653189515944,
+            "MomentOfInertiaY": 0.000840757094817931
+        },
+        "40LH15": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 525.3803727629786,
+            "MomentOfInertiaY": 0.000937345678285539
+        },
+        "40LH16": {
+            "JoistType": "LH",
+            "Depth": 1.016,
+            "UnitWeight": 612.943768223475,
+            "MomentOfInertiaY": 0.0010295434364444925
+        },
+        "44LH09": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 277.2840272493084,
+            "MomentOfInertiaY": 0.00048423531591452795
+        },
+        "44LH10": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.0005332715401644639
+        },
+        "44LH11": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 321.0657249795566,
+            "MomentOfInertiaY": 0.0005761787566724399
+        },
+        "44LH12": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.0007110289977069022
+        },
+        "44LH13": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 437.8169773024821,
+            "MomentOfInertiaY": 0.0008428145267546718
+        },
+        "44LH14": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 452.41081817030124,
+            "MomentOfInertiaY": 0.0009654055036109375
+        },
+        "44LH15": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 525.3803727629786,
+            "MomentOfInertiaY": 0.0011217095610151007
+        },
+        "44LH16": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 612.943768223475,
+            "MomentOfInertiaY": 0.0012902724663660348
+        },
+        "44LH17": {
+            "JoistType": "LH",
+            "Depth": 1.1176,
+            "UnitWeight": 685.9133228161522,
+            "MomentOfInertiaY": 0.0013791511951372541
+        },
+        "48LH10": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.0005729758558524478
+        },
+        "48LH11": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 321.0657249795566,
+            "MomentOfInertiaY": 0.0006176761973419086
+        },
+        "48LH12": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.0007761588100276622
+        },
+        "48LH13": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 423.223136434663,
+            "MomentOfInertiaY": 0.0009265145041285758
+        },
+        "48LH14": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 467.0048341649112,
+            "MomentOfInertiaY": 0.0010931244516305951
+        },
+        "48LH15": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 525.3803727629786,
+            "MomentOfInertiaY": 0.0012516070643163485
+        },
+        "48LH16": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 612.943768223475,
+            "MomentOfInertiaY": 0.0014425990162671646
+        },
+        "48LH17": {
+            "JoistType": "LH",
+            "Depth": 1.2191999999999998,
+            "UnitWeight": 685.9133228161522,
+            "MomentOfInertiaY": 0.001613273047408742
+        },
+        "52DLH10": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 364.8474227098048,
+            "MomentOfInertiaY": 0.0009142535750246767
+        },
+        "52DLH11": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 379.4414387044148,
+            "MomentOfInertiaY": 0.0009997974576139886
+        },
+        "52DLH12": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 423.223136434663,
+            "MomentOfInertiaY": 0.0010906882490965583
+        },
+        "52DLH13": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 496.19251590054944,
+            "MomentOfInertiaY": 0.0013205882660181853
+        },
+        "52DLH14": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 569.1620704932268,
+            "MomentOfInertiaY": 0.0014756373856741646
+        },
+        "52DLH15": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 612.943768223475,
+            "MomentOfInertiaY": 0.0016627650450697102
+        },
+        "52DLH16": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 656.7254659537232,
+            "MomentOfInertiaY": 0.0018498931206966814
+        },
+        "52DLH17": {
+            "JoistType": "DLH",
+            "Depth": 1.3208,
+            "UnitWeight": 758.8827022820386,
+            "MomentOfInertiaY": 0.0021118720935893003
+        },
+        "56DLH11": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 379.4414387044148,
+            "MomentOfInertiaY": 0.0011617547702406509
+        },
+        "56DLH12": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 437.8169773024821,
+            "MomentOfInertiaY": 0.0012648694462302412
+        },
+        "56DLH13": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 496.19251590054944,
+            "MomentOfInertiaY": 0.001532966604847755
+        },
+        "56DLH14": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 569.1620704932268,
+            "MomentOfInertiaY": 0.0017116980439260973
+        },
+        "56DLH15": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 612.943768223475,
+            "MomentOfInertiaY": 0.0019316755198928459
+        },
+        "56DLH16": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 671.3193068215423,
+            "MomentOfInertiaY": 0.0021516525796281692
+        },
+        "56DLH17": {
+            "JoistType": "DLH",
+            "Depth": 1.4223999999999999,
+            "UnitWeight": 744.2888614142196,
+            "MomentOfInertiaY": 0.0024472472349150952
+        },
+        "60DLH12": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 423.223136434663,
+            "MomentOfInertiaY": 0.0014353940502900284
+        },
+        "60DLH13": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 510.78653189515944,
+            "MomentOfInertiaY": 0.0017344346855494974
+        },
+        "60DLH14": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 583.7559113610458,
+            "MomentOfInertiaY": 0.0018455068739337084
+        },
+        "60DLH15": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 627.537609091294,
+            "MomentOfInertiaY": 0.002178723439086342
+        },
+        "60DLH16": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 671.3193068215423,
+            "MomentOfInertiaY": 0.002435043745747929
+        },
+        "60DLH17": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 758.8827022820386,
+            "MomentOfInertiaY": 0.0027682603109005625
+        },
+        "60DLH18": {
+            "JoistType": "DLH",
+            "Depth": 1.524,
+            "UnitWeight": 861.0401137371452,
+            "MomentOfInertiaY": 0.0031271088234730697
+        },
+        "64DLH12": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 452.41081817030124,
+            "MomentOfInertiaY": 0.001622758961598166
+        },
+        "64DLH13": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 496.19251590054944,
+            "MomentOfInertiaY": 0.001972765886228078
+        },
+        "64DLH14": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 583.7559113610458,
+            "MomentOfInertiaY": 0.002110647540735185
+        },
+        "64DLH15": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 627.537609091294,
+            "MomentOfInertiaY": 0.0024818668675079497
+        },
+        "64DLH16": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 671.3193068215423,
+            "MomentOfInertiaY": 0.0027788421624335914
+        },
+        "64DLH17": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 758.8827022820386,
+            "MomentOfInertiaY": 0.0031606678983934953
+        },
+        "64DLH18": {
+            "JoistType": "DLH",
+            "Depth": 1.6256,
+            "UnitWeight": 861.0401137371452,
+            "MomentOfInertiaY": 0.0035743124456833913
+        },
+        "68DLH13": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 539.9742136307976,
+            "MomentOfInertiaY": 0.0022189297298735996
+        },
+        "68DLH14": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 583.7559113610458,
+            "MomentOfInertiaY": 0.002387620418272193
+        },
+        "68DLH15": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 583.7559113610458,
+            "MomentOfInertiaY": 0.0026730964876027835
+        },
+        "68DLH16": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 715.1010045517904,
+            "MomentOfInertiaY": 0.003140239676256473
+        },
+        "68DLH17": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 802.6644000122868,
+            "MomentOfInertiaY": 0.0035684539883680715
+        },
+        "68DLH18": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 890.2277954727832,
+            "MomentOfInertiaY": 0.004035597593253186
+        },
+        "68DLH19": {
+            "JoistType": "DLH",
+            "Depth": 1.7271999999999998,
+            "UnitWeight": 977.7911909332797,
+            "MomentOfInertiaY": 0.004580597702528207
+        },
+        "72DLH14": {
+            "JoistType": "DLH",
+            "Depth": 1.8288,
+            "UnitWeight": 598.3499273556558,
+            "MomentOfInertiaY": 0.002648429364627451
+        },
+        "72DLH15": {
+            "JoistType": "DLH",
+            "Depth": 1.8288,
+            "UnitWeight": 642.131625085904,
+            "MomentOfInertiaY": 0.0029581875428646934
+        },
+        "72DLH16": {
+            "JoistType": "DLH",
+            "Depth": 1.8288,
+            "UnitWeight": 729.6950205464005,
+            "MomentOfInertiaY": 0.003484775655028299
+        },
+        "72DLH17": {
+            "JoistType": "DLH",
+            "Depth": 1.8288,
+            "UnitWeight": 817.2584160068969,
+            "MomentOfInertiaY": 0.003964900685615026
+        },
+        "72DLH18": {
+            "JoistType": "DLH",
+            "Depth": 1.8288,
+            "UnitWeight": 861.0401137371452,
+            "MomentOfInertiaY": 0.004476002907589183
+        },
+        "72DLH19": {
+            "JoistType": "DLH",
+            "Depth": 1.8288,
+            "UnitWeight": 1021.5728886635279,
+            "MomentOfInertiaY": 0.005080029627791391
+        }
+    },
+    "JOIST_ENVELOPE": {
+        "10KCS1": {
+            "JoistType": "KCS",
+            "Depth": 0.254,
+            "UnitWeight": 87.56339546049642,
+            "MomentOfInertiaY": 1.2070711342399997e-05
+        },
+        "10KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.254,
+            "UnitWeight": 109.45424432562052,
+            "MomentOfInertiaY": 1.5400562747199996e-05
+        },
+        "10KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.254,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 1.9562877003199995e-05
+        },
+        "12KCS1": {
+            "JoistType": "KCS",
+            "Depth": 0.30479999999999996,
+            "UnitWeight": 87.56339546049642,
+            "MomentOfInertiaY": 1.7897951300799997e-05
+        },
+        "12KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.30479999999999996,
+            "UnitWeight": 116.75119978488826,
+            "MomentOfInertiaY": 2.2892728407999994e-05
+        },
+        "12KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.30479999999999996,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 2.9552431217599993e-05
+        },
+        "14KCS1": {
+            "JoistType": "KCS",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 94.86035091976414,
+            "MomentOfInertiaY": 2.4557654110399995e-05
+        },
+        "14KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 116.75119978488826,
+            "MomentOfInertiaY": 3.2049819771199996e-05
+        },
+        "14KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.35559999999999997,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 4.120691113439999e-05
+        },
+        "16KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.4064,
+            "UnitWeight": 124.04813773147691,
+            "MomentOfInertiaY": 4.120691113439999e-05
+        },
+        "16KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.4064,
+            "UnitWeight": 153.23594205586875,
+            "MomentOfInertiaY": 5.327762247679999e-05
+        },
+        "16KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.4064,
+            "UnitWeight": 211.61148065393607,
+            "MomentOfInertiaY": 7.991643371519998e-05
+        },
+        "16KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.4064,
+            "UnitWeight": 262.6901863814893,
+            "MomentOfInertiaY": 0.00010197669927199998
+        },
+        "18KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.4572,
+            "UnitWeight": 131.34509319074465,
+            "MomentOfInertiaY": 5.286139105119999e-05
+        },
+        "18KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.4572,
+            "UnitWeight": 160.53289751513645,
+            "MomentOfInertiaY": 6.826195379839999e-05
+        },
+        "18KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.4572,
+            "UnitWeight": 218.90848865124104,
+            "MomentOfInertiaY": 0.00010280916212319998
+        },
+        "18KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.4572,
+            "UnitWeight": 269.98719437879424,
+            "MomentOfInertiaY": 0.00013152913048959997
+        },
+        "20KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.508,
+            "UnitWeight": 138.64204865001236,
+            "MomentOfInertiaY": 6.618079667039999e-05
+        },
+        "20KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.508,
+            "UnitWeight": 167.8298354617251,
+            "MomentOfInertiaY": 8.532744224799999e-05
+        },
+        "20KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.508,
+            "UnitWeight": 240.79933751636517,
+            "MomentOfInertiaY": 0.00012819927908479999
+        },
+        "20KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.508,
+            "UnitWeight": 291.87804324391834,
+            "MomentOfInertiaY": 0.00016482764453759995
+        },
+        "22KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.5588,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 8.074889656639999e-05
+        },
+        "22KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.5588,
+            "UnitWeight": 182.42379891829785,
+            "MomentOfInertiaY": 0.00010447408782559997
+        },
+        "22KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.5588,
+            "UnitWeight": 240.79933751636517,
+            "MomentOfInertiaY": 0.00015691924745119996
+        },
+        "22KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.5588,
+            "UnitWeight": 299.1748761144325,
+            "MomentOfInertiaY": 0.00020187224141599995
+        },
+        "24KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 9.656569073919998e-05
+        },
+        "24KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 182.42379891829785,
+            "MomentOfInertiaY": 0.00012528565910559998
+        },
+        "24KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 240.79933751636517,
+            "MomentOfInertiaY": 0.00018855283579679997
+        },
+        "24KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.6095999999999999,
+            "UnitWeight": 299.1748761144325,
+            "MomentOfInertiaY": 0.00024307915255039996
+        },
+        "26KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.6604,
+            "UnitWeight": 145.938986596601,
+            "MomentOfInertiaY": 0.00011404741061439997
+        },
+        "26KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.6604,
+            "UnitWeight": 182.42379891829785,
+            "MomentOfInertiaY": 0.00014776215608799996
+        },
+        "26KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.6604,
+            "UnitWeight": 240.79933751636517,
+            "MomentOfInertiaY": 0.00022310004412159996
+        },
+        "26KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.6604,
+            "UnitWeight": 299.1748761144325,
+            "MomentOfInertiaY": 0.0002876159150895999
+        },
+        "28KCS2": {
+            "JoistType": "KCS",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 153.23594205586875,
+            "MomentOfInertiaY": 0.00013319405619199997
+        },
+        "28KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 182.42379891829785,
+            "MomentOfInertiaY": 0.00017231981019839998
+        },
+        "28KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 240.79933751636517,
+            "MomentOfInertiaY": 0.00026056087242559993
+        },
+        "28KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.7111999999999999,
+            "UnitWeight": 299.1748761144325,
+            "MomentOfInertiaY": 0.0003363149918847999
+        },
+        "30KCS3": {
+            "JoistType": "KCS",
+            "Depth": 0.762,
+            "UnitWeight": 189.72063178881197,
+            "MomentOfInertiaY": 0.00019895862143679997
+        },
+        "30KCS4": {
+            "JoistType": "KCS",
+            "Depth": 0.762,
+            "UnitWeight": 240.79933751636517,
+            "MomentOfInertiaY": 0.00030051908928319993
+        },
+        "30KCS5": {
+            "JoistType": "KCS",
+            "Depth": 0.762,
+            "UnitWeight": 306.4718841117375,
+            "MomentOfInertiaY": 0.0003887601515103999
+        }
+    }
+}

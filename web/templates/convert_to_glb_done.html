@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conversion to GLB Complete</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .footer-logo {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5 text-center">
+      <h2 class="mb-4">Conversion to GLB Complete!</h2>
+      <p class="alert alert-success">
+        Your file has been processed successfully.
+      </p>
+
+      <!-- First Button Group -->
+      <div class="d-grid gap-2 col-6 mx-auto">
+        <a
+          href="{{ url_for('download_file', directory='web/output', filename=output_glb_filename) }}"
+          class="btn btn-success"
+          >Download New GLB File</a
+        >
+      </div>
+
+      <div class="my-4"></div>
+
+      <form method="POST" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-primary">View GLB</button>
+      </form>
+    </div>
+
+    <!-- Footer Logo -->
+    <img
+      src="{{ url_for('static', filename='logo.png') }}"
+      alt="Company Logo"
+      class="footer-logo"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

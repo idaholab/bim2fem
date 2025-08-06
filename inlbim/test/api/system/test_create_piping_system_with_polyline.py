@@ -1,0 +1,120 @@
+# Copyright 2024, Battelle Energy Alliance, LLC All Rights Reserved
+
+import os
+import sys
+
+
+# Insert parent directory of package to path
+sys.path.insert(
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")),
+)
+
+
+from inlbim import current_time
+import time
+import chime
+import inlbim.api.file
+import ifcopenshell
+import ifcopenshell.api.root
+import ifcopenshell.api.aggregate
+import inlbim.api.geometry
+import inlbim.api.material
+import inlbim.api.system
+import ifcopenshell.api.system
+
+
+def main() -> int:
+
+    start_time = time.time()  # Record the start time
+
+    print(f"{current_time()}: Running {os.path.basename(__file__)} ...")
+
+    # Add IFC File
+    ifc4_file = inlbim.api.file.create_ifc4_file(
+        model_view_definition="ReferenceView_V1.2",
+        precision=1e-4,
+    )
+
+    # Get Project
+    project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+    # Add Building
+    building = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcBuilding",
+        name="Building-01",
+    )
+    ifcopenshell.api.aggregate.assign_object(
+        file=ifc4_file,
+        products=[building],
+        relating_object=project,
+    )
+    inlbim.api.geometry.edit_object_placement(
+        product=building,
+        place_object_relative_to_parent=True,
+    )
+
+    # Get Material
+    steel_material = inlbim.api.material.add_material_from_standard_library(
+        ifc4_file=ifc4_file,
+        region="Europe",
+        material_name="S355",
+        check_for_duplicate=True,
+    )
+    assert isinstance(steel_material, ifcopenshell.entity_instance)
+
+    # Add DistributionSystem
+    distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+    distribution_system.Name = "WS"
+    distribution_system.LongName = "Water Supply for Building"
+    distribution_system.PredefinedType = "WATERSUPPLY"
+
+    # Set pipe nominal diameter and thickness
+    nominal_diameter = 2.0
+    thickness = 0.1
+
+    # Polyline
+    polyline = [
+        (10.0, 5.0, 0.0),
+        (10.0, 17.0, 0.0),
+        (21.0, 17.0, 0.0),
+        (28.0, 24.0, 0.0),
+    ]
+
+    # Create Element
+    piping_elements = inlbim.api.system.create_piping_system_with_polyline(
+        polyline=polyline,
+        nominal_diameter=nominal_diameter,
+        thickness=thickness,
+        material=steel_material,
+        spatial_element=building,
+        distribution_system=distribution_system,
+        place_objects_relative_to_parent=True,
+        add_shape_representation_to_ports=False,
+    )
+    print(f"len(piping_elements)={len(piping_elements)}")
+
+    # Write IFC file
+    ifc_filename = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "test_create_piping_system_with_polyline.ifc",
+        )
+    )
+    inlbim.api.file.write_to_ifc_spf(
+        ifc4_file=ifc4_file,
+        file_path=ifc_filename,
+        add_annotations=True,
+    )
+
+    print(f"{current_time()}: Total elapsed was {time.time() - start_time:.4f} s\n")
+
+    return 0
+
+
+if __name__ == "__main__":
+
+    main()
+
+    chime.success(sync=True)

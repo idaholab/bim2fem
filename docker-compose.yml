@@ -1,0 +1,38 @@
+# This defines the services (or containers) that make up your application. In this 
+# case, there is a single service named web.
+# Note: the equivalent Docker CLI commands are the following:
+# docker build -t example_python_app-web .
+# docker run -it -v .:/app -p 8000:8000 example_python_app-web
+services:
+
+  # This is the name of the service. You can refer to this service with this name 
+  # in Docker Compose commands.
+
+  inlbim-web-service:
+
+    # This specifies that Docker should build the image for this service using the 
+    # Dockerfile located in the current directory (denoted by .).
+    build: .
+
+    # Interactive container
+    stdin_open: true  # docker run -i
+    tty: true         # docker run -t    
+    
+    # This section mounts a volume. Here, the current directory on your host machine 
+    # (.) is mapped to the /app directory inside the Docker container. This means any 
+    # changes you make in your local directory will be reflected inside the container, 
+    # and vice versa.
+    volumes:
+      - .:/ifc_deeplynx_adapter
+      
+    # This maps port 8000 on the host machine to port 8000 inside the Docker container.
+    # This is useful if you have a web application or API running inside the container
+    # that you want to access from your host machine. You can change the port numbers 
+    # as needed.
+    ports:
+      - "8000:8000"
+
+    # develop:
+    #   watch:
+    #     - action: rebuild
+    #       path: .

@@ -1,0 +1,9 @@
+chime
+Flask
+Flask_Cors
+ifcopenshell==0.8.2
+matplotlib
+numpy
+ortools
+pygltflib
+xmltodict

@@ -1,0 +1,438 @@
+{
+    "ASTM A36": {
+        "steel": {
+            "A36": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 248211261.7025234,
+                "UltimateStress": 399895921.63184327
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A53": {
+        "steel": {
+            "A53GrB": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 241316504.43300888,
+                "UltimateStress": 413685436.17087233
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A500": {
+        "steel": {
+            "A500GrB42": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 289579805.31961066,
+                "UltimateStress": 399895921.63184327
+            },
+            "A500GrB46": {
+                "IsDefault": true,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 317158834.3976688,
+                "UltimateStress": 399895921.63184327
+            },
+            "A500GrC": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 427474950.70990145
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A572": {
+        "steel": {
+            "A572Gr50": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 448159222.5184451
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A913": {
+        "steel": {
+            "A913Gr50": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 413685436.17087233
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A992": {
+        "steel": {
+            "A992Fy50": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 448159222.5184451
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A709": {
+        "steel": {
+            "A709Gr30": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 248211261.7025234,
+                "UltimateStress": 399895921.63184327
+            },
+            "A709Gr50": {
+                "IsDefault": true,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 448159222.5184451
+            },
+            "A709Gr50S": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 448159222.5184451
+            },
+            "A709Gr50W": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 482633008.86601776
+            },
+            "A709GrHPS50W": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 482633008.86601776
+            },
+            "A709GrHPS70W": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 482633008.86601776,
+                "UltimateStress": 586054367.9087359
+            },
+            "A709GrHPS100W": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 620528154.2563086,
+                "UltimateStress": 689475726.9514539
+            }
+        },
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "Customary": {
+        "steel": {},
+        "concrete": {
+            "3000Psi": {
+                "IsDefault": false,
+                "MassDensity": 2402.769497973869,
+                "YoungModulus": 21525560437.909603,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 20684271.80854362
+            },
+            "4000Psi": {
+                "IsDefault": true,
+                "MassDensity": 2402.769497973869,
+                "YoungModulus": 24855575824.94947,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 27579029.078058157
+            },
+            "5000Psi": {
+                "IsDefault": false,
+                "MassDensity": 2402.769497973869,
+                "YoungModulus": 27789379159.166595,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 34473786.3475727
+            },
+            "6000Psi": {
+                "IsDefault": false,
+                "MassDensity": 2402.769497973869,
+                "YoungModulus": 30441739191.117863,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 41368543.61708724
+            },
+            "3000PsiLW": {
+                "IsDefault": false,
+                "MassDensity": 1762.030965162384,
+                "YoungModulus": 14377473238.895653,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 20684271.80854362
+            },
+            "4000PsiLW": {
+                "IsDefault": false,
+                "MassDensity": 1762.030965162384,
+                "YoungModulus": 16601676428.643066,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 27579029.078058157
+            },
+            "5000PsiLW": {
+                "IsDefault": false,
+                "MassDensity": 1762.030965162384,
+                "YoungModulus": 18561238839.590427,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 34473786.3475727
+            },
+            "6000PsiLW": {
+                "IsDefault": false,
+                "MassDensity": 1762.030965162384,
+                "YoungModulus": 20332817762.011658,
+                "PoissonRatio": 0.2,
+                "ThermalExpansionCoefficient": 9.901742706716382e-06,
+                "CompressiveStrength": 41368543.61708724
+            }
+        },
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM": {
+        "steel": {},
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {
+            "6061T6": {
+                "IsDefault": true,
+                "MassDensity": 2712.6306522936925,
+                "YoungModulus": 69637048422.09685,
+                "PoissonRatio": 0.33,
+                "ThermalExpansionCoefficient": 2.3589888881419093e-05
+            },
+            "6063T6": {
+                "IsDefault": false,
+                "MassDensity": 2712.6306522936925,
+                "YoungModulus": 69637048422.09685,
+                "PoissonRatio": 0.33,
+                "ThermalExpansionCoefficient": 2.3589888881419093e-05
+            },
+            "5052H34": {
+                "IsDefault": false,
+                "MassDensity": 2712.6306522936925,
+                "YoungModulus": 70326524149.0483,
+                "PoissonRatio": 0.33,
+                "ThermalExpansionCoefficient": 2.3589888881419093e-05
+            }
+        },
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A653": {
+        "steel": {},
+        "concrete": {},
+        "coldformed": {
+            "A653SQGr33": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 203395339450.6789,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 227526989.8939798,
+                "UltimateStress": 310264077.1281543
+            },
+            "A653SQGr50": {
+                "IsDefault": true,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 203395339450.6789,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 344737863.47572696,
+                "UltimateStress": 448159222.5184451
+            }
+        },
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {}
+    },
+    "ASTM A615": {
+        "steel": {},
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {
+            "A615Gr40": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 275790290.7805816,
+                "UltimateStress": 413685436.17087233
+            },
+            "A615Gr60": {
+                "IsDefault": true,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 413685436.17087233,
+                "UltimateStress": 620528154.2563086
+            },
+            "A615Gr75": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 517106795.21359044,
+                "UltimateStress": 689475726.9514539
+            }
+        },
+        "tendon": {}
+    },
+    "ASTM A706": {
+        "steel": {},
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {
+            "A706Gr60": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 199947960815.92163,
+                "PoissonRatio": 0.3,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 413685436.17087233,
+                "UltimateStress": 551580581.5611632
+            }
+        },
+        "tendon": {}
+    },
+    "ASTM A416": {
+        "steel": {},
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {
+            "A416Gr250": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 196500582181.16437,
+                "PoissonRatio": 0.0,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 1493404424.5768492,
+                "UltimateStress": 1723689317.378635
+            },
+            "A416Gr270": {
+                "IsDefault": true,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 196500582181.16437,
+                "PoissonRatio": 0.0,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 1689905006.7580135,
+                "UltimateStress": 1861584462.7689257
+            }
+        }
+    },
+    "ASTM A722": {
+        "steel": {},
+        "concrete": {},
+        "coldformed": {},
+        "aluminum": {},
+        "rebar": {},
+        "tendon": {
+            "A722Gr150TypI": {
+                "IsDefault": false,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 206842718085.4362,
+                "PoissonRatio": 0.0,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 879081551.8631037,
+                "UltimateStress": 1034213590.4271809
+            },
+            "A722Gr150TypII": {
+                "IsDefault": true,
+                "MassDensity": 7849.047026312773,
+                "YoungModulus": 206842718085.4362,
+                "PoissonRatio": 0.0,
+                "ThermalExpansionCoefficient": 1.170243410629411e-05,
+                "YieldStress": 827370872.3417447,
+                "UltimateStress": 1034213590.4271809
+            }
+        }
+    }
+}
