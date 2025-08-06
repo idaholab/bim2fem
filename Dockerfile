@@ -18,12 +18,12 @@ RUN pip install --upgrade pip
 
 # Set the working directory in the container. The Docker container will be an isolated 
 # machine with empty folders. Set the working directory of this empty isolated machine 
-# as /ifc_deeplynx_adapter. /ifc_deeplynx_adapter will not exist yet, so a new /ifc_deeplynx_adapter folder will be created in the 
+# as /app. /app will not exist yet, so a new /app folder will be created in the 
 # container.
-WORKDIR /ifc_deeplynx_adapter
+WORKDIR /app
 
 # Copy the requirements.txt file from the local directory to the remote working 
-# directory of the container (aka ./ifc_deeplynx_adapter) 
+# directory of the container (aka ./app) 
 COPY requirements.txt ./requirements.txt
 
 # Install any needed packages specified in requirements.txt. If you have a 

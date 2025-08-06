@@ -23,7 +23,7 @@ services:
     # changes you make in your local directory will be reflected inside the container, 
     # and vice versa.
     volumes:
-      - .:/ifc_deeplynx_adapter
+      - .:/app
       
     # This maps port 8000 on the host machine to port 8000 inside the Docker container.
     # This is useful if you have a web application or API running inside the container
