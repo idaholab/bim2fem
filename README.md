@@ -1,7 +1,8 @@
-# BIM2FEM
+# bim2fem
 Convert 3D architectural models of buildings to 3D finite element models for structural anaysis. 
 
 Specifically, this programs converts IFC SPF files from the architectural coordination domain (IFC4 ReferenceView/DesignTransferView) to the structural analysis domain (IFC4 StructuralAnalysisView). IFC is an open, internaional standardized schema for Building Information Modeling (BIM) and is the input and output of this program. 
+
 
 # Usage
 
@@ -9,14 +10,10 @@ Specifically, this programs converts IFC SPF files from the architectural coordi
 
 1. Install the latest version of [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/). Then, open Docker Desktop and leave it running in the background.
 
-<!-- 2. Clone the repository:
-    ```sh
-    git clone https://github.com/idaholab/bim2fem
-    ``` -->
 
 2. Clone the repository:
     ```sh
-    git clone https://github.inl.gov/Digital-Engineering/ifc_deeplynx_adapter
+    git clone https://github.com/idaholab/bim2fem
     ```
 
 3. Navigate to the repository:
@@ -34,6 +31,19 @@ Specifically, this programs converts IFC SPF files from the architectural coordi
 6. To terminate hit Ctrl-C or Ctrl-D
 
 ## Example Walkthrough: Convert Revit Steel Frame Construction Model to Finite Element Model
+
+
+<table>
+  <tr>
+    <td><strong>Before (Revit)</strong></td>
+    <td><strong>After (IFC4)</strong></td>
+  </tr>
+  <tr>
+    <td><img src="images/Revit_original.png" alt="Before Image" style="width: 300px;"/></td>
+    <td><img src="images/Revit_IFC4_StructuralAnalysisView.png" alt="After Image" style="width: 300px;"/></td>
+  </tr>
+</table>
+
 
 1. Launch the Web App.
 
@@ -82,3 +92,9 @@ Specifically, this programs converts IFC SPF files from the architectural coordi
 ## IFC Editors/Viewers
 
 * [Bonsai (formely BlenderBIM)](https://ifcopenshell.org/)
+
+## Contact
+
+If you have any questions, suggestions, or would like to contribute, please feel free to reach out to me at:
+
+**Email:** [nicholas.crowder@inl.gov](mailto:nicholas.crowder@inl.gov)
