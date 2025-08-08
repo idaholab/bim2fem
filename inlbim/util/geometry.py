@@ -923,7 +923,7 @@ def project_point_onto_triangle_plane(
     return proj, n, signed_distance
 
 
-def project_and_test_inside(
+def project_point_onto_triangle_plane_and_test_inside(
     p: np.ndarray,
     a: np.ndarray,
     b: np.ndarray,

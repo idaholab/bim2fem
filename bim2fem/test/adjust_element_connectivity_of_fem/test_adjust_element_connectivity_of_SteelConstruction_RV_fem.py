@@ -45,7 +45,7 @@ def main() -> int:
     snapped_ifc4sav__file = adjust_element_connectivity_of_ifc4_sav_file(
         ifc4_sav_file=ifc4_sav_file,
         execute_snap_frame_members=True,
-        execute_snap_floor_beam_systems=False,
+        execute_snap_floor_beam_systems=True,
         execute_snap_walls_to_slabs=False,
         execute_snap_beams_to_walls=False,
     )

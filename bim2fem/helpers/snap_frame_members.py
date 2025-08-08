@@ -8,6 +8,7 @@ import inlbim.api.structural
 import ifcopenshell.util.element
 import numpy as np
 import inlbim.util.file
+import inlbim.util.profile
 
 
 def snap_frame_members(
@@ -253,87 +254,93 @@ def get_allowable_snapping_distance_between_structural_curve_members(
         assert isinstance(material_profile_set, ifcopenshell.entity_instance)
         profile_def = material_profile_set.MaterialProfiles[0].Profile
 
-        # Default value
-        largest_dimension = 0
+        # # Default value
+        # largest_dimension = 0
 
-        # IfcRectangleProfileDef
-        if profile_def.is_a() == "IfcRectangleProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.XDim,
-                    profile_def.YDim,
-                ]
-            )
+        # # IfcRectangleProfileDef
+        # if profile_def.is_a() == "IfcRectangleProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.XDim,
+        #             profile_def.YDim,
+        #         ]
+        #     )
 
-        # IfcRectangleHollowProfileDef
-        if profile_def.is_a() == "IfcRectangleHollowProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.XDim,
-                    profile_def.YDim,
-                    profile_def.WallThickness,
-                ]
-            )
+        # # IfcRectangleHollowProfileDef
+        # if profile_def.is_a() == "IfcRectangleHollowProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.XDim,
+        #             profile_def.YDim,
+        #             profile_def.WallThickness,
+        #         ]
+        #     )
 
-        # IfcCircleProfileDef
-        if profile_def.is_a() == "IfcCircleProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.Radius,
-                ]
-            )
+        # # IfcCircleProfileDef
+        # if profile_def.is_a() == "IfcCircleProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.Radius,
+        #         ]
+        #     )
 
-        # IfcCircleHollowProfileDef
-        if profile_def.is_a() == "IfcCircleHollowProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.Radius,
-                    profile_def.WallThickness,
-                ]
-            )
+        # # IfcCircleHollowProfileDef
+        # if profile_def.is_a() == "IfcCircleHollowProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.Radius,
+        #             profile_def.WallThickness,
+        #         ]
+        #     )
 
-        # IfcIShapeProfileDef
-        if profile_def.is_a() == "IfcIShapeProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.OverallWidth,
-                    profile_def.OverallDepth,
-                    profile_def.WebThickness,
-                    profile_def.FlangeThickness,
-                ]
-            )
+        # # IfcIShapeProfileDef
+        # if profile_def.is_a() == "IfcIShapeProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.OverallWidth,
+        #             profile_def.OverallDepth,
+        #             profile_def.WebThickness,
+        #             profile_def.FlangeThickness,
+        #         ]
+        #     )
 
-        # IfcLShapeProfileDef
-        if profile_def.is_a() == "IfcLShapeProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.Depth,
-                    profile_def.Width,
-                    profile_def.Thickness,
-                ]
-            )
+        # # IfcLShapeProfileDef
+        # if profile_def.is_a() == "IfcLShapeProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.Depth,
+        #             profile_def.Width,
+        #             profile_def.Thickness,
+        #         ]
+        #     )
 
-        # IfcUShapeProfileDef
-        if profile_def.is_a() == "IfcUShapeProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.Depth,
-                    profile_def.FlangeWidth,
-                    profile_def.WebThickness,
-                    profile_def.FlangeThickness,
-                ]
-            )
+        # # IfcUShapeProfileDef
+        # if profile_def.is_a() == "IfcUShapeProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.Depth,
+        #             profile_def.FlangeWidth,
+        #             profile_def.WebThickness,
+        #             profile_def.FlangeThickness,
+        #         ]
+        #     )
 
-        # IfcTShapeProfileDef
-        if profile_def.is_a() == "IfcTShapeProfileDef":
-            largest_dimension = max(
-                [
-                    profile_def.Depth,
-                    profile_def.FlangeWidth,
-                    profile_def.WebThickness,
-                    profile_def.FlangeThickness,
-                ]
+        # # IfcTShapeProfileDef
+        # if profile_def.is_a() == "IfcTShapeProfileDef":
+        #     largest_dimension = max(
+        #         [
+        #             profile_def.Depth,
+        #             profile_def.FlangeWidth,
+        #             profile_def.WebThickness,
+        #             profile_def.FlangeThickness,
+        #         ]
+        #     )
+
+        largest_dimension = (
+            inlbim.util.profile.get_large_dimension_of_parameterized_profile_def(
+                parameterized_profile_def=profile_def
             )
+        )
 
         # Append to list
         largest_dimensions.append(largest_dimension)

@@ -3,6 +3,8 @@
 import math
 from typing import Literal
 
+import ifcopenshell
+
 
 def round_to_sig_digits(value: float, digits: int) -> float:
     """Round to significant digits

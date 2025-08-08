@@ -201,3 +201,92 @@ def get_local_origin_and_x_axis_of_parameterized_profile_def(
         local_x_axis = pos.RefDirection.DirectionRatios
 
     return local_origin, local_x_axis
+
+
+def get_large_dimension_of_parameterized_profile_def(
+    parameterized_profile_def: ifcopenshell.entity_instance,
+) -> float:
+
+    # Default value
+    largest_dimension = 0
+
+    # IfcRectangleProfileDef
+    if parameterized_profile_def.is_a() == "IfcRectangleProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.XDim,
+                parameterized_profile_def.YDim,
+            ]
+        )
+
+    # IfcRectangleHollowProfileDef
+    if parameterized_profile_def.is_a() == "IfcRectangleHollowProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.XDim,
+                parameterized_profile_def.YDim,
+                parameterized_profile_def.WallThickness,
+            ]
+        )
+
+    # IfcCircleProfileDef
+    if parameterized_profile_def.is_a() == "IfcCircleProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.Radius,
+            ]
+        )
+
+    # IfcCircleHollowProfileDef
+    if parameterized_profile_def.is_a() == "IfcCircleHollowProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.Radius,
+                parameterized_profile_def.WallThickness,
+            ]
+        )
+
+    # IfcIShapeProfileDef
+    if parameterized_profile_def.is_a() == "IfcIShapeProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.OverallWidth,
+                parameterized_profile_def.OverallDepth,
+                parameterized_profile_def.WebThickness,
+                parameterized_profile_def.FlangeThickness,
+            ]
+        )
+
+    # IfcLShapeProfileDef
+    if parameterized_profile_def.is_a() == "IfcLShapeProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.Depth,
+                parameterized_profile_def.Width,
+                parameterized_profile_def.Thickness,
+            ]
+        )
+
+    # IfcUShapeProfileDef
+    if parameterized_profile_def.is_a() == "IfcUShapeProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.Depth,
+                parameterized_profile_def.FlangeWidth,
+                parameterized_profile_def.WebThickness,
+                parameterized_profile_def.FlangeThickness,
+            ]
+        )
+
+    # IfcTShapeProfileDef
+    if parameterized_profile_def.is_a() == "IfcTShapeProfileDef":
+        largest_dimension = max(
+            [
+                parameterized_profile_def.Depth,
+                parameterized_profile_def.FlangeWidth,
+                parameterized_profile_def.WebThickness,
+                parameterized_profile_def.FlangeThickness,
+            ]
+        )
+
+    return largest_dimension
