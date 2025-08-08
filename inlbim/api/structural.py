@@ -6,6 +6,7 @@ import ifcopenshell.api.root
 import ifcopenshell.api.material
 import ifcopenshell.api.structural
 import inlbim.api.representation
+import inlbim.util.geometry
 import inlbim.util.structural
 import inlbim.util.file
 import ifcopenshell.api.project
@@ -13,6 +14,8 @@ import inlbim.api.material
 import inlbim.api.product
 import math
 import numpy as np
+import inlbim.api.structural
+import ifcopenshell.util.element
 
 
 def add_structural_analysis_model(
@@ -347,135 +350,6 @@ def create_structural_point_connection(
     return structural_point_connection
 
 
-# def create_npt_structural_surface_member_old(
-#     material_layer_set: ifcopenshell.entity_instance,
-#     coordinates_of_points_of_outer_bound: list[tuple[float, float, float]],
-#     coordinates_of_points_of_inner_bounds: list[list[tuple[float, float, float]]] = [],
-#     name: str | None = None,
-#     predefined_type: str | None = "NOTDEFINED",
-# ) -> ifcopenshell.entity_instance:
-#     """Create npt IfcStructuralSurfaceMember"""
-
-#     # Get IFC4 File
-#     ifc4_file = material_layer_set.file
-
-#     # Create StructuralPointConnections for Outer Bound
-#     nodes_of_outer_bound = []
-#     for coordinates_of_point_of_outer_bound in coordinates_of_points_of_outer_bound:
-#         node_of_outer_bound = create_structural_point_connection(
-#             ifc4_file=ifc4_file,
-#             name=None,
-#             keypoint=coordinates_of_point_of_outer_bound,
-#         )
-#         nodes_of_outer_bound.append(node_of_outer_bound)
-
-#     # Add Nodes for Inner Bounds
-#     nodes_of_inner_bounds = []
-#     for coordinates_of_points_of_inner_bound in coordinates_of_points_of_inner_bounds:
-#         nodes_of_inner_bound = []
-#         for coordinates_of_point_of_inner_bound in coordinates_of_points_of_inner_bound:
-#             node_of_inner_bound = create_structural_point_connection(
-#                 ifc4_file=ifc4_file,
-#                 name=None,
-#                 keypoint=coordinates_of_point_of_inner_bound,
-#             )
-#             nodes_of_inner_bound.append(node_of_inner_bound)
-#         nodes_of_inner_bounds.append(nodes_of_inner_bound)
-
-#     # Initialize StructuralSurfaceMember
-#     structural_surface_member = ifcopenshell.api.root.create_entity(
-#         file=ifc4_file,
-#         ifc_class="IfcStructuralSurfaceMember",
-#         name=name,
-#         predefined_type=predefined_type,
-#     )
-
-#     # Establish the Name if not given
-#     if structural_surface_member.Name is None:
-#         structural_surface_member.Name = (
-#             f"StructuralSurfaceMember-{structural_surface_member.id()}"
-#         )
-
-#     # Create MaterialLayerSetUsage
-#     material_layer_set_usage = ifc4_file.create_entity(type="IfcMaterialLayerSetUsage")
-#     material_layer_set_usage.ForLayerSet = material_layer_set
-#     material_layer_set_usage.LayerSetDirection = "AXIS3"
-#     material_layer_set_usage.DirectionSense = "POSITIVE"
-#     material_layer_set_usage.OffsetFromReferenceLine = 0.0
-
-#     # Assign MaterialLayerSetUsage to the IfcStructuralSurfaceMember
-#     ifcopenshell.api.material.assign_material(
-#         file=ifc4_file,
-#         products=[structural_surface_member],
-#         material=material_layer_set_usage,
-#     )
-
-#     # Get total thickness from MaterialLayerSet
-#     total_thickness = inlbim.util.material.sum_material_layer_thicknesses(
-#         material_layer_set=material_layer_set
-#     )
-#     structural_surface_member.Thickness = total_thickness
-
-#     # Get VertexPoints of Outer Bound
-#     vertex_points_of_outer_bound = []
-#     for node_of_outer_bound in nodes_of_outer_bound:
-#         vertex_point_of_outer_bound = (
-#             node_of_outer_bound.Representation.Representations[0].Items[0]
-#         )
-#         vertex_points_of_outer_bound.append(vertex_point_of_outer_bound)
-
-#     # Get VertexPoints of Inner Bounds
-#     vertex_points_of_inner_bounds = []
-#     for nodes_of_inner_bound in nodes_of_inner_bounds:
-#         vertex_points_of_inner_bound = []
-#         for node_of_inner_bound in nodes_of_inner_bound:
-#             vertex_point_of_inner_bound = (
-#                 node_of_inner_bound.Representation.Representations[0].Items[0]
-#             )
-#             vertex_points_of_inner_bound.append(vertex_point_of_inner_bound)
-#         vertex_points_of_inner_bounds.append(vertex_points_of_inner_bound)
-
-#     # Get the Reference Subcontext
-#     subcontext = ifcopenshell.util.representation.get_context(
-#         ifc_file=ifc4_file,
-#         context="Model",
-#         subcontext="Reference",
-#     )
-#     assert isinstance(subcontext, ifcopenshell.entity_instance)
-
-#     # Create FaceSurface Representation
-#     face_surface_representation = inlbim.api.geometry.add_face_surface_representation(
-#         context=subcontext,
-#         vertex_points_of_outer_bound=vertex_points_of_outer_bound,
-#         vertex_points_of_inner_bounds=vertex_points_of_inner_bounds,
-#     )
-#     assert face_surface_representation
-
-#     # Assign FaceSurface Representation
-#     ifcopenshell.api.geometry.assign_representation(
-#         file=ifc4_file,
-#         product=structural_surface_member,
-#         representation=face_surface_representation,
-#     )
-
-#     # Assign StructuralPointConnections to StructuralCurveMember
-#     for node_of_outer_bound in nodes_of_outer_bound:
-#         ifcopenshell.api.structural.add_structural_member_connection(
-#             file=ifc4_file,
-#             relating_structural_member=structural_surface_member,
-#             related_structural_connection=node_of_outer_bound,
-#         )
-#     for nodes_of_inner_bound in nodes_of_inner_bounds:
-#         for node_of_inner_bound in nodes_of_inner_bound:
-#             ifcopenshell.api.structural.add_structural_member_connection(
-#                 file=ifc4_file,
-#                 relating_structural_member=structural_surface_member,
-#                 related_structural_connection=node_of_inner_bound,
-#             )
-
-#     return structural_surface_member
-
-
 def merge_all_coincident_structural_point_connections(
     ifc4sav_file: ifcopenshell.file,
 ):
@@ -658,3 +532,172 @@ def merge_two_structural_point_connections_together(
             ifc4sav_file.remove(inst=replaced_entity)
 
     return replacing_structural_point_connection
+
+
+def translate_structural_point_connection(
+    structural_point_connection: ifcopenshell.entity_instance,
+    translation: tuple[float, float, float],
+):
+
+    vertex_point = (
+        inlbim.util.structural.get_vertex_point_of_structural_point_connection(
+            structural_point_connection=structural_point_connection
+        )
+    )
+
+    old_coordinates = (
+        inlbim.util.structural.get_coordinates_of_structural_point_connection(
+            structural_point_connection=structural_point_connection
+        )
+    )
+
+    new_coordinates = (
+        old_coordinates[0] + translation[0],
+        old_coordinates[1] + translation[1],
+        old_coordinates[2] + translation[2],
+    )
+
+    old_cartesian_point = vertex_point.VertexGeometry
+
+    ifc4_sav_file = structural_point_connection.file
+
+    count_of_references_to_old_cartesian_point = ifc4_sav_file.get_total_inverses(
+        inst=old_cartesian_point
+    )
+
+    safe_to_edit_old_cartesian_point = count_of_references_to_old_cartesian_point == 1
+
+    if safe_to_edit_old_cartesian_point:
+        old_cartesian_point.Coordinates = new_coordinates
+
+    else:
+        new_cartesian_point = ifc4_sav_file.createIfcCartesianPoint(new_coordinates)
+        vertex_point.VertexGeometry = new_cartesian_point
+
+
+def divide_structural_curve_member(
+    structural_curve_member: ifcopenshell.entity_instance,
+    division_locations_as_proportions_of_length: list[float],
+) -> list[ifcopenshell.entity_instance]:
+
+    # Check number of divisions
+    if len(division_locations_as_proportions_of_length) == 0:
+        return [structural_curve_member]
+
+    # Validate the input list to ensure all division locations are between 0.0 and 1.0 (exclusive)
+    if all(0.0 < num < 1.0 for num in division_locations_as_proportions_of_length):
+        # Sort the list in ascending order
+        division_locations_as_proportions_of_length = sorted(
+            division_locations_as_proportions_of_length
+        )
+    else:
+        raise ValueError(
+            "All elements in the list must be between 0.0 and 1.0 (exclusive)"
+        )
+
+    # Get various parameters
+    original_start_point, original_end_point, original_orientation_point = (
+        inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+            linear_structural_curve_member=structural_curve_member
+        )
+    )
+    length_of_original_member = float(
+        np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
+    )
+    direction_vector = (
+        inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=original_start_point,
+            p2=original_end_point,
+        )
+    )
+    local_orientation_axis_in_global_coordinates = (
+        inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=original_start_point,
+            p2=original_orientation_point,
+        )
+    )
+
+    # Get assigned product
+    assigned_product = inlbim.util.structural.get_assigned_product_of_structural_item(
+        structural_item=structural_curve_member
+    )
+
+    # Get ProfileDef and Material
+    material_profile_set = ifcopenshell.util.element.get_material(
+        element=structural_curve_member,
+        should_skip_usage=True,
+    )
+    assert isinstance(material_profile_set, ifcopenshell.entity_instance)
+    profile_def = material_profile_set.MaterialProfiles[0].Profile
+    material = material_profile_set.MaterialProfiles[0].Material
+
+    structural_analysis_model = (
+        inlbim.util.structural.get_structural_analysis_model_of_structural_item(
+            structural_item=structural_curve_member
+        )
+    )
+    assert structural_analysis_model
+
+    new_end_points = []
+    for (
+        division_location_as_proportion_of_length
+    ) in division_locations_as_proportions_of_length + [1.0]:
+        new_end_point = tuple(
+            float(val)
+            for val in (
+                np.array(original_start_point)
+                + np.array(direction_vector)
+                * division_location_as_proportion_of_length
+                * length_of_original_member
+            ).tolist()
+        )
+        assert len(new_end_point) == 3
+        new_end_points.append(new_end_point)
+
+    new_structural_curve_members = []
+    new_start_point = original_start_point
+    for index, new_end_point in enumerate(new_end_points):
+        new_orientation_point = tuple(
+            float(val)
+            for val in (
+                np.array(new_start_point)
+                + np.array(local_orientation_axis_in_global_coordinates) * 1.0
+            ).tolist()
+        )
+        assert len(new_orientation_point) == 3
+
+        if index == 0:
+            translation = tuple(
+                float(val)
+                for val in (
+                    np.array(new_end_point) - np.array(original_end_point)
+                ).tolist()
+            )
+            assert len(translation) == 3
+            second_node_of_structural_curve_member = inlbim.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
+                linear_structural_curve_member=structural_curve_member
+            )[
+                1
+            ]
+            translate_structural_point_connection(
+                structural_point_connection=second_node_of_structural_curve_member,
+                translation=translation,
+            )
+            new_structural_curve_members.append(structural_curve_member)
+        else:
+            new_structural_curve_member = (
+                inlbim.api.structural.create_3pt_structural_curve_member(
+                    p1=new_start_point,
+                    p2=new_end_point,
+                    p3=new_orientation_point,
+                    profile_def=profile_def,
+                    material=material,
+                    structural_analysis_model=structural_analysis_model,
+                    corresponding_product=assigned_product,
+                )
+            )
+            new_structural_curve_members.append(new_structural_curve_member)
+
+        new_start_point = new_end_point
+
+    return new_structural_curve_members

@@ -712,3 +712,246 @@ class HorizontalCurve:
                 f"center_of_curvature={self.center_of_curvature})",
             ]
         )
+
+
+def calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
+    coordinates_of_start_of_line_1: tuple[float, float, float],
+    coordinates_of_end_of_line_1: tuple[float, float, float],
+    coordinates_of_start_of_line_2: tuple[float, float, float],
+    coordinates_of_end_of_line_2: tuple[float, float, float],
+    assume_line_1_is_finite: bool,
+    assume_line_2_is_finite: bool,
+) -> tuple[tuple[float, float, float], tuple[float, float, float]] | tuple[None, None]:
+
+    # Get coordinates of VertexPoints of Line 1
+    p_i = np.array(coordinates_of_start_of_line_1)
+    p_j = np.array(coordinates_of_end_of_line_1)
+
+    # Get coordinates of VertexPoints of Line 2
+    q_i = np.array(coordinates_of_start_of_line_2)
+    q_j = np.array(coordinates_of_end_of_line_2)
+
+    # Calculate unit vectors
+    p_hat = (p_j - p_i) * 1 / np.linalg.norm(p_j - p_i)
+    q_hat = (q_j - q_i) * 1 / np.linalg.norm(q_j - q_i)
+
+    # Calculate the denominator
+    denominator = np.dot(p_hat, q_hat) ** 2 - 1
+
+    # Determine whether the edges are parallel
+    edges_are_parallel = 0.0 == np.round(denominator, 4)
+
+    # If edges are parallel, then exit without solution
+    if edges_are_parallel:
+        return None, None
+
+    # Calculate the numerators
+    numerator_for_t_p = np.dot(p_hat, p_i - q_i) - (
+        np.dot(p_hat, q_hat) * np.dot(q_hat, p_i - q_i)
+    )
+    numerator_for_t_q = np.dot(-q_hat, p_i - q_i) + (
+        np.dot(p_hat, q_hat) * np.dot(p_hat, p_i - q_i)
+    )
+
+    # Get the constants t_p and t_q
+    t_p = numerator_for_t_p / denominator
+    t_q = numerator_for_t_q / denominator
+
+    # If line 1 is assumed to be finite, then adjust the constants
+    if assume_line_1_is_finite:
+
+        # t_p
+        line_1_length = np.linalg.norm(p_j - p_i)
+        if t_p < 0:
+            t_p = 0
+        if t_p > line_1_length:
+            t_p = line_1_length
+
+    # If line 2 is assumed to be finite, then adjust the constants
+    if assume_line_2_is_finite:
+
+        # t_q
+        line_2_length = np.linalg.norm(q_j - q_i)
+        if t_q < 0:
+            t_q = 0
+        if t_q > line_2_length:
+            t_q = line_2_length
+
+    # Calculate the coordiantes of the endpoints
+    r_i = p_i + t_p * p_hat
+    r_j = q_i + t_q * q_hat
+
+    # Convert to tuples
+    coordinates_of_connecting_line_start_point = tuple(r_i)
+    coordinates_of_connecting_line_end_point = tuple(r_j)
+
+    return (
+        coordinates_of_connecting_line_start_point,
+        coordinates_of_connecting_line_end_point,
+    )
+
+
+def calculate_coordinates_of_point_projected_onto_line(
+    point: tuple[float, float, float],
+    start_point_of_line: tuple[float, float, float],
+    end_point_of_line: tuple[float, float, float],
+    assume_line_is_finite: bool = False,
+) -> tuple[float, float, float]:
+
+    # Get vector of coordinates of VertexPoint
+    p = np.array(point)
+
+    # Get vector of coordinates of EdgeStart
+    q_i = np.array(start_point_of_line)
+
+    # Get vector of coordinates of EdgeEnd
+    q_j = np.array(end_point_of_line)
+
+    # Get unit vector of Edge
+    q_hat = (q_j - q_i) * 1 / np.linalg.norm(q_j - q_i)
+
+    # Get constant t
+    t = np.dot(p - q_i, q_hat)
+
+    # If the edge is assumed to be finite, then adjust the constant t
+    if assume_line_is_finite:
+        line_length = np.linalg.norm(q_j - q_i)
+        if t < 0:
+            t = 0
+        if t > line_length:
+            t = line_length
+
+    # Calculate vector of projected coordinates of vertex point
+    p_star = q_i + t * q_hat
+
+    # Convert to tuple
+    projected_point = tuple(float(val) for val in p_star.tolist())
+    assert len(projected_point) == 3
+
+    return projected_point
+
+
+def barycentric_coords(
+    p: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps=1e-12,
+) -> np.ndarray:
+    """
+    Return barycentric coordinates (u, v, w) of point p relative to triangle (a,b,c).
+    Assumes p is ON the plane of the triangle (project first if needed).
+    """
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    c = np.asarray(c, float)
+    p = np.asarray(p, float)
+
+    v0 = b - a
+    v1 = c - a
+    v2 = p - a
+
+    d00 = np.dot(v0, v0)
+    d01 = np.dot(v0, v1)
+    d11 = np.dot(v1, v1)
+    d20 = np.dot(v2, v0)
+    d21 = np.dot(v2, v1)
+
+    denom = d00 * d11 - d01 * d01
+    if abs(denom) < eps:
+        raise ValueError("Degenerate triangle: area ~ 0.")
+
+    v = (d11 * d20 - d01 * d21) / denom
+    w = (d00 * d21 - d01 * d20) / denom
+    u = 1.0 - v - w
+    return np.array([u, v, w])
+
+
+def project_point_onto_triangle_plane(
+    p: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps: float = 1e-12,
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    float,
+]:
+    """
+    Project a 3D point p onto the plane defined by triangle (a, b, c).
+
+    Parameters
+    ----------
+    p, a, b, c : array-like shape (3,)
+        3D coordinates (x, y, z). They can be lists/tuples/ndarrays.
+    eps : float
+        Tolerance to detect a degenerate triangle (near-zero area).
+
+    Returns
+    -------
+    proj : np.ndarray shape (3,)
+        The orthogonal projection of p onto the plane of triangle ABC.
+    n : np.ndarray shape (3,)
+        The unit normal vector of the plane (right-hand rule from A->B->C).
+    signed_distance : float
+        Signed distance from p to the plane along n. (proj = p - signed_distance * n)
+
+    Raises
+    ------
+    ValueError
+        If the triangle is degenerate (area ~ 0).
+    """
+
+    p = np.asarray(p, dtype=float)
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    c = np.asarray(c, dtype=float)
+
+    ab = b - a
+    ac = c - a
+    n = np.cross(ab, ac)
+    norm_n = np.linalg.norm(n)
+    if norm_n < eps:
+        raise ValueError(
+            "Degenerate triangle: vertices are collinear or too close together."
+        )
+
+    n /= norm_n
+    signed_distance = np.dot(p - a, n)
+    proj = p - signed_distance * n
+    return proj, n, signed_distance
+
+
+def project_and_test_inside(
+    p: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps: float = 1e-12,
+    tol: float = 1e-10,
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    float,
+    bool,
+    np.ndarray,
+]:
+    """
+    Project point p onto the plane of triangle (a,b,c), then test if the
+    projected point is inside the triangle.
+
+    Returns
+    -------
+    proj : (3,) np.ndarray       Orthogonal projection of p onto the plane.
+    n : (3,) np.ndarray          Unit normal of the plane (A->B->C orientation).
+    signed_distance : float      Signed distance from p to the plane along n.
+    inside : bool                True if proj lies inside (or on edge of) triangle.
+    bary : (3,) np.ndarray       Barycentric coordinates (u, v, w) of proj.
+    """
+    proj, n, signed_distance = project_point_onto_triangle_plane(p, a, b, c, eps=eps)
+    u, v, w = barycentric_coords(proj, a, b, c, eps=eps)
+
+    # Robust inside test with small tolerance to accept boundary points
+    inside = (u >= -tol) and (v >= -tol) and (w >= -tol)
+    return proj, n, signed_distance, inside, np.array([u, v, w])
