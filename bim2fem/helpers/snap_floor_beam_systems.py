@@ -90,7 +90,7 @@ def snap_floor_beam_systems(
     # Remove repeat nodes
     all_frame_member_nodes = list(set(all_frame_member_nodes))
 
-    # Get thicknesses for each
+    # Get thicknesses for each slab
     thicknesses_for_slabs = {}
     for slab in slabs:
         material_layer_set = ifcopenshell.util.element.get_material(

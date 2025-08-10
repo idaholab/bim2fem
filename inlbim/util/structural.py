@@ -181,23 +181,80 @@ def get_ordered_structural_point_connections_of_linear_structural_curve_member(
     assert topology_representation
 
     edge = topology_representation.Items[0]
-
     vertex_points = [edge.EdgeStart, edge.EdgeEnd]
 
-    ifc4_sav_file = linear_structural_curve_member.file
+    # ifc4_sav_file = linear_structural_curve_member.file
     structural_points_connections = []
     for vertex_point in vertex_points:
-        references = ifc4_sav_file.get_inverse(inst=vertex_point)
-        topology_representation = None
-        for reference in references:
-            if reference.is_a("IfcTopologyRepresentation"):
-                topology_representation = reference
-        assert isinstance(topology_representation, ifcopenshell.entity_instance)
-        product_definition_shape = topology_representation.OfProductRepresentation[0]
-        structural_point_connection = product_definition_shape.ShapeOfProduct[0]
+        # references = ifc4_sav_file.get_inverse(inst=vertex_point)
+        # topology_representation = None
+        # for reference in references:
+        #     if reference.is_a("IfcTopologyRepresentation"):
+        #         topology_representation = reference
+        # assert isinstance(topology_representation, ifcopenshell.entity_instance)
+        # product_definition_shape = topology_representation.OfProductRepresentation[0]
+        # structural_point_connection = product_definition_shape.ShapeOfProduct[0]
+        structural_point_connection = get_structural_point_connection_of_vertex_point(
+            vertex_point=vertex_point
+        )
         structural_points_connections.append(structural_point_connection)
 
     return structural_points_connections
+
+
+def get_ordered_structural_point_connections_of_triangular_structural_surface_member(
+    triangular_structural_surface_member: ifcopenshell.entity_instance,
+) -> list[ifcopenshell.entity_instance]:
+
+    topology_representation = ifcopenshell.util.representation.get_representation(
+        element=triangular_structural_surface_member,
+        context="Model",
+        subcontext="Reference",
+        target_view="MODEL_VIEW",
+    )
+    assert topology_representation
+
+    face_surface = topology_representation.Items[0]
+    face_outer_bound = face_surface.Bounds[0]
+    edge_list = face_outer_bound.Bound.EdgeList
+    vertex_points = []
+    for oriented_edge in edge_list:
+        vertex_point = oriented_edge.EdgeStart
+        vertex_points.append(vertex_point)
+
+    # ifc4_sav_file = triangular_structural_surface_member.file
+    structural_points_connections = []
+    for vertex_point in vertex_points:
+        # references = ifc4_sav_file.get_inverse(inst=vertex_point)
+        # topology_representation = None
+        # for reference in references:
+        #     if reference.is_a("IfcTopologyRepresentation"):
+        #         topology_representation = reference
+        # assert isinstance(topology_representation, ifcopenshell.entity_instance)
+        # product_definition_shape = topology_representation.OfProductRepresentation[0]
+        # structural_point_connection = product_definition_shape.ShapeOfProduct[0]
+        structural_point_connection = get_structural_point_connection_of_vertex_point(
+            vertex_point=vertex_point
+        )
+        structural_points_connections.append(structural_point_connection)
+
+    return structural_points_connections
+
+
+def get_structural_point_connection_of_vertex_point(
+    vertex_point: ifcopenshell.entity_instance,
+) -> ifcopenshell.entity_instance:
+    ifc4_sav_file = vertex_point.file
+    references = ifc4_sav_file.get_inverse(inst=vertex_point)
+    topology_representation = None
+    for reference in references:
+        if reference.is_a("IfcTopologyRepresentation"):
+            topology_representation = reference
+    assert isinstance(topology_representation, ifcopenshell.entity_instance)
+    product_definition_shape = topology_representation.OfProductRepresentation[0]
+    structural_point_connection = product_definition_shape.ShapeOfProduct[0]
+
+    return structural_point_connection
 
 
 def select_structural_point_connections(

@@ -46,6 +46,7 @@ def main() -> int:
         ifc4_sav_file=ifc4_sav_file,
         execute_snap_frame_members=True,
         execute_snap_floor_beam_systems=True,
+        execute_snap_walls_to_walls=True,
         execute_snap_walls_to_slabs=False,
         execute_snap_beams_to_walls=False,
     )
