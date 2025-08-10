@@ -1231,3 +1231,103 @@ def convert_3pt_ndarray_to_tuple_of_floats(
     assert len(result) == 3
 
     return result
+
+
+def _unit_normal(a, b, c, eps=1e-12):
+    """Unit normal of the plane through triangle (a,b,c)."""
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    c = np.asarray(c, float)
+    n = np.cross(b - a, c - a)
+    n_norm = np.linalg.norm(n)
+    if n_norm < eps:
+        raise ValueError(
+            "Degenerate triangle: vertices are collinear or too close together."
+        )
+    return n / n_norm
+
+
+def line_parallel_to_triangle_plane(
+    p0,
+    p1,
+    a,
+    b,
+    c,
+    ang_tol_deg: float = 1e-6,
+    dist_tol: float = 1e-9,
+    eps: float = 1e-12,
+):
+    """
+    Determine if a 3D line (p0->p1) is parallel to the plane of triangle (a,b,c).
+
+    Parameters
+    ----------
+    p0, p1 : array-like (3,)
+        Two distinct points defining the line.
+    a, b, c : array-like (3,)
+        Triangle vertices defining the plane.
+    ang_tol_deg : float
+        Angular tolerance (degrees) for the parallel test. 0 means exact.
+        The test uses |n·d_unit| <= sin(ang_tol_deg).
+    dist_tol : float
+        Distance tolerance to decide if the line lies in (is coplanar with) the plane.
+    eps : float
+        Degeneracy tolerance for zero-length vectors.
+
+    Returns
+    -------
+    is_parallel : bool
+        True if the line direction is parallel to the plane (within angular tolerance).
+    is_coplanar : bool
+        True if the line is parallel AND lies in the plane (point-to-plane distance <= dist_tol).
+        Will be False if not parallel.
+    angle_to_plane_deg : float
+        Angle between the line direction and the plane (0..90 degrees).
+        0° means parallel to plane; 90° means perpendicular to plane.
+
+    Raises
+    ------
+    ValueError
+        If the triangle is degenerate or p0==p1 (degenerate line).
+
+    # Example:
+    # Triangle in the XY plane
+    A, B, C = [0, 0, 0], [1, 0, 0], [0, 1, 0]
+
+    # Line parallel to the plane (direction along X+Y, z constant)
+    P0, P1 = [0, 0, 2], [1, 1, 2]
+
+    is_par, is_copl, ang = line_parallel_to_triangle_plane(
+        P0, P1, A, B, C, ang_tol_deg=1e-6, dist_tol=1e-9
+    )
+    print("Parallel? ", is_par)  # True
+    print("Coplanar? ", is_copl)  # False (z=2, plane is z=0)
+    print("Angle to plane (deg):", ang)
+
+
+    """
+    p0 = np.asarray(p0, float)
+    p1 = np.asarray(p1, float)
+    d = p1 - p0
+    d_norm = np.linalg.norm(d)
+    if d_norm < eps:
+        raise ValueError("Degenerate line: p0 and p1 are the same (or too close).")
+    d_unit = d / d_norm
+
+    n = _unit_normal(a, b, c, eps=eps)
+
+    # |n·d_unit| = 0 for perfectly parallel (direction lies in plane)
+    nd = float(abs(np.dot(n, d_unit)))
+    angle_to_plane_rad = np.arcsin(np.clip(nd, 0.0, 1.0))
+    angle_to_plane_deg = float(np.degrees(angle_to_plane_rad))
+
+    # Parallel if the angle to plane is within tolerance
+    is_parallel = angle_to_plane_deg <= ang_tol_deg
+
+    # Coplanar if parallel and point p0 is (nearly) on the plane
+    # Plane equation: n·x = c
+    c_plane = float(np.dot(n, np.asarray(a, float)))
+    dist = abs(np.dot(n, p0) - c_plane)  # signed distance magnitude
+    is_coplanar = is_parallel and (dist <= dist_tol)
+
+    return is_parallel, is_coplanar, angle_to_plane_deg

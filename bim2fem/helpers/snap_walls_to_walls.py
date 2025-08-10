@@ -8,7 +8,6 @@ import inlbim.api.structural
 import ifcopenshell.util.element
 import numpy as np
 import inlbim.util.material
-import inlbim.util.file
 from inlbim.util.geometry import convert_3pt_ndarray_to_tuple_of_floats
 
 
@@ -16,6 +15,9 @@ def snap_walls_to_perpendicular_walls(
     ifc4_sav_file: ifcopenshell.file,
     minimum_allowable_snapping_distance: float = 1.0,
 ) -> ifcopenshell.file:
+
+    # Print Statement
+    print("\nSnap structural walls to other nearby perpendicular walls")
 
     # Get walls
     walls = (
@@ -26,11 +28,11 @@ def snap_walls_to_perpendicular_walls(
     )
     print(f"\tlen(walls): {len(walls)}")
 
-    numeric_scale = inlbim.util.file.get_numeric_scale_of_project(
-        ifc4_file=ifc4_sav_file
-    )
+    # numeric_scale = inlbim.util.file.get_numeric_scale_of_project(
+    #     ifc4_file=ifc4_sav_file
+    # )
 
-    # Get thicknesses for each slab
+    # Get thicknesses
     thicknesses_for_walls = {}
     for wall in walls:
         material_layer_set = ifcopenshell.util.element.get_material(

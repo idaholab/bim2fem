@@ -15,6 +15,9 @@ def snap_floor_beam_systems(
     minimum_allowable_snapping_distance=1.0,
 ) -> ifcopenshell.file:
 
+    # Print Statement
+    print("\nSnap Floor Beam Systems")
+
     # Get Beams
     beams = (
         inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
