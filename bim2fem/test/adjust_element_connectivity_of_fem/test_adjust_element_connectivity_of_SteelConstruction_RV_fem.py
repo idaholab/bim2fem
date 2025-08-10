@@ -16,8 +16,9 @@ import time
 import chime
 import inlbim.api.file
 import ifcopenshell
-import bim2fem.recreate_fem_with_3d_body_shape_representation
-import bim2glb.convert_ifc_to_glb
+from bim2fem.adjust_element_connectivity_of_fem import (
+    adjust_element_connectivity_of_ifc4_sav_file,
+)
 
 
 def main() -> int:
@@ -40,24 +41,27 @@ def main() -> int:
     ifc4_sav_file = ifcopenshell.open(path=ifc_sav_filepath)
     assert isinstance(ifc4_sav_file, ifcopenshell.file)
 
-    # TODO
+    # Execute
+    snapped_ifc4sav__file = adjust_element_connectivity_of_ifc4_sav_file(
+        ifc4_sav_file=ifc4_sav_file,
+        execute_snap_frame_members=True,
+        execute_snap_floor_beam_systems=True,
+        execute_snap_walls_to_slabs=True,
+        execute_snap_walls_to_walls=True,
+        execute_snap_beams_to_walls=False,
+    )
 
-    # # Execute
-    # snapped_ifc4sav__file = bim2fem.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
-    #     ifc4_sav_file=ifc4_sav_file,
-    # )
-
-    # # Write to disk
-    # inlbim.api.file.write_to_ifc_spf(
-    #     ifc4_file=snapped_ifc4sav__file,
-    #     file_path=os.path.abspath(
-    #         os.path.join(
-    #             os.path.dirname(__file__),
-    #             "test_adjust_element_connectivity_of_SteelConstruction_RV_fem.ifc",
-    #         )
-    #     ),
-    #     add_annotations=True,
-    # )
+    # Write to disk
+    inlbim.api.file.write_to_ifc_spf(
+        ifc4_file=snapped_ifc4sav__file,
+        file_path=os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "test_adjust_element_connectivity_of_SteelConstruction_RV_fem.ifc",
+            )
+        ),
+        add_annotations=True,
+    )
 
     print(f"{current_time()}: Total elapsed was {time.time() - start_time:.4f} s\n")
 

@@ -712,3 +712,622 @@ class HorizontalCurve:
                 f"center_of_curvature={self.center_of_curvature})",
             ]
         )
+
+
+def calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
+    coordinates_of_start_of_line_1: tuple[float, float, float],
+    coordinates_of_end_of_line_1: tuple[float, float, float],
+    coordinates_of_start_of_line_2: tuple[float, float, float],
+    coordinates_of_end_of_line_2: tuple[float, float, float],
+    assume_line_1_is_finite: bool,
+    assume_line_2_is_finite: bool,
+) -> tuple[tuple[float, float, float], tuple[float, float, float]] | tuple[None, None]:
+
+    # Get coordinates of VertexPoints of Line 1
+    p_i = np.array(coordinates_of_start_of_line_1)
+    p_j = np.array(coordinates_of_end_of_line_1)
+
+    # Get coordinates of VertexPoints of Line 2
+    q_i = np.array(coordinates_of_start_of_line_2)
+    q_j = np.array(coordinates_of_end_of_line_2)
+
+    # Calculate unit vectors
+    p_hat = (p_j - p_i) * 1 / np.linalg.norm(p_j - p_i)
+    q_hat = (q_j - q_i) * 1 / np.linalg.norm(q_j - q_i)
+
+    # Calculate the denominator
+    denominator = np.dot(p_hat, q_hat) ** 2 - 1
+
+    # Determine whether the edges are parallel
+    edges_are_parallel = 0.0 == np.round(denominator, 4)
+
+    # If edges are parallel, then exit without solution
+    if edges_are_parallel:
+        return None, None
+
+    # Calculate the numerators
+    numerator_for_t_p = np.dot(p_hat, p_i - q_i) - (
+        np.dot(p_hat, q_hat) * np.dot(q_hat, p_i - q_i)
+    )
+    numerator_for_t_q = np.dot(-q_hat, p_i - q_i) + (
+        np.dot(p_hat, q_hat) * np.dot(p_hat, p_i - q_i)
+    )
+
+    # Get the constants t_p and t_q
+    t_p = numerator_for_t_p / denominator
+    t_q = numerator_for_t_q / denominator
+
+    # If line 1 is assumed to be finite, then adjust the constants
+    if assume_line_1_is_finite:
+
+        # t_p
+        line_1_length = np.linalg.norm(p_j - p_i)
+        if t_p < 0:
+            t_p = 0
+        if t_p > line_1_length:
+            t_p = line_1_length
+
+    # If line 2 is assumed to be finite, then adjust the constants
+    if assume_line_2_is_finite:
+
+        # t_q
+        line_2_length = np.linalg.norm(q_j - q_i)
+        if t_q < 0:
+            t_q = 0
+        if t_q > line_2_length:
+            t_q = line_2_length
+
+    # Calculate the coordiantes of the endpoints
+    r_i = p_i + t_p * p_hat
+    r_j = q_i + t_q * q_hat
+
+    # Convert to tuples
+    coordinates_of_connecting_line_start_point = tuple(r_i)
+    coordinates_of_connecting_line_end_point = tuple(r_j)
+
+    return (
+        coordinates_of_connecting_line_start_point,
+        coordinates_of_connecting_line_end_point,
+    )
+
+
+def calculate_coordinates_of_point_projected_onto_line(
+    point: tuple[float, float, float],
+    start_point_of_line: tuple[float, float, float],
+    end_point_of_line: tuple[float, float, float],
+    assume_line_is_finite: bool = False,
+) -> tuple[float, float, float]:
+
+    # Get vector of coordinates of VertexPoint
+    p = np.array(point)
+
+    # Get vector of coordinates of EdgeStart
+    q_i = np.array(start_point_of_line)
+
+    # Get vector of coordinates of EdgeEnd
+    q_j = np.array(end_point_of_line)
+
+    # Get unit vector of Edge
+    q_hat = (q_j - q_i) * 1 / np.linalg.norm(q_j - q_i)
+
+    # Get constant t
+    t = np.dot(p - q_i, q_hat)
+
+    # If the edge is assumed to be finite, then adjust the constant t
+    if assume_line_is_finite:
+        line_length = np.linalg.norm(q_j - q_i)
+        if t < 0:
+            t = 0
+        if t > line_length:
+            t = line_length
+
+    # Calculate vector of projected coordinates of vertex point
+    p_star = q_i + t * q_hat
+
+    # Convert to tuple
+    projected_point = tuple(float(val) for val in p_star.tolist())
+    assert len(projected_point) == 3
+
+    return projected_point
+
+
+def barycentric_coords(
+    p: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps=1e-12,
+) -> np.ndarray:
+    """
+    Return barycentric coordinates (u, v, w) of point p relative to triangle (a,b,c).
+    Assumes p is ON the plane of the triangle (project first if needed).
+    """
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    c = np.asarray(c, float)
+    p = np.asarray(p, float)
+
+    v0 = b - a
+    v1 = c - a
+    v2 = p - a
+
+    d00 = np.dot(v0, v0)
+    d01 = np.dot(v0, v1)
+    d11 = np.dot(v1, v1)
+    d20 = np.dot(v2, v0)
+    d21 = np.dot(v2, v1)
+
+    denom = d00 * d11 - d01 * d01
+    if abs(denom) < eps:
+        raise ValueError("Degenerate triangle: area ~ 0.")
+
+    v = (d11 * d20 - d01 * d21) / denom
+    w = (d00 * d21 - d01 * d20) / denom
+    u = 1.0 - v - w
+    return np.array([u, v, w])
+
+
+def project_point_onto_triangle_plane(
+    p: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps: float = 1e-12,
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    float,
+]:
+    """
+    Project a 3D point p onto the plane defined by triangle (a, b, c).
+
+    Parameters
+    ----------
+    p, a, b, c : array-like shape (3,)
+        3D coordinates (x, y, z). They can be lists/tuples/ndarrays.
+    eps : float
+        Tolerance to detect a degenerate triangle (near-zero area).
+
+    Returns
+    -------
+    proj : np.ndarray shape (3,)
+        The orthogonal projection of p onto the plane of triangle ABC.
+    n : np.ndarray shape (3,)
+        The unit normal vector of the plane (right-hand rule from A->B->C).
+    signed_distance : float
+        Signed distance from p to the plane along n. (proj = p - signed_distance * n)
+
+    Raises
+    ------
+    ValueError
+        If the triangle is degenerate (area ~ 0).
+    """
+
+    p = np.asarray(p, dtype=float)
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    c = np.asarray(c, dtype=float)
+
+    ab = b - a
+    ac = c - a
+    n = np.cross(ab, ac)
+    norm_n = np.linalg.norm(n)
+    if norm_n < eps:
+        raise ValueError(
+            "Degenerate triangle: vertices are collinear or too close together."
+        )
+
+    n /= norm_n
+    signed_distance = np.dot(p - a, n)
+    proj = p - signed_distance * n
+    return proj, n, signed_distance
+
+
+def project_point_onto_triangle_plane_and_test_inside(
+    p: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps: float = 1e-12,
+    tol: float = 1e-10,
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    float,
+    bool,
+    np.ndarray,
+]:
+    """
+    Project point p onto the plane of triangle (a,b,c), then test if the
+    projected point is inside the triangle.
+
+    Returns
+    -------
+    proj : (3,) np.ndarray       Orthogonal projection of p onto the plane.
+    n : (3,) np.ndarray          Unit normal of the plane (A->B->C orientation).
+    signed_distance : float      Signed distance from p to the plane along n.
+    inside : bool                True if proj lies inside (or on edge of) triangle.
+    bary : (3,) np.ndarray       Barycentric coordinates (u, v, w) of proj.
+    """
+    proj, n, signed_distance = project_point_onto_triangle_plane(p, a, b, c, eps=eps)
+    u, v, w = barycentric_coords(proj, a, b, c, eps=eps)
+
+    # Robust inside test with small tolerance to accept boundary points
+    inside = (u >= -tol) and (v >= -tol) and (w >= -tol)
+    return proj, n, signed_distance, inside, np.array([u, v, w])
+
+
+def plane_normal(
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    eps=1e-12,
+):
+    """
+    Return unit normal of the plane defined by triangle (a,b,c).
+    Raises if the triangle is degenerate (area ~ 0).
+    """
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    c = np.asarray(c, float)
+    n = np.cross(b - a, c - a)
+    n_norm = np.linalg.norm(n)
+    if n_norm < eps:
+        raise ValueError("Degenerate triangle: vertices are collinear or too close.")
+    return n / n_norm
+
+
+def planes_are_right_angled(
+    a1: np.ndarray,
+    b1: np.ndarray,
+    c1: np.ndarray,
+    a2: np.ndarray,
+    b2: np.ndarray,
+    c2: np.ndarray,
+    tol_degrees: float = 1.0,
+    eps: float = 1e-12,
+) -> tuple[
+    bool,
+    float,
+]:
+    """
+    Determine if the planes of triangles (a1,b1,c1) and (a2,b2,c2) are at right angles.
+
+    Parameters
+    ----------
+    tol_degrees : float
+        Allowed deviation from exactly 90° (e.g., 1.0 → accept 89°..91°).
+    eps : float
+        Degeneracy tolerance for computing normals.
+
+    Returns
+    -------
+    is_perpendicular : bool
+    angle_degrees : float
+        The acute angle between the plane normals, in degrees (0..90).
+    """
+    n1 = plane_normal(a1, b1, c1, eps=eps)
+    n2 = plane_normal(a2, b2, c2, eps=eps)
+
+    # Clamp for numerical safety, use acute angle via abs(dot)
+    d = np.clip(np.abs(np.dot(n1, n2)), -1.0, 1.0)
+    angle_rad = np.arccos(d)
+    angle_deg = np.degrees(angle_rad)
+
+    # Planes are perpendicular if normals are ~90° apart
+    return abs(angle_deg - 90.0) <= tol_degrees, angle_deg
+
+
+def plane_intersection_line(
+    a1: np.ndarray,
+    b1: np.ndarray,
+    c1: np.ndarray,
+    a2: np.ndarray,
+    b2: np.ndarray,
+    c2: np.ndarray,
+    eps=1e-12,
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+]:
+    """
+    Return the infinite line where the planes of triangles (a1,b1,c1) and (a2,b2,c2) intersect.
+
+    Parameters
+    ----------
+    a1,b1,c1,a2,b2,c2 : array-like (3,)
+        Triangle vertices defining each plane.
+    eps : float
+        Tolerance for degeneracy / parallel checks.
+
+    Returns
+    -------
+    p0 : np.ndarray shape (3,)
+        A point on the intersection line.
+    dir : np.ndarray shape (3,)
+        A unit direction vector of the line.
+
+    Raises
+    ------
+    ValueError
+        If a triangle is degenerate, or the planes are parallel (no intersection),
+        or coincident (infinite intersections — not a unique line).
+    """
+    # Compute plane unit normals
+    n1 = plane_normal(a1, b1, c1, eps=eps)
+    n2 = plane_normal(a2, b2, c2, eps=eps)
+
+    # Direction of line is cross of normals
+    dir_vec = np.cross(n1, n2)
+    dir_norm = np.linalg.norm(dir_vec)
+
+    if dir_norm < eps:
+        # Normals are parallel -> planes are either parallel or coincident
+        # Check if planes are the same (point from plane1 satisfies plane2?)
+        a1 = np.asarray(a1, float)
+        same_plane = abs(np.dot(n2, a1) - np.dot(n2, np.asarray(a2, float))) < 1e-9
+        if same_plane:
+            raise ValueError(
+                "Planes are coincident: infinite intersection (not a unique line)."
+            )
+        else:
+            raise ValueError("Planes are parallel and distinct: no intersection line.")
+    dir_unit = dir_vec / dir_norm
+
+    # Plane equations: n1·x = c1, n2·x = c2
+    c1 = np.dot(n1, np.asarray(a1, float))
+    c2 = np.dot(n2, np.asarray(a2, float))
+
+    # Use a closed-form point on the line:
+    # p0 = ( c1 * (n2 × d) + c2 * (d × n1) ) / ||d||^2, where d = n1 × n2
+    d = dir_vec
+    p0 = (c1 * np.cross(n2, d) + c2 * np.cross(d, n1)) / (dir_norm**2)
+
+    return p0, dir_unit
+
+
+import numpy as np
+
+
+def _as_min_max(
+    min_corner: tuple[float, float, float],
+    max_corner: tuple[float, float, float],
+) -> tuple[
+    tuple[float, float, float],
+    tuple[float, float, float],
+]:
+    """Ensure min/max ordering per axis."""
+    min_corner_as_array = np.asarray(min_corner, dtype=float)
+    max_corner_as_array = np.asarray(max_corner, dtype=float)
+    lo = np.minimum(min_corner_as_array, max_corner_as_array)
+    hi = np.maximum(min_corner_as_array, max_corner_as_array)
+    return (
+        convert_3pt_ndarray_to_tuple_of_floats(lo),
+        convert_3pt_ndarray_to_tuple_of_floats(hi),
+    )
+
+
+def aabb_overlap_3d(
+    a_min: tuple[float, float, float],
+    a_max: tuple[float, float, float],
+    b_min: tuple[float, float, float],
+    b_max: tuple[float, float, float],
+    tol: float | np.ndarray = 0.0,
+    inclusive=True,
+    eps=1e-12,
+) -> tuple[
+    bool,
+    np.ndarray,
+]:
+    """
+    Determine whether two 3D AABBs overlap with an expanded tolerance.
+
+    Parameters
+    ----------
+    a_min, a_max : array-like shape (3,)
+        Min and max corners of box A.
+    b_min, b_max : array-like shape (3,)
+        Min and max corners of box B.
+    tol : float or array-like shape (3,), default 0.0
+        Allowed separation along each axis that still counts as overlap.
+        Example: tol=0.01 (same for all axes) or tol=[0.0, 0.0, 0.05] (only z is lenient).
+    inclusive : bool, default True
+        If True, touching edges (within tol) count as overlap.
+        If False, requires strictly less-than tolerance (useful to exclude exact touching).
+    eps : float
+        Numerical wiggle room on comparisons.
+
+    Returns
+    -------
+    overlap : bool
+        True if boxes overlap under the chosen rules.
+    sep : np.ndarray shape (3,)
+        Per-axis signed separation (>=0 means gap; <0 means penetration).
+        With tolerance, condition is sep[i] <= tol[i] (+/- eps).
+
+
+    Example
+    -------
+    # # Box A from triangle vertices
+    # A = [(0, 0, 0), (1, 0.2, 0.1), (0.2, 0.8, 0.4)]
+    # a_min, a_max = aabb_from_points(points=A)
+
+    # # Box B from triangle vertices
+    # B = [(1.01, -0.1, 0.35), (1.5, 0.5, 0.5), (1.2, 0.1, 0.9)]
+    # b_min, b_max = aabb_from_points(points=B)
+
+    shift = 1.1
+    a_min, a_max = (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)
+    b_min, b_max = (
+        0.0 + shift,
+        0.0 + shift,
+        0.0 + shift,
+    ), (
+        1.0 + shift,
+        1.0 + shift,
+        1.0 + shift,
+    )
+
+    # Allow small tolerance to count near-touching along x
+    overlap, sep = aabb_overlap_3d(
+        a_min=a_min,
+        a_max=a_max,
+        b_min=b_min,
+        b_max=b_max,
+        tol=0.1,
+        inclusive=True,
+    )
+    print("Overlap with tol?", overlap)
+    print("Per-axis separation (gap >=0, penetration <0):", sep)
+
+    """
+    a_min, a_max = _as_min_max(min_corner=a_min, max_corner=a_max)
+    b_min, b_max = _as_min_max(min_corner=b_min, max_corner=b_max)
+
+    tol = np.asarray(tol, dtype=float)
+    if tol.ndim == 0:
+        tol = np.array([tol, tol, tol], dtype=float)
+    elif tol.shape != (3,):
+        raise ValueError("tol must be a scalar or a length-3 iterable.")
+
+    # Per-axis separation: positive if there is a gap, negative if overlapping (penetration)
+    # sep[i] = max(A_min[i] - B_max[i], B_min[i] - A_max[i])
+    sep = np.maximum(
+        np.array(a_min) - np.array(b_max), np.array(b_min) - np.array(a_max)
+    )
+
+    if inclusive:
+        overlap_axes = sep <= (tol + eps)
+    else:
+        overlap_axes = sep < (tol - eps)
+
+    return bool(np.all(overlap_axes)), sep
+
+
+# --- Optional helper: build AABB from a set of 3D points (e.g., triangle vertices) ---
+def aabb_from_points(
+    points: list[tuple[float, float, float]],
+) -> tuple[
+    tuple[float, float, float],
+    tuple[float, float, float],
+]:
+    """
+    Given an iterable of 3D points, return (min_corner, max_corner) as np.ndarrays.
+    """
+    pts = np.asarray(points, dtype=float)
+    if pts.ndim != 2 or pts.shape[1] != 3:
+        raise ValueError("points must be an array-like of shape (N, 3).")
+    return (
+        convert_3pt_ndarray_to_tuple_of_floats(pts.min(axis=0)),
+        convert_3pt_ndarray_to_tuple_of_floats(pts.max(axis=0)),
+    )
+
+
+def convert_3pt_ndarray_to_tuple_of_floats(
+    numpy_3pt_array: np.ndarray,
+) -> tuple[float, float, float]:
+
+    result = tuple(float(val) for val in numpy_3pt_array.tolist())
+    assert len(result) == 3
+
+    return result
+
+
+def _unit_normal(a, b, c, eps=1e-12):
+    """Unit normal of the plane through triangle (a,b,c)."""
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    c = np.asarray(c, float)
+    n = np.cross(b - a, c - a)
+    n_norm = np.linalg.norm(n)
+    if n_norm < eps:
+        raise ValueError(
+            "Degenerate triangle: vertices are collinear or too close together."
+        )
+    return n / n_norm
+
+
+def line_parallel_to_triangle_plane(
+    p0,
+    p1,
+    a,
+    b,
+    c,
+    ang_tol_deg: float = 1e-6,
+    dist_tol: float = 1e-9,
+    eps: float = 1e-12,
+):
+    """
+    Determine if a 3D line (p0->p1) is parallel to the plane of triangle (a,b,c).
+
+    Parameters
+    ----------
+    p0, p1 : array-like (3,)
+        Two distinct points defining the line.
+    a, b, c : array-like (3,)
+        Triangle vertices defining the plane.
+    ang_tol_deg : float
+        Angular tolerance (degrees) for the parallel test. 0 means exact.
+        The test uses |n·d_unit| <= sin(ang_tol_deg).
+    dist_tol : float
+        Distance tolerance to decide if the line lies in (is coplanar with) the plane.
+    eps : float
+        Degeneracy tolerance for zero-length vectors.
+
+    Returns
+    -------
+    is_parallel : bool
+        True if the line direction is parallel to the plane (within angular tolerance).
+    is_coplanar : bool
+        True if the line is parallel AND lies in the plane (point-to-plane distance <= dist_tol).
+        Will be False if not parallel.
+    angle_to_plane_deg : float
+        Angle between the line direction and the plane (0..90 degrees).
+        0° means parallel to plane; 90° means perpendicular to plane.
+
+    Raises
+    ------
+    ValueError
+        If the triangle is degenerate or p0==p1 (degenerate line).
+
+    # Example:
+    # Triangle in the XY plane
+    A, B, C = [0, 0, 0], [1, 0, 0], [0, 1, 0]
+
+    # Line parallel to the plane (direction along X+Y, z constant)
+    P0, P1 = [0, 0, 2], [1, 1, 2]
+
+    is_par, is_copl, ang = line_parallel_to_triangle_plane(
+        P0, P1, A, B, C, ang_tol_deg=1e-6, dist_tol=1e-9
+    )
+    print("Parallel? ", is_par)  # True
+    print("Coplanar? ", is_copl)  # False (z=2, plane is z=0)
+    print("Angle to plane (deg):", ang)
+
+
+    """
+    p0 = np.asarray(p0, float)
+    p1 = np.asarray(p1, float)
+    d = p1 - p0
+    d_norm = np.linalg.norm(d)
+    if d_norm < eps:
+        raise ValueError("Degenerate line: p0 and p1 are the same (or too close).")
+    d_unit = d / d_norm
+
+    n = _unit_normal(a, b, c, eps=eps)
+
+    # |n·d_unit| = 0 for perfectly parallel (direction lies in plane)
+    nd = float(abs(np.dot(n, d_unit)))
+    angle_to_plane_rad = np.arcsin(np.clip(nd, 0.0, 1.0))
+    angle_to_plane_deg = float(np.degrees(angle_to_plane_rad))
+
+    # Parallel if the angle to plane is within tolerance
+    is_parallel = angle_to_plane_deg <= ang_tol_deg
+
+    # Coplanar if parallel and point p0 is (nearly) on the plane
+    # Plane equation: n·x = c
+    c_plane = float(np.dot(n, np.asarray(a, float)))
+    dist = abs(np.dot(n, p0) - c_plane)  # signed distance magnitude
+    is_coplanar = is_parallel and (dist <= dist_tol)
+
+    return is_parallel, is_coplanar, angle_to_plane_deg
