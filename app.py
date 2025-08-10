@@ -20,6 +20,9 @@ import inlbim.api.file
 import bim2glb.convert_ifc_to_glb
 import bim2fem.convert_ifc_to_fem
 import bim2fem.recreate_fem_with_3d_body_shape_representation
+from bim2fem.adjust_element_connectivity_of_fem import (
+    adjust_element_connectivity_of_ifc4_sav_file,
+)
 from flask import (
     Flask,
     render_template,
@@ -40,7 +43,7 @@ JOB_OPTIONS = [
     "View IFC File",
     "Convert IFC to GLB",
     "Convert IFC to Finite Element Model",
-    "Adjust Element Connectivity of Finite Element Model",
+    # "Adjust Element Connectivity of Finite Element Model",
 ]
 
 PATH_TO_INPUT_DIRECTORY = os.path.abspath(
@@ -131,6 +134,7 @@ def convert_to_fem():
         element_selection_query = request.form.get("element_selection_query", "")
         element_deselection_query = request.form.get("element_deselection_query", "")
         region = request.form.get("region", "")
+        snap_option = request.form.get("snap_option", "")
         if element_selection_query == "":
             element_selection_query = "IfcColumn, IfcSlab, IfcWall, IfcBeam, IfcMember"
         if element_deselection_query == "":
@@ -140,6 +144,7 @@ def convert_to_fem():
         print(f"element_selection_query: {element_selection_query}")
         print(f"element_deselection_query: {element_deselection_query}")
         print(f"region: {region}")
+        print(f"snap_option: {snap_option}")
 
         # Save the IFC File in FileStorage to the Input folder
         input_ifc_filename = ifc_file_in_FileStorage.filename
@@ -156,6 +161,17 @@ def convert_to_fem():
             element_deselection_query=element_deselection_query,
             region=region,
         )
+
+        # Adjust Element Connectivity
+        if snap_option == "Yes":
+            ifc4_sav_file = adjust_element_connectivity_of_ifc4_sav_file(
+                ifc4_sav_file=ifc4_sav_file,
+                execute_snap_frame_members=True,
+                execute_snap_floor_beam_systems=True,
+                execute_snap_walls_to_slabs=True,
+                execute_snap_walls_to_walls=True,
+                execute_snap_beams_to_walls=False,
+            )
 
         # Save the New IFC file to the Output Directory
         output_ifc_filename = input_ifc_filename.replace(

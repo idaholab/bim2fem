@@ -66,9 +66,11 @@ Specifically, this programs converts IFC SPF files from the architectural coordi
     Europe
     ```
 
-7. Click "Upload and Process". 
+7. Select "No" for the element connectivity adjustment option. But, re-run this example again after step 9 and "Yes" to see the change in the model. 
 
-8. After the conversion is complete, you can download the new IFC4 StructuralAnalysisView file and/or view it in the browser. 
+8. Click "Upload and Process". 
+
+9. After the conversion is complete, you can download the new IFC4 StructuralAnalysisView file and/or view it in the browser. 
 
 
 # OpenBIM Resources
