@@ -168,10 +168,8 @@ def recreate_structural_surface_members(
         )
 
         # Get coordinates of outer bound vertices
-        points_3d = (
-            inlbim.util.structural.get_outer_bound_points_of_structural_surface_member(
-                triangular_structural_surface_member=structural_surface_member
-            )
+        points_3d = inlbim.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
+            triangular_structural_surface_member=structural_surface_member
         )
 
         # Transform coordinates of vertices to 2D
@@ -304,7 +302,7 @@ def recreate_linear_structural_curve_members(
 
         # Get points
         p1, p2, p3 = (
-            inlbim.util.structural.get_three_points_of_linear_structural_curve_member(
+            inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
                 linear_structural_curve_member=structural_curve_member
             )
         )
