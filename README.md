@@ -8,7 +8,7 @@ Specifically, this programs converts IFC SPF files from the architectural coordi
 
 ## Launch Web App
 
-1. Install the latest version of [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/). Then, open Docker Desktop and leave it running in the background.
+1. Install the latest version of [Docker](https://docs.docker.com/get-docker/). Then, open Docker Desktop and leave it running in the background.
 
 
 2. Clone the repository:

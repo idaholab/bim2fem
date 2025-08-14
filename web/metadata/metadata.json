@@ -2,7 +2,7 @@
     "objects": [
         {
             "class": "IfcBeam",
-            "globalid": "21QzuahBv4vRaWfic03MLy",
+            "globalid": "0YnKK5fmrCwgm_90TQmhQI",
             "name": "UB-Universal Beams:UB254x102x28:420371",
             "description": null,
             "objecttype": null,
@@ -10,7 +10,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1jomler4n1ZABOwL99vQV6",
+            "globalid": "070DfIpc919vXOtBN5$pQP",
             "name": "UB-Universal Beams:UB254x102x28:420821",
             "description": null,
             "objecttype": null,
@@ -18,39 +18,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3$VfjcS_XF1vM4jtwyDRyv",
-            "name": "UB-Universal Beams:UB254x102x28:420359",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBeam",
-            "globalid": "3McuKAO697ogJXFzJu0cSR",
-            "name": "UB-Universal Beams:UB254x102x28:420377",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBeam",
-            "globalid": "0Xdcx6tBD8Ih3FEU8RfGL$",
-            "name": "UB-Universal Beams:UB406x178x60:420701",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBeam",
-            "globalid": "2vJj7R8pLCkRhK0WBjMf9U",
-            "name": "UB-Universal Beams:UB254x102x28:420374",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBeam",
-            "globalid": "0kNtVNQxf4ov8Qf6RSvfmy",
+            "globalid": "1D2Mgg6rb7yu_3tC7zANOC",
             "name": "UB-Universal Beams:UB254x102x28:420819",
             "description": null,
             "objecttype": null,
@@ -58,15 +26,31 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2dnbmigcT4h91w8OjPDO22",
-            "name": "UB-Universal Beams:UB406x178x60:418185",
+            "globalid": "1UmptktE94afQbpfNIFw$c",
+            "name": "UB-Universal Beams:UB254x102x28:420359",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2gdFVxsgL43fb2LdS31BTi",
+            "globalid": "3l_DvhzPj2iQDWE64XgQuM",
+            "name": "UB-Universal Beams:UB406x178x60:420701",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBeam",
+            "globalid": "0JCPFKQnP7RPQ4i1fU4w3y",
+            "name": "UB-Universal Beams:UB254x102x28:420374",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBeam",
+            "globalid": "1ZqvPW2_9CmgUSqKIlYthb",
             "name": "UB-Universal Beams:UB254x102x28:420728",
             "description": null,
             "objecttype": null,
@@ -74,15 +58,15 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "38YGZkx3H48gdH$OjUtkvk",
-            "name": "UB-Universal Beams:UB254x102x28:420365",
+            "globalid": "2ZkFxFIIT3PPrrYYXEQHDc",
+            "name": "UB-Universal Beams:UB254x102x28:420377",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2WV2NV$dT9hefJ0AOdT_eD",
+            "globalid": "0ZpVa$TM98dBZATrp42qVb",
             "name": "UB-Universal Beams:UB254x102x28:420383",
             "description": null,
             "objecttype": null,
@@ -90,7 +74,23 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1B1NJFGy1Dj9Q5hSkkKZnA",
+            "globalid": "1WIos3zeXFgASw4cWnKA0c",
+            "name": "UB-Universal Beams:UB406x178x60:418185",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBeam",
+            "globalid": "2DWmaWa_P7IOp6giwKrrB5",
+            "name": "UB-Universal Beams:UB254x102x28:420365",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBeam",
+            "globalid": "19CnnP_ZD2UgkieNp4rl0A",
             "name": "UB-Universal Beams:UB406x178x60:418108",
             "description": null,
             "objecttype": null,
@@ -98,7 +98,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2J24_x7KfA3OdIssPxWkIi",
+            "globalid": "3ax62FgHr7ku2X$gAyDPfi",
             "name": "UB-Universal Beams:UB254x102x28:420823",
             "description": null,
             "objecttype": null,
@@ -106,7 +106,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "01X8Rikr92G9mYC5EeGYU6",
+            "globalid": "1MZNyW34j1DB1w7nuxBZrg",
             "name": "UB-Universal Beams:UB254x102x28:420730",
             "description": null,
             "objecttype": null,
@@ -114,7 +114,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3AtzWi0pL4UeR_DaUzgTIs",
+            "globalid": "035b1418L8hBJvGxWOILb3",
             "name": "UB-Universal Beams:UB406x178x60:420780",
             "description": null,
             "objecttype": null,
@@ -122,7 +122,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3dlVzKkJfD4uw1FUmE4zym",
+            "globalid": "0KtcyPSTb9WBfAeuJk7dLU",
             "name": "UB-Universal Beams:UB406x178x60:420784",
             "description": null,
             "objecttype": null,
@@ -130,7 +130,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3ruUxxnfv42R6XGjT0UD4V",
+            "globalid": "26qQ3RDa5CZgrUEsWa5eAZ",
             "name": "UB-Universal Beams:UB406x178x60:420705",
             "description": null,
             "objecttype": null,
@@ -138,7 +138,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3_gLbdjmjE3fNVJWGsocx0",
+            "globalid": "0gl5MAHsXEDB7hJ9jmv7Z1",
             "name": "UB-Universal Beams:UB254x102x28:420732",
             "description": null,
             "objecttype": null,
@@ -146,7 +146,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0M2UKZ3IvFMRNBsUoLOTL0",
+            "globalid": "1tHauQ3uHFxvNHeTw6HXLK",
             "name": "UB-Universal Beams:UB406x178x60:420782",
             "description": null,
             "objecttype": null,
@@ -154,7 +154,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0cqzCwP1PCcwehhewVvpXO",
+            "globalid": "2hY9nMACD6p9JOs57euNi3",
             "name": "UB-Universal Beams:UB254x102x28:420734",
             "description": null,
             "objecttype": null,
@@ -162,7 +162,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0WpkEZjjXFBgaeq_QupRem",
+            "globalid": "3Qo0RsOc11tO$oIutA3QdH",
             "name": "UB-Universal Beams:UB406x178x60:418141",
             "description": null,
             "objecttype": null,
@@ -170,7 +170,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1QsMPp7D19Uhj5eMadWNHQ",
+            "globalid": "2giOX_xmHF8AHV87H$AHzC",
             "name": "UB-Universal Beams:UB406x178x60:418053",
             "description": null,
             "objecttype": null,
@@ -178,7 +178,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2OHVhs3Nv0lfOoWYpS9VYf",
+            "globalid": "1g4QPTzwb6mRHa2qQdd6PM",
             "name": "UB-Universal Beams:UB254x102x28:420726",
             "description": null,
             "objecttype": null,
@@ -186,7 +186,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2Flhu$YPv3cPZDnZEq8mb8",
+            "globalid": "0WaxteTJb5PAGYb6d1Bfu0",
             "name": "UB-Universal Beams:UB254x102x28:420809",
             "description": null,
             "objecttype": null,
@@ -194,7 +194,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2Uz4$NocT4qO6eSNsXp1eo",
+            "globalid": "3EpxdzSPT5WeXBDIo5W695",
             "name": "UB-Universal Beams:UB254x102x28:420362",
             "description": null,
             "objecttype": null,
@@ -202,7 +202,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2RivgbcjT07eq3GJY_22ke",
+            "globalid": "2DUBwuSVvAKPb9XVYSO3jO",
             "name": "UB-Universal Beams:UB254x102x28:420736",
             "description": null,
             "objecttype": null,
@@ -210,7 +210,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2SGF5Ueez6XRJR$pl7H5tB",
+            "globalid": "1aoNrgf2j7O9he_fyiM3xR",
             "name": "UB-Universal Beams:UB254x102x28:420811",
             "description": null,
             "objecttype": null,
@@ -218,7 +218,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3mYkvJ4w50of9c9ojRpgKv",
+            "globalid": "0IoDmVycrAzemSkWfFdSUo",
             "name": "UB-Universal Beams:UB254x102x28:420380",
             "description": null,
             "objecttype": null,
@@ -226,7 +226,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1fUW4J8uT27hJKsbrwi6LB",
+            "globalid": "3CO4_4NE16KRpsoQfQI64x",
             "name": "UB-Universal Beams:UB254x102x28:420740",
             "description": null,
             "objecttype": null,
@@ -234,7 +234,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2K5RWtMM99kBZH4twNnw8d",
+            "globalid": "0nvSSgtZ9B6vPQFHmb0cmp",
             "name": "UB-Universal Beams:UB254x102x28:420738",
             "description": null,
             "objecttype": null,
@@ -242,7 +242,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1dLfDewvf4ZxvICLeEiP7F",
+            "globalid": "2UUKJlndnE2htE2sSZWbUP",
             "name": "UB-Universal Beams:UB254x102x28:420368",
             "description": null,
             "objecttype": null,
@@ -250,7 +250,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3ZJC4zzib0ffszK521_0G1",
+            "globalid": "0$kXSRKmX1ihlsdfAoxr5D",
             "name": "UB-Universal Beams:UB254x102x28:420813",
             "description": null,
             "objecttype": null,
@@ -258,15 +258,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3_j_jy3jnDrOicVSG9UyOF",
-            "name": "UB-Universal Beams:UB406x178x60:420786",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBeam",
-            "globalid": "19iaDuWlbFoxjyiKk1OImX",
+            "globalid": "39E0Or7vvFgxg8TCcxmgug",
             "name": "UB-Universal Beams:UB254x102x28:420742",
             "description": null,
             "objecttype": null,
@@ -274,7 +266,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0vUTVNa$D9wQ1NBbGnW9_7",
+            "globalid": "3pd6XFyOH9wAx1qVPvFKsH",
             "name": "UB-Universal Beams:UB254x102x28:420807",
             "description": null,
             "objecttype": null,
@@ -282,7 +274,15 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0tDUwA_nH1nfx2EPPmsHzQ",
+            "globalid": "2fEk4U8WLByfOdflB$$wV_",
+            "name": "UB-Universal Beams:UB406x178x60:420786",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBeam",
+            "globalid": "1HNrZcD4P7Tv0HwR3W0KPA",
             "name": "UB-Universal Beams:UB254x102x28:420815",
             "description": null,
             "objecttype": null,
@@ -290,7 +290,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2NwXAagGv9GPMLuCM3snEN",
+            "globalid": "3QDQtRqTDApArl6FeIwjPa",
             "name": "UB-Universal Beams:UB406x178x60:420703",
             "description": null,
             "objecttype": null,
@@ -298,7 +298,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "35Fjpc10TD9v2sa_fZvOB2",
+            "globalid": "0gj4zW2W18rvmDrKahqK5p",
             "name": "UB-Universal Beams:UB254x102x28:420817",
             "description": null,
             "objecttype": null,
@@ -306,7 +306,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "10MqESSSb2txpXW8pLf8$4",
+            "globalid": "0v0CDpI2TCBOJEQfjYgMEt",
             "name": "UB-Universal Beams:UB406x178x60:420699",
             "description": null,
             "objecttype": null,
@@ -314,7 +314,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2GvirDubP8XfjsDoJXhO8t",
+            "globalid": "2cxvcWF9987fKYbGWyKJe7",
             "name": "FrameMember-87",
             "description": null,
             "objecttype": null,
@@ -322,7 +322,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1h5V7p6A5BkP1liKj$gw9k",
+            "globalid": "3BJTpXRmHEUwt6s24mLa7L",
             "name": "FrameMember-122",
             "description": null,
             "objecttype": null,
@@ -330,7 +330,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "29AuExG2T5Cvpm0QLk1D9B",
+            "globalid": "2KOWzwjjj4dOWYed69Nzws",
             "name": "FrameMember-154",
             "description": null,
             "objecttype": null,
@@ -338,7 +338,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2FEzeBauH4nvUBlv2554k_",
+            "globalid": "08XxUpNIPBnh1dPxntSIWo",
             "name": "FrameMember-186",
             "description": null,
             "objecttype": null,
@@ -346,7 +346,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "27Lg4kCKT8FAl5RS9r_M5H",
+            "globalid": "3emo_jIgnEIQuDT8H$0dgN",
             "name": "FrameMember-234",
             "description": null,
             "objecttype": null,
@@ -354,7 +354,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1zSPcC0JL4zuC6l8$6wh$Z",
+            "globalid": "0PZQmanmn0JgyM8t10B6Cl",
             "name": "FrameMember-266",
             "description": null,
             "objecttype": null,
@@ -362,7 +362,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1uPbKglePF7gnYn0i34Bar",
+            "globalid": "1jrcEsnG9ALBxv7ZHtFV3r",
             "name": "FrameMember-298",
             "description": null,
             "objecttype": null,
@@ -370,7 +370,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0TqcJYDOLFsuf4RcVyUcBM",
+            "globalid": "2HEsCvb21FQRzIF9nhtR7T",
             "name": "FrameMember-330",
             "description": null,
             "objecttype": null,
@@ -378,7 +378,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3hk11iNZLA99CJLOd7c1BB",
+            "globalid": "3qH4mZspfE1RJ06JjyTlPP",
             "name": "FrameMember-362",
             "description": null,
             "objecttype": null,
@@ -386,7 +386,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3NslL24DLD2PsGg4da12Ko",
+            "globalid": "2Az7JUPpH6EvASU5RYALUK",
             "name": "FrameMember-394",
             "description": null,
             "objecttype": null,
@@ -394,7 +394,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0pBFLp7hv9Mvx0E0lhAfaB",
+            "globalid": "1XC8_xo7z7iBG9rp1zw593",
             "name": "FrameMember-426",
             "description": null,
             "objecttype": null,
@@ -402,7 +402,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1CbT95x$r4hg1hKopf8TXt",
+            "globalid": "3UgOaJOJbAjxCwkBKsGIUq",
             "name": "FrameMember-458",
             "description": null,
             "objecttype": null,
@@ -410,7 +410,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0d$Nckhu99$xPAt$yOexOW",
+            "globalid": "137z9NBELCsBjPytww93Gu",
             "name": "FrameMember-490",
             "description": null,
             "objecttype": null,
@@ -418,7 +418,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0R9K9Sb4P0YfbA1mPLSKvs",
+            "globalid": "0IqnCI7UHBg9hyJXtK9Roe",
             "name": "FrameMember-522",
             "description": null,
             "objecttype": null,
@@ -426,7 +426,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2DjFzMvS10Pvwaw0IE0cNX",
+            "globalid": "1RlWkTufXFiusarcccctgo",
             "name": "FrameMember-554",
             "description": null,
             "objecttype": null,
@@ -434,7 +434,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0WwQ5nxR9F0uOWzWfrVPSP",
+            "globalid": "2Rveb47216S8ycQIxbQNQK",
             "name": "FrameMember-586",
             "description": null,
             "objecttype": null,
@@ -442,7 +442,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "28OloMMsr2$8ZNZakCLUDU",
+            "globalid": "3vGPM2SLPCjwnqanx2_ol7",
             "name": "FrameMember-618",
             "description": null,
             "objecttype": null,
@@ -450,7 +450,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3ilhirzr9EkBd8w3O5rUbW",
+            "globalid": "0R6VjQy4j1PvJMEtKSXpNU",
             "name": "FrameMember-650",
             "description": null,
             "objecttype": null,
@@ -458,7 +458,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3dwDCH7g9DthNfsyRVvbt6",
+            "globalid": "2NTYf5JF53jRK3uqTPEQzH",
             "name": "FrameMember-682",
             "description": null,
             "objecttype": null,
@@ -466,7 +466,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3VIh1T$MnFUu9Xn2mCdD9$",
+            "globalid": "3x5ZiGLubFAQ37gGPJcaWd",
             "name": "FrameMember-714",
             "description": null,
             "objecttype": null,
@@ -474,7 +474,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1SKOqSj1v62ePC5g15HI_t",
+            "globalid": "26_B9DA1nAIhj3yW2clx36",
             "name": "FrameMember-746",
             "description": null,
             "objecttype": null,
@@ -482,7 +482,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2EizcF6vvBaBpmFaUIzgBY",
+            "globalid": "1dwsAeeG57i8NJhtwEcBJ8",
             "name": "FrameMember-778",
             "description": null,
             "objecttype": null,
@@ -490,7 +490,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1Zo8e$YxrBEQcIfhl5xVWy",
+            "globalid": "0_EvcjGtn2wvNtenY76cBJ",
             "name": "FrameMember-810",
             "description": null,
             "objecttype": null,
@@ -498,7 +498,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "379OPy4QrBeuwYoyjnhIeX",
+            "globalid": "0DJ24FHW97phBvBc$HhhlD",
             "name": "FrameMember-842",
             "description": null,
             "objecttype": null,
@@ -506,7 +506,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3E64Lq9dT2SwWZDo4ppUIG",
+            "globalid": "0QQKxonqn6FuKXZJajjft7",
             "name": "FrameMember-874",
             "description": null,
             "objecttype": null,
@@ -514,7 +514,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1j3v_War5EtPBp1W$Fqak9",
+            "globalid": "0oluJ4bx187vrnhP6$k53o",
             "name": "FrameMember-906",
             "description": null,
             "objecttype": null,
@@ -522,7 +522,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "38KaKJZi18NOyx6rlJUJFH",
+            "globalid": "2JRVnyza55SwRUBoEqolJG",
             "name": "FrameMember-938",
             "description": null,
             "objecttype": null,
@@ -530,7 +530,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1WeUTb9YLBVB5fQUdHWIEn",
+            "globalid": "0bQVDMZ1T9_PUG$0EOvjnO",
             "name": "FrameMember-970",
             "description": null,
             "objecttype": null,
@@ -538,7 +538,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "1o1AtuEzLFDRU8r38y1o$F",
+            "globalid": "1hyTxO39L7BQzAkLqeGhoc",
             "name": "FrameMember-1002",
             "description": null,
             "objecttype": null,
@@ -546,7 +546,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "3GkF6kax17XQDYb20ZywTG",
+            "globalid": "2WrGrDp8T7wgAGceU2QUYc",
             "name": "FrameMember-1034",
             "description": null,
             "objecttype": null,
@@ -554,7 +554,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2dL8y7MlfFueNsYzyy9O$d",
+            "globalid": "3rAfO3yRj2EOmPc1LdvkMP",
             "name": "FrameMember-1066",
             "description": null,
             "objecttype": null,
@@ -562,7 +562,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "08tpohcB52mQSL8WcejICe",
+            "globalid": "2NN9OHysj9T9X4LM0r_gdq",
             "name": "FrameMember-1098",
             "description": null,
             "objecttype": null,
@@ -570,7 +570,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "37wrtT6VPADA4_ZrkzTnIG",
+            "globalid": "2YaqzlywvDswq4zbN06Cwc",
             "name": "FrameMember-1130",
             "description": null,
             "objecttype": null,
@@ -578,7 +578,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2rrg6ywP5ELBZHlf6wvUX0",
+            "globalid": "0YmfZEdmLDLwHWjwx0ACoE",
             "name": "FrameMember-1162",
             "description": null,
             "objecttype": null,
@@ -586,7 +586,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2gVYPBXSr8aexmrnKu4S4H",
+            "globalid": "2lUkp$Irf3Fu7uYhDDMePi",
             "name": "FrameMember-1194",
             "description": null,
             "objecttype": null,
@@ -594,7 +594,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0zgWvIfUr7KAOb4X1Gq9gQ",
+            "globalid": "2VEh9Ci0b168ySKOYOIXME",
             "name": "FrameMember-1226",
             "description": null,
             "objecttype": null,
@@ -602,7 +602,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "36zww73FjCZQTV5eRcNGpG",
+            "globalid": "2nIwUVdFbCWv7zeOsjQpaw",
             "name": "FrameMember-1258",
             "description": null,
             "objecttype": null,
@@ -610,7 +610,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "0MkF8xm6D489o0rxZrW4Tf",
+            "globalid": "24RYAHvO1EjQ1f2tLRadEc",
             "name": "FrameMember-1290",
             "description": null,
             "objecttype": null,
@@ -618,7 +618,7 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "36ohGhsE5A0wji84Jgavqw",
+            "globalid": "39kM2grSX6UwjHGPOpo9ga",
             "name": "FrameMember-1322",
             "description": null,
             "objecttype": null,
@@ -626,367 +626,367 @@
         },
         {
             "class": "IfcBeam",
-            "globalid": "2OKMfeZ99F4ObKwfv1xspg",
-            "name": "FrameMember-2598",
+            "globalid": "1FruPEIZX0o8dAJtcIyrC4",
+            "name": "FrameMember-3374",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3demq0uWz2LAMYLXiaSBFf",
-            "name": "FrameMember-2623",
+            "globalid": "2uPOvN9HbCb8nGq_Wrprw_",
+            "name": "FrameMember-3399",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "29WGj0FMb5zvnIPohVIgv3",
-            "name": "FrameMember-2648",
+            "globalid": "09FBJzgXLEkQg7s1OFnFOU",
+            "name": "FrameMember-3424",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1ECsKqEufAeusBQLV9Mqdj",
-            "name": "FrameMember-2673",
+            "globalid": "2oL73DP9PBeA_ufrLkJpDu",
+            "name": "FrameMember-3449",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0xlwJ6zvzCpBxgXlBjc_Cb",
-            "name": "FrameMember-2698",
+            "globalid": "10KKBkmGbC2BFBVInA4CdU",
+            "name": "FrameMember-3474",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0R0VATIhb3kf6Wlp$2lFgS",
-            "name": "FrameMember-2723",
+            "globalid": "2i34hQBkn57epLGtKGnn9Q",
+            "name": "FrameMember-3499",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3fVKaRdUT2VgHSjqdIEgDX",
-            "name": "FrameMember-2748",
+            "globalid": "0sp5885Er7xhb35aoQhEtQ",
+            "name": "FrameMember-3524",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0LLLLpWdf2LgprnZ7EPDP6",
-            "name": "FrameMember-2773",
+            "globalid": "2q8kNA8T5428k0hQvFQzwW",
+            "name": "FrameMember-3549",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0S6AoWg3n0YQEF3xLy6qLp",
-            "name": "FrameMember-2798",
+            "globalid": "29Pj3y8lD0gPDe8NNTrVVn",
+            "name": "FrameMember-3574",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1ikSrzFq1DwfuAg7vr_dpd",
-            "name": "FrameMember-2823",
+            "globalid": "1bfyIl8q95KvL1V7BMGFzL",
+            "name": "FrameMember-3599",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3Q_iZo_wP92B4BtW2JKNOi",
-            "name": "FrameMember-2848",
+            "globalid": "2H36XJuED7TxjwbnQZrNM4",
+            "name": "FrameMember-3624",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3MFNDswTT4fvRHRcIWRSH8",
-            "name": "FrameMember-2873",
+            "globalid": "3GSsr08Nn3QB1plwIb_5UJ",
+            "name": "FrameMember-3649",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2DprDXbbfEuOri9$iCZukn",
-            "name": "FrameMember-2898",
+            "globalid": "3$VFP51lH8xQWSsJGbJsbF",
+            "name": "FrameMember-3674",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1K0EaatLL9DAS6jpP02zGg",
-            "name": "FrameMember-2923",
+            "globalid": "1IMXpO4oz4VvWCEjoOD5vD",
+            "name": "FrameMember-3699",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1KHVU71pHFgB$6TNRFa4Al",
-            "name": "FrameMember-2948",
+            "globalid": "2mtOO3wer61x9$RyKYqPg4",
+            "name": "FrameMember-3724",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2cyFKD63HFa9lDXGttamh_",
-            "name": "FrameMember-2973",
+            "globalid": "0EaCpXtiP5LQ7LCMJ00Jy7",
+            "name": "FrameMember-3749",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0rq6WZ$znFVfcJK1i3OVQP",
-            "name": "FrameMember-2998",
+            "globalid": "0jVug222D3$ePO2NowXFsh",
+            "name": "FrameMember-3774",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1QSdtPdYrELhTlJkvnO_7h",
-            "name": "FrameMember-3023",
+            "globalid": "0vKBPUlMf3if1mTerDXlrg",
+            "name": "FrameMember-3799",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0KESFh9av0ze8R6zUZNHXH",
-            "name": "FrameMember-3048",
+            "globalid": "071ELf1fP1au7KdYoLbbDc",
+            "name": "FrameMember-3824",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0avDFSiRzDaeFSLm5cwesb",
-            "name": "FrameMember-3073",
+            "globalid": "3AvVMiEwn8exPsA3m5SG85",
+            "name": "FrameMember-3849",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2nIV8FSFv22P$4IVe_bPiT",
-            "name": "FrameMember-3098",
+            "globalid": "0vkSHcIVb4$fw6I17aE28i",
+            "name": "FrameMember-3874",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "11xvvQ5ujAeeMj5O5elwOr",
-            "name": "FrameMember-3123",
+            "globalid": "2r0S4OoQT93Pq$zvA48lqM",
+            "name": "FrameMember-3899",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "098hu_j_17pRCvjBMSZ0rE",
-            "name": "FrameMember-3148",
+            "globalid": "0VMJURU8H1pv0RSS9rB8pH",
+            "name": "FrameMember-3924",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1ST1qZ2Gf0zeMH2OrYvm02",
-            "name": "FrameMember-3173",
+            "globalid": "1SNgNbvWH9Lhxsoj17o1Fc",
+            "name": "FrameMember-3949",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3X3wYQWY9AERcCWJyPpJXj",
-            "name": "FrameMember-3198",
+            "globalid": "3Rp_YwVUX7f9p9Yis9ZcNX",
+            "name": "FrameMember-3974",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0vAsVG2fX29vQrPGxJahqB",
-            "name": "FrameMember-3223",
+            "globalid": "2f3LmZ_gv259qh6VGWtMcM",
+            "name": "FrameMember-3999",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "06Q8pThen1qvldYFWDcHXV",
-            "name": "FrameMember-3248",
+            "globalid": "3eBpvZPtz4nvZYvM3GQSwv",
+            "name": "FrameMember-4024",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0TnCzcK599SwpOtTxK5Svl",
-            "name": "FrameMember-3273",
+            "globalid": "3n9HHkzLT7uRvUVDgQsSkZ",
+            "name": "FrameMember-4049",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3C9ZQ0QZT1yB_CuoOW6sS_",
-            "name": "FrameMember-3298",
+            "globalid": "2MN77rdCnFH8d0aOn$DRQs",
+            "name": "FrameMember-4074",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2lGQtpsJ9CqQigM3FuVgJC",
-            "name": "FrameMember-3323",
+            "globalid": "17TVL5_8nFyulkThToOLP6",
+            "name": "FrameMember-4099",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "11T4wJnfX1xu8y0LzdEXsE",
-            "name": "FrameMember-3348",
+            "globalid": "2dtA5BMaT5y9uGnTMyOyLE",
+            "name": "FrameMember-4124",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "11Tm_CvoX0KACv4APT9isX",
-            "name": "FrameMember-3373",
+            "globalid": "3y44njxWjEbxzof9G1DpIu",
+            "name": "FrameMember-4149",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0Ep9w8_Df7QfHP11pnBpd4",
-            "name": "FrameMember-3398",
+            "globalid": "03fquGcojF_uLoT0sF7UId",
+            "name": "FrameMember-4174",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3uuqQpxPz2BAxCz0n_glSi",
-            "name": "FrameMember-3423",
+            "globalid": "0yQjQ$M6H12PdoCtFSf70z",
+            "name": "FrameMember-4199",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0YJ6dosE5CxQbHp0u2Abuw",
-            "name": "FrameMember-3448",
+            "globalid": "292JWJDnL2lfAuRwgyg9L6",
+            "name": "FrameMember-4224",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0FN78yaLTC_wH8up5GKC1u",
-            "name": "FrameMember-3473",
+            "globalid": "1HIntu12LCwOTGlE7Ti0dE",
+            "name": "FrameMember-4249",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "28TYcC5wrCrPUibcB1KviX",
-            "name": "FrameMember-3498",
+            "globalid": "2L$Ygg2q1909oessFbH_LP",
+            "name": "FrameMember-4274",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2r0KfDSen8zhY2gjdmY9IQ",
-            "name": "FrameMember-3523",
+            "globalid": "2Dabffsa97Hg3Aqy3x7tCL",
+            "name": "FrameMember-4299",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "1ZKynvGRnAoBp_euPyKtvh",
-            "name": "FrameMember-3548",
+            "globalid": "3G9W6tqhvAt8_QDyAM4EXQ",
+            "name": "FrameMember-4324",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "2DdU1kT8j6Dx_NyR4rrxIO",
-            "name": "FrameMember-3573",
+            "globalid": "33C8BPntX7pRwcaz$m$Zzk",
+            "name": "FrameMember-4349",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "10DazWi7LF0BIMv3eWjHBh",
-            "name": "FrameMember-3598",
+            "globalid": "25vqXKxev7aOSCxNHrTSiD",
+            "name": "FrameMember-4374",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0_2XkkAQn7ZeT068dRS6WO",
-            "name": "FrameMember-3623",
+            "globalid": "0AS6LEOkLERArKrEUMyKz3",
+            "name": "FrameMember-4399",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "3F83YrpVzEMw$N4LDOMClo",
-            "name": "FrameMember-3648",
+            "globalid": "3Xj5CKeJ57$97lnj_Q2QFV",
+            "name": "FrameMember-4424",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "0UP2SwHf54iwpLYhhNfF$I",
-            "name": "FrameMember-3673",
+            "globalid": "0fRgpFZy97_9w60vZIhuKE",
+            "name": "FrameMember-4449",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBeam",
-            "globalid": "21TbDKzCPEFhid7tvKvoio",
-            "name": "FrameMember-3698",
+            "globalid": "074qN8fqX7hf2MN4p43eP6",
+            "name": "FrameMember-4474",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1ppCswIgn0qv9cNt08bakH",
+            "globalid": "1BXtnwwrb57er5N4Dn7T0_",
             "name": "Node-103",
             "description": null,
             "objecttype": null,
@@ -994,7 +994,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0NA9qVIXfE9h8uwgOFbEVu",
+            "globalid": "2C98uF$7fDsgyf_Q1gMqkc",
             "name": "Node-109",
             "description": null,
             "objecttype": null,
@@ -1002,7 +1002,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2ATFEiZl991ekXB4XYJCi4",
+            "globalid": "08WwBsMC56IQGCBVon_oZz",
             "name": "Node-135",
             "description": null,
             "objecttype": null,
@@ -1010,7 +1010,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2ZpuLAVzTDq8hYI$RrpepU",
+            "globalid": "2P3EEV5Nn8xPM$x0$WLlwW",
             "name": "Node-141",
             "description": null,
             "objecttype": null,
@@ -1018,7 +1018,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0SZ5g04YX8PBuLrqvTIwp2",
+            "globalid": "31TS9byqX84B75r9BDKXZh",
             "name": "Node-167",
             "description": null,
             "objecttype": null,
@@ -1026,7 +1026,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3i3QSKNjP2qugLK$IXSwLR",
+            "globalid": "1kdc6QFj15cuWE9mQ6OTRM",
             "name": "Node-173",
             "description": null,
             "objecttype": null,
@@ -1034,7 +1034,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1rCpz2W5P7LA8Ap7Uqx_AP",
+            "globalid": "0U4tw6qMz3v8bu8iVexRmQ",
             "name": "Node-199",
             "description": null,
             "objecttype": null,
@@ -1042,7 +1042,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2XlFxY0nnFFP5BnNcDUXhW",
+            "globalid": "2ZDxwz0zX6HOGc_9jc_106",
             "name": "Node-205",
             "description": null,
             "objecttype": null,
@@ -1050,7 +1050,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "38Sk_eDerE_Q$IQXYuqTHH",
+            "globalid": "24C81bYoDCNeh6Afy4$2Yu",
             "name": "Node-247",
             "description": null,
             "objecttype": null,
@@ -1058,7 +1058,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0$3CNK1g57QeVz5j9iMd0Z",
+            "globalid": "3PldB_24f4KfWfUTpVn2Si",
             "name": "Node-253",
             "description": null,
             "objecttype": null,
@@ -1066,7 +1066,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0TUoq5h0D6PwsmeAuhAJNX",
+            "globalid": "1BU_woQdH1pvUOrj46I0Th",
             "name": "Node-279",
             "description": null,
             "objecttype": null,
@@ -1074,7 +1074,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0q2QxsVQP7FuVeOYIKM7Kn",
+            "globalid": "0MZjed5zf4ofEg_LiS_Lx4",
             "name": "Node-285",
             "description": null,
             "objecttype": null,
@@ -1082,7 +1082,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1MLrko7$5EZ8MQlOoebdsK",
+            "globalid": "183Lp0hInBKhGQJz5dlrG$",
             "name": "Node-311",
             "description": null,
             "objecttype": null,
@@ -1090,7 +1090,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1Ijb5n$WDAsfxw7mxg_FLT",
+            "globalid": "1rCxB4rm5AEPH0s_ebpIRb",
             "name": "Node-317",
             "description": null,
             "objecttype": null,
@@ -1098,7 +1098,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0W7B8AcgnBbu3BOQCO2drb",
+            "globalid": "27Rtty$MbFtOM3K4mMDyPZ",
             "name": "Node-343",
             "description": null,
             "objecttype": null,
@@ -1106,7 +1106,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0ETGXE1Ob6Iuno$rewzbEb",
+            "globalid": "3oquCvUIzC8gvHvFBe5IZj",
             "name": "Node-349",
             "description": null,
             "objecttype": null,
@@ -1114,7 +1114,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2_U$2KRknEn85VnjLxxc4j",
+            "globalid": "2_Ur2nxQ976eSiArj2x9kf",
             "name": "Node-375",
             "description": null,
             "objecttype": null,
@@ -1122,7 +1122,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2xOcGLIi14yvyx5q6agpEI",
+            "globalid": "2HWr6aETX9ChThsVmJ9RAf",
             "name": "Node-381",
             "description": null,
             "objecttype": null,
@@ -1130,7 +1130,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0S$8Q41AvBVec6q2wBnA2w",
+            "globalid": "30Y62fZCr44gpH_1PN0uBN",
             "name": "Node-407",
             "description": null,
             "objecttype": null,
@@ -1138,7 +1138,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2eVX_IJKj8NweCBW$R89hx",
+            "globalid": "1rNtkvIk1918UoDUP$YON9",
             "name": "Node-413",
             "description": null,
             "objecttype": null,
@@ -1146,7 +1146,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3wkA5h$1b1ThIZ8Hv5rloE",
+            "globalid": "2GmvvTHCTDc9OBm9_FH9c4",
             "name": "Node-439",
             "description": null,
             "objecttype": null,
@@ -1154,7 +1154,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2X1N17VhD3Sg0Vd61i3CiF",
+            "globalid": "0hk5TXXLjCSOWS8oNL0nOv",
             "name": "Node-445",
             "description": null,
             "objecttype": null,
@@ -1162,7 +1162,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2BYTVkCXrADwJb2_iB2$aW",
+            "globalid": "13i8VAu5n2_OGSwB4ytL33",
             "name": "Node-471",
             "description": null,
             "objecttype": null,
@@ -1170,7 +1170,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2tS0VGYUXBSAdLu3AdvZiw",
+            "globalid": "38v0S84899aOHQYLheZeK0",
             "name": "Node-477",
             "description": null,
             "objecttype": null,
@@ -1178,7 +1178,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1a5Tlgf3982gvm5VaQSXKO",
+            "globalid": "1ENhRGVkzDTvJFKZxT6UNE",
             "name": "Node-503",
             "description": null,
             "objecttype": null,
@@ -1186,7 +1186,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2Fv398pQz0Uxz7suIfSbSn",
+            "globalid": "36H_3TM0TDSuzRDjzoAl7I",
             "name": "Node-509",
             "description": null,
             "objecttype": null,
@@ -1194,7 +1194,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3IkOnUcNX49vzH$FHlRUbC",
+            "globalid": "3qTiV5XLn5gg3qoh$DbKDz",
             "name": "Node-535",
             "description": null,
             "objecttype": null,
@@ -1202,7 +1202,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "01FdwX7VH99Q8Eg$rALy4K",
+            "globalid": "12nknhOxb6IRTv7zrWmEQq",
             "name": "Node-541",
             "description": null,
             "objecttype": null,
@@ -1210,7 +1210,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1SmHPInIXFlA9EyCu8axfs",
+            "globalid": "3Vbz4wJTP6uRXMivyYUu8s",
             "name": "Node-567",
             "description": null,
             "objecttype": null,
@@ -1218,7 +1218,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3t87IkKDPF$x3G1yw8dscq",
+            "globalid": "2rxRA3cKH9FuFBpYfvOp76",
             "name": "Node-573",
             "description": null,
             "objecttype": null,
@@ -1226,7 +1226,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "17OBBpxnD4dw00fYkTsA_G",
+            "globalid": "2TxQGE0f1FTvCJypb59HcX",
             "name": "Node-599",
             "description": null,
             "objecttype": null,
@@ -1234,7 +1234,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2pP53D7yv6C8h3iLne$_vp",
+            "globalid": "3o$tQ$rRDBJwRDPPbpXJka",
             "name": "Node-605",
             "description": null,
             "objecttype": null,
@@ -1242,7 +1242,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1c_3W_KOH8ZAvbDQdVxmJ2",
+            "globalid": "2BxtcOMKH6PxA6khhFfh1H",
             "name": "Node-631",
             "description": null,
             "objecttype": null,
@@ -1250,7 +1250,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2wHGVOif1F99D_aroD9wkJ",
+            "globalid": "3P2Th$24T1BvbzxEmIgFLf",
             "name": "Node-637",
             "description": null,
             "objecttype": null,
@@ -1258,7 +1258,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0DvF$ODXb3kQTTENJlAeYQ",
+            "globalid": "1vavACXBPFggVAQoqpw7Mj",
             "name": "Node-663",
             "description": null,
             "objecttype": null,
@@ -1266,7 +1266,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2DKIdsk3j3D8phjALZEOSC",
+            "globalid": "0KwhPYpZv2uOXUZ1_b7daT",
             "name": "Node-669",
             "description": null,
             "objecttype": null,
@@ -1274,7 +1274,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2uXnNDsRfFHeaqmhTBBVhd",
+            "globalid": "25nXcqfMX0YRMoxcjl3z5h",
             "name": "Node-695",
             "description": null,
             "objecttype": null,
@@ -1282,7 +1282,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3viOjVNvL0huaH$XjMUuIz",
+            "globalid": "0gHjC6rnXA3fOz1RBeupFP",
             "name": "Node-701",
             "description": null,
             "objecttype": null,
@@ -1290,7 +1290,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1hcJ2M39D1IRwYeeMUHzcD",
+            "globalid": "1ndM7LtnvCPwJuq0$C9yIa",
             "name": "Node-727",
             "description": null,
             "objecttype": null,
@@ -1298,7 +1298,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "09$UgA6ij5auyilC1SuDZS",
+            "globalid": "29iwfDM95D6BErgEF$RlVT",
             "name": "Node-733",
             "description": null,
             "objecttype": null,
@@ -1306,7 +1306,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0gCKNK0_5EX8KqxGpv7sON",
+            "globalid": "3VYtuHiQjEHhLZsvGyje2F",
             "name": "Node-759",
             "description": null,
             "objecttype": null,
@@ -1314,7 +1314,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2kzotWzqv4ygUxFr_YpZG3",
+            "globalid": "37NJTwaMT4tv2DGJQWQ99D",
             "name": "Node-791",
             "description": null,
             "objecttype": null,
@@ -1322,7 +1322,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0Kr9wESoHA3gzDlAv7vdBO",
+            "globalid": "3M95T6Nyb7JxIbu8NOD6cY",
             "name": "Node-797",
             "description": null,
             "objecttype": null,
@@ -1330,7 +1330,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1AcfGX0FfBHPJERU3ivfPB",
+            "globalid": "3dHmA3sRb469Hyngwcr01f",
             "name": "Node-823",
             "description": null,
             "objecttype": null,
@@ -1338,7 +1338,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0FNJBVxKDA0RHzB7IdGGQ1",
+            "globalid": "2bJ4T8wMnFyBggSyk8_IGw",
             "name": "Node-829",
             "description": null,
             "objecttype": null,
@@ -1346,7 +1346,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "17FtYRnNrEhet8NV4flFhA",
+            "globalid": "2SfKyYDtj9FhPdQJA12yen",
             "name": "Node-855",
             "description": null,
             "objecttype": null,
@@ -1354,7 +1354,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2KKKJMP1HFMPxSqJnNINz6",
+            "globalid": "1yrNVYpxDE_AUzZ1Ym54pM",
             "name": "Node-861",
             "description": null,
             "objecttype": null,
@@ -1362,7 +1362,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1_yHoQFkvCU8QnN0oEXkJx",
+            "globalid": "1WAL$wDCnDPv0cyBfUg6DH",
             "name": "Node-887",
             "description": null,
             "objecttype": null,
@@ -1370,7 +1370,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1UoK$Os2nCVu1ruM_gG4CA",
+            "globalid": "2$in1EgS96mf94DnDkZ64D",
             "name": "Node-893",
             "description": null,
             "objecttype": null,
@@ -1378,7 +1378,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2aY7zkJkf39R_zSZfq7QN5",
+            "globalid": "0pYvdwj_X3A8QvnGXDHVl5",
             "name": "Node-919",
             "description": null,
             "objecttype": null,
@@ -1386,7 +1386,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1L2mVwSKfDRgX5$7A9PMsI",
+            "globalid": "09kP1PxbLCO8lQ6brLnaUr",
             "name": "Node-925",
             "description": null,
             "objecttype": null,
@@ -1394,7 +1394,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3l7o9uJjX0swyQzG2t2N4C",
+            "globalid": "3gFQEJw7D7wBr8h7ZQEjTt",
             "name": "Node-951",
             "description": null,
             "objecttype": null,
@@ -1402,7 +1402,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3xfV0cDrX8LeCtZsypdW_o",
+            "globalid": "1Sw6gVmxf2CxU01ernEx9k",
             "name": "Node-957",
             "description": null,
             "objecttype": null,
@@ -1410,7 +1410,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0TokoVBvz96R8cjw$sOzHv",
+            "globalid": "0vqC7vQcjBc9BTTOmgzlvR",
             "name": "Node-983",
             "description": null,
             "objecttype": null,
@@ -1418,7 +1418,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "01tcgmYxLAcvODiA3mQz6g",
+            "globalid": "2ObIlx9EjERO33rpqLZ3a0",
             "name": "Node-989",
             "description": null,
             "objecttype": null,
@@ -1426,7 +1426,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1JmEvNpn18bwqU9$XJbx0D",
+            "globalid": "15EigmJbL3_gMm4sbzvgP6",
             "name": "Node-1015",
             "description": null,
             "objecttype": null,
@@ -1434,7 +1434,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0_1t_mhR51Xx1S5NG_fIW3",
+            "globalid": "2F8TW3Odb1Uf0ub5dd6$uK",
             "name": "Node-1021",
             "description": null,
             "objecttype": null,
@@ -1442,7 +1442,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0Im_EiSWP4$9ycQfuMN8gm",
+            "globalid": "0J_wL1ngn3MBVIWaMXx09I",
             "name": "Node-1047",
             "description": null,
             "objecttype": null,
@@ -1450,7 +1450,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2Qa9E2fSH9YvSYnOqBjM5b",
+            "globalid": "3tj0bKmTjDpQ$JTR929Cp5",
             "name": "Node-1053",
             "description": null,
             "objecttype": null,
@@ -1458,7 +1458,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2COiJCdaz5A8FPQ1i2hfpF",
+            "globalid": "3ggAbawOHD_f69Fn29QInP",
             "name": "Node-1079",
             "description": null,
             "objecttype": null,
@@ -1466,7 +1466,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2BRdhtf0z5ZPHQBQtjmAdQ",
+            "globalid": "1TWzBpfSXFsAo$4Ld973yj",
             "name": "Node-1085",
             "description": null,
             "objecttype": null,
@@ -1474,7 +1474,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1ExjaTbeD8zw3oIXR072z0",
+            "globalid": "0MKjgHB1bBNRjR29RkERZB",
             "name": "Node-1111",
             "description": null,
             "objecttype": null,
@@ -1482,7 +1482,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3Z5sYS$bH8ihcUDxoADJ5v",
+            "globalid": "2DvAKbk_n6M81V8xuJxJ_f",
             "name": "Node-1117",
             "description": null,
             "objecttype": null,
@@ -1490,7 +1490,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0Sw6IO9lfFO8CVCbWqisNk",
+            "globalid": "1dzQ7PnaP8P9lWHG_vcosp",
             "name": "Node-1143",
             "description": null,
             "objecttype": null,
@@ -1498,7 +1498,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "25lqoNaD5CfeqNEviQuR1c",
+            "globalid": "0dcGGkAb57e98Yiqtczwy6",
             "name": "Node-1149",
             "description": null,
             "objecttype": null,
@@ -1506,7 +1506,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1bORAHOF5ANhHkFzwa8pM2",
+            "globalid": "0hjE3Ora51suwlMYdShB1b",
             "name": "Node-1175",
             "description": null,
             "objecttype": null,
@@ -1514,7 +1514,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1O0XUp$BD1deOdBehWjn6u",
+            "globalid": "3JQoG61Ar7KB_6xwsuux9x",
             "name": "Node-1181",
             "description": null,
             "objecttype": null,
@@ -1522,7 +1522,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2gFjywuybCBBIel91lZe8Y",
+            "globalid": "3zrpK6Xir1nOEFPM3Rp20x",
             "name": "Node-1207",
             "description": null,
             "objecttype": null,
@@ -1530,7 +1530,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3iSVcBWrr4EheziwJXlM3F",
+            "globalid": "12dPH5IdT1sP_gVcwiwnX9",
             "name": "Node-1213",
             "description": null,
             "objecttype": null,
@@ -1538,7 +1538,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "39HydBAo10w9I54U8tNnHC",
+            "globalid": "283Xi5pyTEKR$BVheYs0Jc",
             "name": "Node-1239",
             "description": null,
             "objecttype": null,
@@ -1546,7 +1546,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "35XJQHRK995eu626H3qjhC",
+            "globalid": "1dqQS4BqL7TgF2CHdzdLN7",
             "name": "Node-1271",
             "description": null,
             "objecttype": null,
@@ -1554,7 +1554,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2sDQsNmX11hAx_xrUGqxcQ",
+            "globalid": "0kwrBhIpPDZhFzJ8woSV0l",
             "name": "Node-1303",
             "description": null,
             "objecttype": null,
@@ -1562,7 +1562,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3yEjwVNEL0nB8fGqPZuutJ",
+            "globalid": "3rNNElkMjBqx71DS8L10$J",
             "name": "Node-1309",
             "description": null,
             "objecttype": null,
@@ -1570,7 +1570,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2WPw$LMArB8Qm8cMUsVW9c",
+            "globalid": "16bu2O7s95TwGb1cqSHdQe",
             "name": "Node-1335",
             "description": null,
             "objecttype": null,
@@ -1578,7 +1578,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0za5tVbAnCcRp4y25zD8RF",
+            "globalid": "1hbEqmSoHEpg7GI0QWsf4F",
             "name": "Node-1341",
             "description": null,
             "objecttype": null,
@@ -1586,7 +1586,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3R0gPq04zFJeOVcUexFqWn",
+            "globalid": "1DZsHPz7T04QtB5vARJlLK",
             "name": "Node-1383",
             "description": null,
             "objecttype": null,
@@ -1594,15 +1594,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0Uhd3a7p1BbAHLJvmi1CHA",
-            "name": "Node-1389",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBuildingElementProxy",
-            "globalid": "25sCDeJWL3weuePckrt4XO",
+            "globalid": "0SDgF_VpD1ZfX74kPRyE8E",
             "name": "Node-1415",
             "description": null,
             "objecttype": null,
@@ -1610,7 +1602,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3wi0XLENT5mBnJJpRqaCTc",
+            "globalid": "2apSn$q95BPxuzDJyAPWD2",
             "name": "Node-1447",
             "description": null,
             "objecttype": null,
@@ -1618,7 +1610,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3i5HSJwybCDuM581jDYyRv",
+            "globalid": "3q_uL6Kyv6Wf6yCw1T557g",
             "name": "Node-1479",
             "description": null,
             "objecttype": null,
@@ -1626,7 +1618,15 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3o0x9Qr3v44wsjyr2QvzRw",
+            "globalid": "2mjSjkMaXBiOL88ZYPCP33",
+            "name": "Node-1485",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2eR69I$ar0d9$1RBxGxHjk",
             "name": "Node-1511",
             "description": null,
             "objecttype": null,
@@ -1634,15 +1634,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3j1fXtoaj1T9XFauXj9Avn",
-            "name": "Node-1517",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBuildingElementProxy",
-            "globalid": "3jXRHt7VT1WAJdsf58IZgr",
+            "globalid": "3zLBIcrNLF0glkG5NUtg2O",
             "name": "Node-1543",
             "description": null,
             "objecttype": null,
@@ -1650,7 +1642,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3pe$sp1NvDeQOCl6IkOEkI",
+            "globalid": "1vt8VfyZ99YQYOFVmpXOWf",
             "name": "Node-1575",
             "description": null,
             "objecttype": null,
@@ -1658,7 +1650,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1meT$b5817$wkMowPb4W2H",
+            "globalid": "3__JoHJQb9kwHJbCGAY5To",
             "name": "Node-1607",
             "description": null,
             "objecttype": null,
@@ -1666,7 +1658,15 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2q6nzg8of1Uw4q6twTyh8O",
+            "globalid": "10E3sV6iXDN8urj51vgzqv",
+            "name": "Node-1613",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2eTXpwPtn8Ghef_ynLor9v",
             "name": "Node-1677",
             "description": null,
             "objecttype": null,
@@ -1674,7 +1674,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2Ygn4SqVHDdB1pytjLqKG_",
+            "globalid": "2G2Hoxs5j3shJs4aOG_6Hp",
             "name": "Node-1683",
             "description": null,
             "objecttype": null,
@@ -1682,7 +1682,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2twj7bnUfERRUIqQxG1HfN",
+            "globalid": "0hBFWps3fFeO_ew91tUyzn",
             "name": "Node-1689",
             "description": null,
             "objecttype": null,
@@ -1690,7 +1690,7 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0I1bYOt2XAMwekAi9UjbAm",
+            "globalid": "3aR5on7xr0U85JJYXY6M$Y",
             "name": "Node-1730",
             "description": null,
             "objecttype": null,
@@ -1698,111 +1698,119 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1l8ZmwRkX6Ze7RiOKzMf$2",
-            "name": "Node-1736",
+            "globalid": "2FuAbt_gv6dfn2adag4XP6",
+            "name": "Node-1774",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0_xL_33j909PNbus8EO$Ns",
-            "name": "Node-1781",
+            "globalid": "2l1kje6s1DQwEJvVP8t8$n",
+            "name": "Node-1780",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1cVubqvt92fwO3o3BIq1ak",
-            "name": "Node-1864",
+            "globalid": "3QqzVITfPBAfKF3urKl7go",
+            "name": "Node-1786",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3KnQM0R9jByQstglpR3WFC",
-            "name": "Node-1870",
+            "globalid": "3h9WC1LL57yB2Rlk84N0ZG",
+            "name": "Node-1827",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0zHfwrQpzEthE4wmdoekz5",
-            "name": "Node-1876",
+            "globalid": "2CWncE$Ez2rOmJhhbDyvWZ",
+            "name": "Node-1871",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2nnG3kTQ953A0185$lEnHl",
-            "name": "Node-1917",
+            "globalid": "1cIEUPXz16YBHoucrDT27a",
+            "name": "Node-1877",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2Qp6YZRxXBfA9YS7lp$VVs",
-            "name": "Node-1923",
+            "globalid": "1huPujoEb1WRhD30n6e5og",
+            "name": "Node-1883",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2ASWgDZ2XBGPJ8$meqb_Lc",
-            "name": "Node-1968",
+            "globalid": "0Bb4f$u$LDRBVpyKHRBXJy",
+            "name": "Node-1924",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "34w4qZDRH3JxKCg8hWOTHc",
-            "name": "Node-2051",
+            "globalid": "2RCAFwy_v9NvupEXbRdKSJ",
+            "name": "Node-1930",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2_B_HC8PL1dgUJYnOZcpAZ",
-            "name": "Node-2057",
+            "globalid": "26hcgWXur2JuagxYOsopGX",
+            "name": "Node-1975",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "16M8bI5Pf4OfWDLgu8Sj3l",
-            "name": "Node-2063",
+            "globalid": "3fTxIVkmnCBgGGDn5RdKC2",
+            "name": "Node-2058",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0$5dqBMWD7bgQ9rwvO7Vyu",
-            "name": "Node-2104",
+            "globalid": "2HFw4sAyj9m8WHSsOqNLlD",
+            "name": "Node-2064",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1_qjbcjwf45PRPzuD4jMto",
-            "name": "Node-2110",
+            "globalid": "3Y4NxVPFX6nxB3hg3I15rh",
+            "name": "Node-2070",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "38AX2tUfvDOvJmSvPMnPsf",
+            "globalid": "0UhxrMsuX71PU6vumfKI2F",
+            "name": "Node-2111",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "3JgDIl70jD3uok7njD8gmS",
             "name": "Node-2155",
             "description": null,
             "objecttype": null,
@@ -1810,87 +1818,191 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "13Qk9xA4j0pRM_i0c1DhIr",
-            "name": "Node-2242",
+            "globalid": "1QHNww0l92tgPDY3bJmZJO",
+            "name": "Node-2161",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1f0NGw1y9EUPr9F$CALn4B",
-            "name": "Node-2248",
+            "globalid": "1$zwbRnvLBcgxZKOMOaaHe",
+            "name": "Node-2167",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0erpeJLOfEEPZUyWnx18sO",
-            "name": "Node-2254",
+            "globalid": "1FSYq71oP2YfWrc87rhSZa",
+            "name": "Node-2208",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2oj4i3UhnBaBh6n0iMfdOy",
-            "name": "Node-2289",
+            "globalid": "3Uti_lv0D32Qx6dvu8wHgB",
+            "name": "Node-2252",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2ByXcNbr1BVu7muV3rEiPi",
-            "name": "Node-2351",
+            "globalid": "1Gih0jyib66AJI7M$lg84s",
+            "name": "Node-2258",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0Q6p$UAkn1KeYdkQkL6EOe",
-            "name": "Node-2386",
+            "globalid": "0Q1FbFjTrAqAve283ou6Kw",
+            "name": "Node-2264",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1KlfB3xWz7XuHyarbh2Cy6",
-            "name": "Node-2436",
+            "globalid": "2WOjzk_2L5phud$WNpfcMm",
+            "name": "Node-2305",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2OPf2VNIrAO8FQn_ccnMBA",
-            "name": "Node-2442",
+            "globalid": "23acqJ07H77ub5FiQgyCja",
+            "name": "Node-2311",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2_KESECt95xPeMzvdxSjFk",
-            "name": "Node-2642",
+            "globalid": "3qXS2FAaXFN9olFQiY8FVg",
+            "name": "Node-2356",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1By99EILD21O6zhIQXm5It",
-            "name": "Node-2692",
+            "globalid": "0YR7micFz1ifsDBgdt73v8",
+            "name": "Node-2439",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2TTgJbV8LCxPJqUB9tS9BP",
+            "globalid": "25b1blk$18MOoVssl_W$LP",
+            "name": "Node-2445",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "3E_Zzh7uf1ofBc2GyAVopE",
+            "name": "Node-2451",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2G8PBxLWH7HRrYCGn9yRca",
+            "name": "Node-2492",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "29Jo62e_1DDRRaNSyjq6yY",
+            "name": "Node-2536",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1jzuTQn0X6nBUF6L$4_hfV",
+            "name": "Node-2542",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2FeDKejkz1v8R9$$wfBU$D",
+            "name": "Node-2548",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "0CHzWDlNP27R63RLBx9bEN",
+            "name": "Node-2589",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "0enIcPHuD3B8V18o2erIC9",
+            "name": "Node-2633",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2J3cA48BfDCAg3_Tud52$T",
+            "name": "Node-2639",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2xZxRFpSX3$xI5r6Q$Aph3",
+            "name": "Node-2645",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2S$oCeGRT8Kh8OakHYBlkp",
+            "name": "Node-2686",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "3L2fktvcjEc9hvYzsZHyjF",
+            "name": "Node-2730",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "0V0NbJ6HT56RhuoJ8Bf0R1",
+            "name": "Node-2736",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1P$N$u9296ieop_q$MkEE_",
             "name": "Node-2742",
             "description": null,
             "objecttype": null,
@@ -1898,39 +2010,31 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3GzTdkRXfCC9fZu$Oyxp0o",
-            "name": "Node-2817",
+            "globalid": "3u2qdGmz1B9R6Vk0k4bOGZ",
+            "name": "Node-2783",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "314qVynvHBtuL8jKla4PPP",
-            "name": "Node-2842",
+            "globalid": "2rFyfOXqTFlgjkmYIav8if",
+            "name": "Node-2789",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2wJA0sQFvAnv_4gw_EqJjF",
-            "name": "Node-2867",
+            "globalid": "1WfBIkyO9DbOy7ncm0vA2c",
+            "name": "Node-2834",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2NwaVgSc95oP5JMGRuYIRs",
-            "name": "Node-2892",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcBuildingElementProxy",
-            "globalid": "0DUygS1CX8oAdjZ8oN_VET",
+            "globalid": "3aq$qD7mLCTwxaG06wfoTE",
             "name": "Node-2917",
             "description": null,
             "objecttype": null,
@@ -1938,271 +2042,415 @@
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2xFQOs4efEq97TybRDgtN0",
-            "name": "Node-2942",
+            "globalid": "2qvnQYjKL3kAIelt71u57c",
+            "name": "Node-2923",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1G4j2uVg1Fl9a6Lwt$ORvm",
-            "name": "Node-2967",
+            "globalid": "3WwPW0eFD9a8jbcCvEwuTX",
+            "name": "Node-2929",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0Pery4qRz8gwbkEYi83YLZ",
-            "name": "Node-2992",
+            "globalid": "1eUCFyQrz5qQjt9rS3tFRr",
+            "name": "Node-2970",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2n5CS3EpDF2hSL7cmtGBzM",
-            "name": "Node-3017",
+            "globalid": "0lFophEX9AVwhfG2$TfJRf",
+            "name": "Node-3018",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "18R32btOr62umKucoC63ct",
-            "name": "Node-3042",
+            "globalid": "3MWbVjQEX6wO3CO3YwLqnL",
+            "name": "Node-3024",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3UxUkzlDz8K8Nx4Bbt$DsY",
-            "name": "Node-3067",
+            "globalid": "0Ry8FphH1Apud1Zg66n7O$",
+            "name": "Node-3030",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3dIKZAdOnARvnZCJf5_wBD",
-            "name": "Node-3092",
+            "globalid": "2MtWNpGinEXhDZwhFz$F6S",
+            "name": "Node-3065",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0lU0GDhz9E$RRiy_feNE8a",
-            "name": "Node-3117",
+            "globalid": "2ZZkFk6J97SA0_FKPrWdUA",
+            "name": "Node-3127",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1kE28y4hX7AB8MjoFTicJu",
-            "name": "Node-3142",
+            "globalid": "1zsPho3hn8kgAU80LvlVOq",
+            "name": "Node-3162",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0WHhb3qlX3dR67CEbTmG05",
-            "name": "Node-3167",
+            "globalid": "2QggLbDmf1Fu8hO4r7XGWC",
+            "name": "Node-3224",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "12pRRO$dP9u8i1ILCY11c$",
-            "name": "Node-3192",
+            "globalid": "1EeTz$mbX4uAMYx3Ajyhhc",
+            "name": "Node-3259",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1ZsKbaX6L0keDe_koap599",
-            "name": "Node-3217",
+            "globalid": "3GsTuuLtH3WgacCdEDpn5N",
+            "name": "Node-3418",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "21EvEQQhb2HxrjwhATSPdw",
-            "name": "Node-3242",
+            "globalid": "2ih34FLNzEfRmXjf49GxVC",
+            "name": "Node-3468",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3sSTgf3brENf7VJQcHA1Ei",
-            "name": "Node-3267",
+            "globalid": "0C5qOVnGX4rOQQfis7ZA_A",
+            "name": "Node-3518",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "05B71F3ULCNBLLgrveKEoU",
-            "name": "Node-3292",
+            "globalid": "1mQSHH2wL2YPOzaZRs9JFV",
+            "name": "Node-3593",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1d_IMgBOb1JQXgm6W3dXOE",
-            "name": "Node-3317",
+            "globalid": "3_ZsiOl8b1tfpkU$vVPFhM",
+            "name": "Node-3618",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1HPT3o23f4lRR6riq6IbUx",
-            "name": "Node-3342",
+            "globalid": "18oXW36aX0OQEa6aTpCEFQ",
+            "name": "Node-3643",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1Q0MRueSb0oxh9AzZLc0cB",
-            "name": "Node-3367",
+            "globalid": "0M5j1Ms9XBKxM3SICmvnC5",
+            "name": "Node-3668",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3dA1jxEBD0YOnCHKYUlxM9",
-            "name": "Node-3392",
+            "globalid": "2mbkE8wXHD9xFuo9SeEzVC",
+            "name": "Node-3693",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1EMAlqUrj5vuS45g1o$EuR",
-            "name": "Node-3417",
+            "globalid": "2V41X2Zo98qeIAYf$7gH4F",
+            "name": "Node-3718",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1egRWwPwDAaRsWhiqfpMqO",
-            "name": "Node-3442",
+            "globalid": "2_yRJ0WLnA1Qu6$Zb4Nc04",
+            "name": "Node-3743",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "2zKkKYLFr20P8M1zYdjRYg",
-            "name": "Node-3467",
+            "globalid": "1R7MVwBmzDxAHpIK4BzXUq",
+            "name": "Node-3768",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3GpXUmY85ERfXAVTWzJ6Vl",
-            "name": "Node-3492",
+            "globalid": "0Vasah_1f39BT6rxQxdpip",
+            "name": "Node-3793",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "36Ew_ZT2T9Ixs8rzgU7vc4",
-            "name": "Node-3517",
+            "globalid": "3H$z6d4cfCIOHieT6aPZYl",
+            "name": "Node-3818",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "25OQ9OTwzAWAgT7n5BKg1x",
-            "name": "Node-3542",
+            "globalid": "3tOOqgte5FnBkLIhRVca3Q",
+            "name": "Node-3843",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0V0Tf7fm52yAnFev1IGEL2",
-            "name": "Node-3567",
+            "globalid": "1HLH4i1snDLA6cZ6cnHejO",
+            "name": "Node-3868",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "22YR1cQA5Bu8VO6B0$l02w",
-            "name": "Node-3592",
+            "globalid": "0JfCgpb$HC7v5BkjxzUCiL",
+            "name": "Node-3893",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "1md9DO7Sj9rvzXUrDE$WRL",
-            "name": "Node-3617",
+            "globalid": "08kbJshUzCt80x3S7x9rpA",
+            "name": "Node-3918",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "21iai_mt9A6uCKFxgQw7qj",
-            "name": "Node-3642",
+            "globalid": "2oWA8W5zLFMQHuKtr1T_it",
+            "name": "Node-3943",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3bvlz0Uz5EPPvaAWDeywBd",
-            "name": "Node-3667",
+            "globalid": "1Xfx1O0Dn4Ge9wRSxcGgXQ",
+            "name": "Node-3968",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "0J4QXvQO52fOhTOhdrTnmH",
-            "name": "Node-3692",
+            "globalid": "31OhtUiAH8BuiMrJWY2d8J",
+            "name": "Node-3993",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcBuildingElementProxy",
-            "globalid": "3BOQX1LXn6o84LhdYtuwbI",
-            "name": "Node-3717",
+            "globalid": "34wlftZ7588fyqN0ZJqnjM",
+            "name": "Node-4018",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2VHRNxg6P6TvqNxBHMJKbn",
+            "name": "Node-4043",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "33Rd6VVBzClQjvPk3KPwhM",
+            "name": "Node-4068",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2_mBm55NvB2xLxRC1Jw3WT",
+            "name": "Node-4093",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2ik6P_rfDFy8bzgyAeLC$y",
+            "name": "Node-4118",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "3zw4yBvvD7tuxHfXyES12M",
+            "name": "Node-4143",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "310$ARjvb0HR_hlarWBNq2",
+            "name": "Node-4168",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1PVcpP1zD9QQ9aIRrgyORp",
+            "name": "Node-4193",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "266N9U4dPBwBN0iZ77A2Id",
+            "name": "Node-4218",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2Y93ZFAnT7mxjF_Tq1uw9e",
+            "name": "Node-4243",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1ev$d_v3D4cxRsq6nPg5E1",
+            "name": "Node-4268",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1Vz8kIDCD46vH5puPwUB8n",
+            "name": "Node-4293",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1RSNM1riH6_BJnOIwcR2ju",
+            "name": "Node-4318",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2X5EhWcvb69AaWasaVPmL6",
+            "name": "Node-4343",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2$kXR$30zEb8gzDcWlzcze",
+            "name": "Node-4368",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "0rVHNSwMjDSRoDpNId0OiY",
+            "name": "Node-4393",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "3QeWRcHI51i8sFmwCmj4Kn",
+            "name": "Node-4418",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "1U1Qi1TC15gBhOXBgYen8b",
+            "name": "Node-4443",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "2de8lTHyj6QeoNXjtmw4QP",
+            "name": "Node-4468",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcBuildingElementProxy",
+            "globalid": "0$FBWCCRDCkwT7ArCUNxIn",
+            "name": "Node-4493",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcColumn",
-            "globalid": "1m9fFv1J95Fx_5nBENf4AT",
-            "name": "UC-Universal Columns-Column:UC305x305x97:418747",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcColumn",
-            "globalid": "2CCWvlbRb7fBBxLE1JOmoq",
+            "globalid": "1Ss4wCEOz1rBlUpKX1GGfs",
             "name": "UC-Universal Columns-Column:UC305x305x97:419062",
             "description": null,
             "objecttype": null,
@@ -2210,7 +2458,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0piOnk1yr0BAWj1jzcyRZL",
+            "globalid": "3uiYHsHBTCE809s4sCVr1j",
             "name": "UC-Universal Columns-Column:UC305x305x97:418349",
             "description": null,
             "objecttype": null,
@@ -2218,7 +2466,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "2$FjP9Z3v59xAt1QHu9rai",
+            "globalid": "3mBh1$5Hf9TvBsUlzmq_1$",
             "name": "UC-Universal Columns-Column:UC305x305x97:419635",
             "description": null,
             "objecttype": null,
@@ -2226,7 +2474,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "15drzevwfCHRE89d7XhbdU",
+            "globalid": "1g_6_szeLD1PrCQkkOYsYG",
             "name": "UC-Universal Columns-Column:UC305x305x97:418897",
             "description": null,
             "objecttype": null,
@@ -2234,7 +2482,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0mqOo1n75Ff8wTRfK_Isjs",
+            "globalid": "0Zmw3qqJT0zP7QaaNHbgRx",
             "name": "UC-Universal Columns-Column:UC305x305x97:419283",
             "description": null,
             "objecttype": null,
@@ -2242,7 +2490,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0ikAlDSdLCFfYNPjWzK$W2",
+            "globalid": "16_VfBQaT3ohbZ7ukPWYT9",
             "name": "UC-Universal Columns-Column:UC305x305x97:418490",
             "description": null,
             "objecttype": null,
@@ -2250,7 +2498,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0cjSt_91j6CRwOn7O_330$",
+            "globalid": "1x7aeAzH9D_unMFHCTDJjX",
             "name": "UC-Universal Columns-Column:UC305x305x97:419440",
             "description": null,
             "objecttype": null,
@@ -2258,7 +2506,15 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0mU$tBhbbDiA3edugqntWy",
+            "globalid": "1JRtctJ_H26xgjTJBYfKwj",
+            "name": "UC-Universal Columns-Column:UC305x305x97:418747",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcColumn",
+            "globalid": "39PSPlNj5EFA0ZRMYiUXDl",
             "name": "FrameMember-1370",
             "description": null,
             "objecttype": null,
@@ -2266,7 +2522,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0c2SD$hRPEBR0ujGB90wmt",
+            "globalid": "2ravZVldD4AwasCXoOEyGs",
             "name": "FrameMember-1402",
             "description": null,
             "objecttype": null,
@@ -2274,7 +2530,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "1V3Do9dX98T9y7NyRj8bIM",
+            "globalid": "3OXSFrmUX51fhHpO5D5tf6",
             "name": "FrameMember-1434",
             "description": null,
             "objecttype": null,
@@ -2282,7 +2538,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "2lxAe5enn9zRbc$b07wIOR",
+            "globalid": "2dxSfQEJ150h95LPOJJxkZ",
             "name": "FrameMember-1466",
             "description": null,
             "objecttype": null,
@@ -2290,7 +2546,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "2DSO2MXAv0fBABUqi28eV8",
+            "globalid": "0CQBwZc8zBJvRkFBs4gpQm",
             "name": "FrameMember-1498",
             "description": null,
             "objecttype": null,
@@ -2298,7 +2554,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "3Vy7Qu3Or4Bvmda360HdRM",
+            "globalid": "20kNkzwv5A99vyVEILgaHF",
             "name": "FrameMember-1530",
             "description": null,
             "objecttype": null,
@@ -2306,7 +2562,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "0miP1iBdj3SuThogwzVcSM",
+            "globalid": "0L6XfD7onBCOfepkvSbwXr",
             "name": "FrameMember-1562",
             "description": null,
             "objecttype": null,
@@ -2314,7 +2570,7 @@
         },
         {
             "class": "IfcColumn",
-            "globalid": "1thyGQroz71xsiFCTO$4Sx",
+            "globalid": "2P5CqBFVX8kRIQOJdZ$BSH",
             "name": "FrameMember-1594",
             "description": null,
             "objecttype": null,
@@ -2322,23 +2578,23 @@
         },
         {
             "class": "IfcSlab",
-            "globalid": "15Judva6vCFAbnIEgVdh4s",
-            "name": "Floor:160mm Concrete With 50mm Metal Deck:420569",
+            "globalid": "2a$uwrekr9ogDI$nv0HTnC",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421857",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "0TBR09rxTELx92T6wlttV8",
-            "name": "Floor:160mm Concrete With 50mm Metal Deck:420827",
+            "globalid": "3nnsFzsOjEV8DZ5NVohScg",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421470",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "0dYFdXWbjBGQZCjbJcwCPF",
+            "globalid": "0aHqpuNDTCABSOsZ1IiDqh",
             "name": "Floor:160mm Concrete With 50mm Metal Deck:420746",
             "description": null,
             "objecttype": null,
@@ -2346,7 +2602,71 @@
         },
         {
             "class": "IfcSlab",
-            "globalid": "3DWxO_6UPCEhSehpmKWP7m",
+            "globalid": "0vqZ7wayPFw8jBlNE_Tef5",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421200",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2YAoXlfnL3C8CvoXcWC2r$",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421971",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "26BuX5qKDC1xkRbCRi44j1",
+            "name": "Floor:160mm Concrete With 50mm Metal Deck:420827",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "133hW740HFnReIz0NEHJka",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421716",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "3ncfwdXcz8$Odk1_YJ9sY2",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421577",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "1T43Kz3k14Eu0IjJ635Xdn",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421294",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2W70Vaz7HFhwtaoKJrD27X",
+            "name": "Floor:160mm Concrete With 50mm Metal Deck:420569",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2WpTPXWnb2KuSOBK9ejyd7",
+            "name": "M_Footing-Rectangular:1800 x 1200 x 450mm:421141",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2xNBD2ty9CNfC0boh$DJGP",
             "name": "StructuralSurfaceMember-1650",
             "description": null,
             "objecttype": null,
@@ -2354,7 +2674,7 @@
         },
         {
             "class": "IfcSlab",
-            "globalid": "0pZn8jw9rAHfGpFnvjDg$N",
+            "globalid": "3cOuTaBuDA0wWV2UL1f9OM",
             "name": "StructuralSurfaceMember-1697",
             "description": null,
             "objecttype": null,
@@ -2362,87 +2682,215 @@
         },
         {
             "class": "IfcSlab",
-            "globalid": "0aS2zKHGr6De08KKWFtsaq",
-            "name": "StructuralSurfaceMember-1742",
+            "globalid": "0$A5PB6y5DqwN2_4C6H66x",
+            "name": "StructuralSurfaceMember-1747",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "27k6jhyHnD1BJZ036kDN1I",
-            "name": "StructuralSurfaceMember-1787",
+            "globalid": "1u_suPWZj0xA_CBf1GNlwv",
+            "name": "StructuralSurfaceMember-1794",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "0uzlF$ofH5WAJDVygNvv7W",
-            "name": "StructuralSurfaceMember-1837",
+            "globalid": "1YYL7f_$P5ExnM0CoJVKa8",
+            "name": "StructuralSurfaceMember-1844",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "0EHSnCQZv4Yu9e1yTRtk5Z",
-            "name": "StructuralSurfaceMember-1884",
+            "globalid": "1AcFjq8oL5YxbpDE1Xt4sj",
+            "name": "StructuralSurfaceMember-1891",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "2WYkTZh0D6Qw57VSYaYQjq",
-            "name": "StructuralSurfaceMember-1929",
+            "globalid": "3udFmjjqPEaPPY4iEyP4Y2",
+            "name": "StructuralSurfaceMember-1936",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "0xv3sS9Pv9YBJgGNnbs7zd",
-            "name": "StructuralSurfaceMember-1974",
+            "globalid": "3VmvOvHaD87Rzd83p6_xZX",
+            "name": "StructuralSurfaceMember-1981",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "2q0LzURyb4kRXH9Y2rfjS$",
-            "name": "StructuralSurfaceMember-2024",
+            "globalid": "0B08tmpaX8J98VqY9lTL75",
+            "name": "StructuralSurfaceMember-2031",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "1SkcNvnjH1gBQNSt4M1Dbv",
-            "name": "StructuralSurfaceMember-2071",
+            "globalid": "392TAbDE1CAxfOI9xkB4gg",
+            "name": "StructuralSurfaceMember-2078",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "1yS94Tmn18kRNE_bZFDifB",
-            "name": "StructuralSurfaceMember-2116",
+            "globalid": "2aD6_7qvn4AeUhTsPt9UcF",
+            "name": "StructuralSurfaceMember-2128",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSlab",
-            "globalid": "16mxxNEWf65wzJQ_lyENxN",
-            "name": "StructuralSurfaceMember-2161",
+            "globalid": "2rrCcP8$1CRxL5IXeK46ZS",
+            "name": "StructuralSurfaceMember-2175",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0hDxh4m7j4JOZ72rF5_ZUR",
+            "name": "StructuralSurfaceMember-2225",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0oQF5q$15F$xNV15hBAqyi",
+            "name": "StructuralSurfaceMember-2272",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0B7lNNqL96LOWbsTc9V2oE",
+            "name": "StructuralSurfaceMember-2317",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "1h_dIr9LPEmO$ZXhbWLoCS",
+            "name": "StructuralSurfaceMember-2362",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0D3Ef3sl595Q4X31FeHoIO",
+            "name": "StructuralSurfaceMember-2412",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2XC5n_gBH8yPUQdgPK0Gir",
+            "name": "StructuralSurfaceMember-2459",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "27DrWknfn8LfsOzs_WH111",
+            "name": "StructuralSurfaceMember-2509",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0DsY9r6FP0DPBrCD9XM0vZ",
+            "name": "StructuralSurfaceMember-2556",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "3Z6ZkuBXz10Qhu7TJQEx4G",
+            "name": "StructuralSurfaceMember-2606",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "1r52z0DG52oe_DszPVlhZp",
+            "name": "StructuralSurfaceMember-2653",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2gicQ0RST1FgE_MOWgKUdb",
+            "name": "StructuralSurfaceMember-2703",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0OGpzRegHDO9sR_thyTPKO",
+            "name": "StructuralSurfaceMember-2750",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0wpb0nR5D4rQm9BL9I1OZh",
+            "name": "StructuralSurfaceMember-2795",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0RfMVuPov1SQf$RzfM0xRQ",
+            "name": "StructuralSurfaceMember-2840",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "2feDIkXjHCYQ3HDx6hHIAj",
+            "name": "StructuralSurfaceMember-2890",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcSlab",
+            "globalid": "0BJQjvR6b41QUni70C718G",
+            "name": "StructuralSurfaceMember-2937",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "2AqV8cdZT6iONUii0IICcq",
+            "globalid": "3g2JEeKsT6nuK$4BlFgh0T",
             "name": "Basic Wall:Generic - 300mm:417840",
             "description": null,
             "objecttype": null,
@@ -2450,7 +2898,7 @@
         },
         {
             "class": "IfcWall",
-            "globalid": "2oL4_Y7Ov5CPNgr7ngtVEm",
+            "globalid": "33OH092szD6OkkN7e8sSe$",
             "name": "Basic Wall:Generic - 300mm:417842",
             "description": null,
             "objecttype": null,
@@ -2458,15 +2906,7 @@
         },
         {
             "class": "IfcWall",
-            "globalid": "25xWvXBxz0Dh6HXIpsghJG",
-            "name": "Basic Wall:Generic - 300mm:417838",
-            "description": null,
-            "objecttype": null,
-            "requirement": "None"
-        },
-        {
-            "class": "IfcWall",
-            "globalid": "0AtKsT8kDEUAMBhFxmJ$JI",
+            "globalid": "1a7izh4k54bf5h2MEQWmWY",
             "name": "Basic Wall:Generic - 300mm:417844",
             "description": null,
             "objecttype": null,
@@ -2474,71 +2914,79 @@
         },
         {
             "class": "IfcWall",
-            "globalid": "0DxX30MJfFw9$1oMzfdVVS",
-            "name": "StructuralSurfaceMember-2215",
+            "globalid": "3JXbyNlPfBCA8x9eEDsfbw",
+            "name": "Basic Wall:Generic - 300mm:417838",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "3TA8zZI1j7DufTtvgdlWJ5",
-            "name": "StructuralSurfaceMember-2262",
+            "globalid": "1mlRvu8i5EzeIjskfl$Gka",
+            "name": "StructuralSurfaceMember-2991",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "1WYh$pySH4Levv9SQl4R4J",
-            "name": "StructuralSurfaceMember-2312",
+            "globalid": "3Egy35AKz7Se_46df_4P6f",
+            "name": "StructuralSurfaceMember-3038",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "1lp5i$s3L6wxPrO9vaGOLi",
-            "name": "StructuralSurfaceMember-2359",
+            "globalid": "1Ap3pGNUbAFgONr_7Ch61_",
+            "name": "StructuralSurfaceMember-3088",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "1_3i2Da7j8qfFzzLhEFWrH",
-            "name": "StructuralSurfaceMember-2409",
+            "globalid": "1sOI4I7WT38B2S9Z6HbsgS",
+            "name": "StructuralSurfaceMember-3135",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "1t$i12sn5EgxifqqHg$V8o",
-            "name": "StructuralSurfaceMember-2456",
+            "globalid": "2fBtVaECDFOhA3OC04VTHn",
+            "name": "StructuralSurfaceMember-3185",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "3y0JHFwwD8XeXsuGDrQRNv",
-            "name": "StructuralSurfaceMember-2506",
+            "globalid": "0BrWfJ1oT0EfukDFuWMGj4",
+            "name": "StructuralSurfaceMember-3232",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcWall",
-            "globalid": "2_dp$bQ5r9zu_IcJDtczOU",
-            "name": "StructuralSurfaceMember-2553",
+            "globalid": "05J0zJn1LDMPxqo0ddNeQX",
+            "name": "StructuralSurfaceMember-3282",
+            "description": null,
+            "objecttype": null,
+            "requirement": "None"
+        },
+        {
+            "class": "IfcWall",
+            "globalid": "1YLtLQ3uz4rOWVCIAom5SA",
+            "name": "StructuralSurfaceMember-3329",
             "description": null,
             "objecttype": null,
             "requirement": "None"
         },
         {
             "class": "IfcSite",
-            "globalid": "2Xc6ACeE1AbvW2jycOVxYF",
+            "globalid": "3T1dgGUR5FQ9j9BxLc7MmW",
             "name": "Site-01",
             "description": null,
             "objecttype": null,
