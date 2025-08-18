@@ -1,4 +1,4 @@
-# Copyright 2024, Battelle Energy Alliance, LLC All Rights Reserved
+# Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell.api.pset
 import ifcopenshell.api.material

@@ -1,4 +1,4 @@
-# Copyright 2024, Battelle Energy Alliance, LLC All Rights Reserved
+# Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 """Welcome to BIM2GLB. Modification of IFC to GLB conversion provided by IfcConvert."""
 
