@@ -1,4 +1,4 @@
-# Copyright 2024, Battelle Energy Alliance, LLC All Rights Reserved
+# Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 """Welcome to INLBIM. INLBIM is a supplement to IfcOpenShell developed by Idaho
 National Lab. IfcOpenShell provides a way to read and write IFCs."""

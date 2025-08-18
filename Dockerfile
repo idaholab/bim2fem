@@ -1,3 +1,5 @@
+# Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
+
 # Use the official Python image from the Docker Hub. This image acts as our base 
 # image that we build from.
 FROM python:3.11
