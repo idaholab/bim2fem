@@ -16,6 +16,7 @@ import math
 import numpy as np
 import inlbim.api.structural
 import ifcopenshell.util.element
+from inlbim.util.geometry import HorizontalCurve
 
 
 def add_structural_analysis_model(
@@ -51,10 +52,10 @@ def add_structural_analysis_model(
     return structural_analysis_model
 
 
-def create_3pt_structural_curve_member(
-    p1: tuple[float, float, float],
-    p2: tuple[float, float, float],
-    p3: tuple[float, float, float],
+def create_linear_structural_curve_member(
+    start_point: tuple[float, float, float],
+    end_point: tuple[float, float, float],
+    orientation_point: tuple[float, float, float],
     profile_def: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
     structural_analysis_model: ifcopenshell.entity_instance,
@@ -62,7 +63,7 @@ def create_3pt_structural_curve_member(
     name: str | None = None,
     corresponding_product: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
-    """Create 3pt IfcStructuralCurveMember"""
+    """Create Linear IfcStructuralCurveMember"""
 
     # Get IFC4 File
     ifc4_file = profile_def.file
@@ -88,14 +89,14 @@ def create_3pt_structural_curve_member(
     structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
     # Add Axis (aka Z-axis orientation) attribute
-    z_axis = np.array(p3) - np.array(p1)
+    z_axis = np.array(orientation_point) - np.array(start_point)
     structural_curve_member.Axis = ifc4_file.createIfcDirection(
         tuple([float(val) for val in z_axis])
     )
 
     # Create Vertex Points
     vertex_points = []
-    for point in [p1, p2]:
+    for point in [start_point, end_point]:
         vertex_points.append(
             inlbim.api.representation.add_vertex_point(
                 ifc4_file=ifc4_file, point_coordinates=point
@@ -106,6 +107,122 @@ def create_3pt_structural_curve_member(
     representation_item = inlbim.api.representation.add_edge(
         edge_start=vertex_points[0],
         edge_end=vertex_points[1],
+    )
+    shape_model = inlbim.api.representation.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcTopologyRepresentation",
+        representation_identifier="Reference",
+        representation_type="Edge",
+        context_type="Model",
+        target_view="MODEL_VIEW",
+        items=[representation_item],
+    )
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=structural_curve_member,
+        representation=shape_model,
+    )
+
+    # Add and Assign MaterialProfileSetUsage
+    material_profile_set = (
+        inlbim.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile_def,
+            check_for_duplicate=True,
+        )
+    )
+    material_profile_set_usage = ifc4_file.create_entity(
+        type="IfcMaterialProfileSetUsage"
+    )
+    material_profile_set_usage.ForProfileSet = material_profile_set
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[structural_curve_member],
+        material=material_profile_set_usage,
+    )
+
+    # Add and Assign StructuralPointConnections
+    for vertex_point in vertex_points:
+        structural_point_connection = create_structural_point_connection(
+            vertex_point=vertex_point,
+            structural_analysis_model=structural_analysis_model,
+            name=None,
+        )
+        ifcopenshell.api.structural.add_structural_member_connection(
+            file=ifc4_file,
+            relating_structural_member=structural_curve_member,
+            related_structural_connection=structural_point_connection,
+        )
+
+    # Assign to corresponding IfcProduct
+    if corresponding_product:
+        inlbim.api.product.assign_product(
+            file=ifc4_file,
+            objects=[structural_curve_member],
+            product=corresponding_product,
+        )
+
+    return structural_curve_member
+
+
+def create_curved_structural_curve_member(
+    horizontal_curve: HorizontalCurve,
+    orientation_point: tuple[float, float, float],
+    profile_def: ifcopenshell.entity_instance,
+    material: ifcopenshell.entity_instance,
+    structural_analysis_model: ifcopenshell.entity_instance,
+    structural_curve_member: ifcopenshell.entity_instance | None = None,
+    name: str | None = None,
+    corresponding_product: ifcopenshell.entity_instance | None = None,
+) -> ifcopenshell.entity_instance:
+    """Create Linear IfcStructuralCurveMember"""
+
+    # Get IFC4 File
+    ifc4_file = profile_def.file
+
+    # Create StructuralCurveMember
+    if structural_curve_member is None:
+        structural_curve_member = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcStructuralCurveMember",
+            name=name,
+            predefined_type="NOTDEFINED",
+        )
+        if name is None:
+            name = f"FrameMember-{structural_curve_member.id()}"
+            structural_curve_member.Name = name
+
+    # Assign StructuralCurveMember to StructuralAnalysisModel
+    ifcopenshell.api.structural.assign_structural_analysis_model(
+        file=structural_analysis_model.file,
+        products=[structural_curve_member],
+        structural_analysis_model=structural_analysis_model,
+    )
+    structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
+
+    # Add Axis (aka Z-axis orientation) attribute
+    z_axis = np.array(orientation_point) - np.array(horizontal_curve.point_of_curvature)
+    structural_curve_member.Axis = ifc4_file.createIfcDirection(
+        tuple([float(val) for val in z_axis])
+    )
+
+    # Create Vertex Points
+    vertex_points = []
+    for point in [
+        horizontal_curve.point_of_curvature,
+        horizontal_curve.point_of_tangency,
+    ]:
+        vertex_points.append(
+            inlbim.api.representation.add_vertex_point(
+                ifc4_file=ifc4_file, point_coordinates=point
+            )
+        )
+
+    # Add and assign representation
+    representation_item = inlbim.api.representation.add_curved_edge(
+        vertex_point_at_point_of_curvature=vertex_points[0],
+        vertex_point_at_point_of_tangency=vertex_points[1],
+        center_of_curvature=horizontal_curve.center_of_curvature,
     )
     shape_model = inlbim.api.representation.add_shape_model(
         ifc4_file=ifc4_file,
@@ -481,7 +598,14 @@ def merge_two_structural_point_connections_together(
     for entity in entities_refercing_replaced_vertex_point:
         if not isinstance(entity, ifcopenshell.entity_instance):
             continue
-        if entity.is_a() == "IfcEdge":
+        elif entity.is_a() == "IfcEdge":
+            if entity.EdgeStart == replaced_vertex_point:
+                entity.EdgeStart = replacing_vertex_point
+                continue
+            elif entity.EdgeEnd == replaced_vertex_point:
+                entity.EdgeEnd = replacing_vertex_point
+                continue
+        elif entity.is_a() == "IfcEdgeCurve":
             if entity.EdgeStart == replaced_vertex_point:
                 entity.EdgeStart = replacing_vertex_point
                 continue
@@ -686,10 +810,10 @@ def divide_structural_curve_member(
             new_structural_curve_members.append(structural_curve_member)
         else:
             new_structural_curve_member = (
-                inlbim.api.structural.create_3pt_structural_curve_member(
-                    p1=new_start_point,
-                    p2=new_end_point,
-                    p3=new_orientation_point,
+                inlbim.api.structural.create_linear_structural_curve_member(
+                    start_point=new_start_point,
+                    end_point=new_end_point,
+                    orientation_point=new_orientation_point,
                     profile_def=profile_def,
                     material=material,
                     structural_analysis_model=structural_analysis_model,
@@ -701,3 +825,182 @@ def divide_structural_curve_member(
         new_start_point = new_end_point
 
     return new_structural_curve_members
+
+
+def calculate_orientation_point_from_endpoints(
+    p1: tuple[float, float, float],
+    p2: tuple[float, float, float],
+) -> tuple[float, float, float]:
+
+    local_x_axis = (
+        inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=p1,
+            p2=p2,
+        )
+    )
+    global_x_axis = (1.0, 0.0, 1.0)
+    angle = np.round(
+        inlbim.util.geometry.calculate_angle_between_two_vectors(
+            vector1=local_x_axis,
+            vector2=global_x_axis,
+        ),
+        4,
+    )
+    if angle == 0.0 or angle == np.pi:
+        p3 = (0.0, 0.0, 1.0)
+    else:
+        p3 = inlbim.util.geometry.calculate_cross_product_of_two_vectors(
+            vector1=local_x_axis,
+            vector2=global_x_axis,
+        )
+
+    return p3
+
+
+# def create_piping_system_composed_of_structural_items_with_polyline(
+#     polyline: list[tuple[float, float, float]],
+#     nominal_diameter: float,
+#     thickness: float,
+#     material: ifcopenshell.entity_instance,
+#     distribution_system: ifcopenshell.entity_instance,
+#     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
+#     branch_name: str = "Unnamed Branch",
+#     spatial_element: ifcopenshell.entity_instance | None = None,
+#     place_objects_relative_to_parent: bool = False,
+#     add_shape_representation_to_ports: bool = False,
+# ) -> list[ifcopenshell.entity_instance]:
+
+#     ifc4_file = material.file
+
+#     assert len(polyline) >= 2
+
+#     if len(polyline) == 2:
+#         p1 = polyline[0]
+#         p2 = polyline[1]
+
+#         pipe_segment = inlbim.api.structural.create_3pt_structural_curve_member(
+#             p1=polyline[0],
+#             p2=polyline[1],
+#             nominal_diameter=nominal_diameter,
+#             thickness=thickness,
+#             material=material,
+#             name=f"Pipe #1 of {branch_name}",
+#             spatial_element=spatial_element,
+#             distribution_system=distribution_system,
+#             place_object_relative_to_parent=place_objects_relative_to_parent,
+#             add_shape_representation_to_ports=add_shape_representation_to_ports,
+#         )
+
+#         pipe_segment = inlbim.api.system.create_pipe_segment(
+#             p1=polyline[0],
+#             p2=polyline[1],
+#             nominal_diameter=nominal_diameter,
+#             thickness=thickness,
+#             material=material,
+#             name=f"Pipe #1 of {branch_name}",
+#             spatial_element=spatial_element,
+#             distribution_system=distribution_system,
+#             place_object_relative_to_parent=place_objects_relative_to_parent,
+#             add_shape_representation_to_ports=add_shape_representation_to_ports,
+#         )
+#         return [pipe_segment]
+
+#     polyline = filter_out_colinear_points_from_polyline(polyline=polyline)
+
+#     if elbow_radius_type == "LONG":
+#         radius_of_curvature = 1.5 * nominal_diameter
+#     else:
+#         radius_of_curvature = 1.0 * nominal_diameter
+
+#     piping_elements = []
+
+#     pipe_segment_start_point = polyline[0]
+
+#     for index in range(len(polyline)):
+
+#         if index + 2 == len(polyline):
+#             last_pipe_segment = inlbim.api.system.create_pipe_segment(
+#                 p1=pipe_segment_start_point,
+#                 p2=polyline[-1],
+#                 nominal_diameter=nominal_diameter,
+#                 thickness=thickness,
+#                 material=material,
+#                 name=f"Pipe #{[index + 1]} of {branch_name}",
+#                 spatial_element=spatial_element,
+#                 distribution_system=distribution_system,
+#                 place_object_relative_to_parent=place_objects_relative_to_parent,
+#                 add_shape_representation_to_ports=add_shape_representation_to_ports,
+#             )
+#             piping_elements += [last_pipe_segment]
+#             break
+
+#         horizontal_curve = inlbim.util.geometry.HorizontalCurve.from_3pt_polyline(
+#             p1=polyline[index],
+#             p2=polyline[index + 1],
+#             p3=polyline[index + 2],
+#             radius_of_curvature=radius_of_curvature,
+#         )
+
+#         pipe_segment_end_point = horizontal_curve.point_of_curvature
+
+#         # Create Element
+#         pipe_segment = inlbim.api.system.create_pipe_segment(
+#             p1=pipe_segment_start_point,
+#             p2=pipe_segment_end_point,
+#             nominal_diameter=nominal_diameter,
+#             thickness=thickness,
+#             material=material,
+#             name=f"Pipe #{[index + 1]} of {branch_name}",
+#             spatial_element=spatial_element,
+#             distribution_system=distribution_system,
+#             place_object_relative_to_parent=place_objects_relative_to_parent,
+#             add_shape_representation_to_ports=add_shape_representation_to_ports,
+#         )
+
+#         # Create Element
+#         elbow = inlbim.api.system.create_elbow(
+#             horizontal_curve=horizontal_curve,
+#             nominal_diameter=nominal_diameter,
+#             thickness=thickness,
+#             material=material,
+#             name=f"Elbow #{[index + 1]} of {branch_name}",
+#             spatial_element=spatial_element,
+#             distribution_system=distribution_system,
+#             place_object_relative_to_parent=place_objects_relative_to_parent,
+#             add_shape_representation_to_ports=add_shape_representation_to_ports,
+#         )
+
+#         piping_elements += [pipe_segment, elbow]
+
+#         pipe_segment_start_point = horizontal_curve.point_of_tangency
+
+#     for index_for_an_elbow in range(len(piping_elements))[1::2]:
+#         pipe_segment_1 = piping_elements[index_for_an_elbow - 1]
+#         elbow = piping_elements[index_for_an_elbow]
+#         pipe_segment_2 = piping_elements[index_for_an_elbow + 1]
+#         ifcopenshell.api.system.connect_port(
+#             file=ifc4_file,
+#             port1=ifcopenshell.util.system.get_ports(
+#                 element=pipe_segment_1,
+#                 flow_direction="SOURCE",
+#             )[0],
+#             port2=ifcopenshell.util.system.get_ports(
+#                 element=elbow,
+#                 flow_direction="SINK",
+#             )[0],
+#             direction="SOURCE",
+#         )
+#         ifcopenshell.api.system.connect_port(
+#             file=ifc4_file,
+#             port1=ifcopenshell.util.system.get_ports(
+#                 element=elbow,
+#                 flow_direction="SOURCE",
+#             )[0],
+#             port2=ifcopenshell.util.system.get_ports(
+#                 element=pipe_segment_2,
+#                 flow_direction="SINK",
+#             )[0],
+#             direction="SOURCE",
+#         )
+
+#     return piping_elements

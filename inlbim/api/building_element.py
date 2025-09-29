@@ -115,7 +115,7 @@ def create_3pt_beam_or_column_or_member(
         element_type_class = "IfcColumnType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = inlbim.api.element_type.add_beam_or_column_or_member_type(
+    element_type = inlbim.api.element_type.add_prismatic_homogenous_linear_elment_type(
         ifc_class=element_type_class,
         material=material,
         profile=profile_def,

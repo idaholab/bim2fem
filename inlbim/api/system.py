@@ -75,6 +75,8 @@ def create_elbow(
             ifc4_file=ifc4_file,
             profile_class="IfcCircleHollowProfileDef",
             dimensions=[outer_radius, thickness],
+            check_for_duplicate=True,
+            calculate_mechanical_properties=True,
         ),
         central_angle_of_curvature=horizontal_curve.central_angle,
         center_of_curvature_in_object_xy_plane=(
@@ -369,6 +371,8 @@ def create_pipe_segment(
             ifc4_file=ifc4_file,
             profile_class="IfcCircleHollowProfileDef",
             dimensions=[outer_radius, thickness],
+            check_for_duplicate=True,
+            calculate_mechanical_properties=True,
         ),
         extrusion_depth=length,
     )
@@ -504,7 +508,7 @@ def filter_out_colinear_points_from_polyline(
     return new_polyine
 
 
-def create_piping_system_with_polyline(
+def create_piping_system_from_polyline(
     polyline: list[tuple[float, float, float]],
     nominal_diameter: float,
     thickness: float,
@@ -708,7 +712,7 @@ def connect_two_distribution_ports_via_piping(
     )
 
     # Create Piping Elements
-    piping_elements = inlbim.api.system.create_piping_system_with_polyline(
+    piping_elements = inlbim.api.system.create_piping_system_from_polyline(
         polyline=[
             source_port_origin,
             second_point,

@@ -328,29 +328,6 @@ def triangle_overlaps_square(
     return False
 
 
-def is_point_in_circle(
-    point: tuple[float, float],
-    center: tuple[float, float],
-    radius: float,
-):
-    """
-    Determine if a point is within a circle.
-
-    :param point: A tuple (x, y) representing the coordinates of the point.
-    :param center: A tuple (cx, cy) representing the coordinates of the circle's center.
-    :param radius: The radius of the circle.
-    :return: True if the point is within the circle, False otherwise.
-    """
-    x, y = point
-    cx, cy = center
-
-    # Calculate the distance between the point and the center of the circle
-    distance = math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy))
-
-    # Check if the distance is less than or equal to the radius
-    return distance <= radius
-
-
 def measure_dimensions_of_classified_shape_of_faces(
     local_z_axis_in_global_coordinates: tuple[float, float, float],
     local_x_axis_in_global_coordinates: tuple[float, float, float],
@@ -401,7 +378,8 @@ def measure_dimensions_of_classified_shape_of_faces(
         )
 
     elif preset_beam_shape_classification == "H_CIRCLE_OR_H_RECT":
-        # Get dims for rectangle and circle
+
+        # Get dims assuming rectangle
         rect_dims = get_dims_for_rectangle_hollow_shape(
             face_surfaces_defined_by_2D_vertex_coordinates=transformed_faces_defined_by_vertex_coordinates,
             numeric_scale=numeric_scale,
@@ -411,42 +389,56 @@ def measure_dimensions_of_classified_shape_of_faces(
             rect_dims[1],
             rect_dims[2],
         )
+
+        # Get dims assuming circle
         circ_dims = get_dims_for_circle_hollow_shape(
             face_surfaces_defined_by_2D_vertex_coordinates=transformed_faces_defined_by_vertex_coordinates,
             numeric_scale=numeric_scale,
         )
         radius, wall_thickness_for_circle = circ_dims[0], circ_dims[1]
 
-        # Rect Case 1: one dimension is larger than the other
-        if max([xdim, ydim]) > 1.1 * min([xdim, ydim]):
-            shape_is_rectangular = True
+        # Get actual area
+        actual_area = 0.0
+        for (
+            transformed_face_defined_by_vertex_coordinates
+        ) in transformed_faces_defined_by_vertex_coordinates:
+            x1 = transformed_face_defined_by_vertex_coordinates[0][0]
+            x2 = transformed_face_defined_by_vertex_coordinates[1][0]
+            x3 = transformed_face_defined_by_vertex_coordinates[2][0]
+            y1 = transformed_face_defined_by_vertex_coordinates[0][1]
+            y2 = transformed_face_defined_by_vertex_coordinates[1][1]
+            y3 = transformed_face_defined_by_vertex_coordinates[2][1]
+            term1 = x1 * (y2 - y3)
+            term2 = x2 * (y3 - y1)
+            term3 = x3 * (y1 - y2)
+            face_area = 1 / 2 * abs(term1 + term2 + term3)
+            actual_area += face_area
 
-        # Rect Case 2: Check whether some point lies outside a hypothetical circle
+        # Determine whether shape is circle or rect
+        hypothetical_rect_area = (xdim * ydim) - (
+            (xdim - 2 * wall_thickness_for_rectangle)
+            * (ydim - 2 * wall_thickness_for_rectangle)
+        )
+        hypothetical_circle_area = np.pi * (
+            radius**2 - (radius - wall_thickness_for_circle) ** 2
+        )
+        percent_diff_between_actual_area_and_hypothetical_circle_area = (
+            abs(actual_area - hypothetical_circle_area)
+            / np.mean([actual_area, hypothetical_circle_area])
+            * 100
+        )
+        percent_diff_between_actual_area_and_hypothetical_rect_area = (
+            abs(actual_area - hypothetical_rect_area)
+            / np.mean([actual_area, hypothetical_rect_area])
+            * 100
+        )
+        if (
+            percent_diff_between_actual_area_and_hypothetical_rect_area
+            < percent_diff_between_actual_area_and_hypothetical_circle_area
+        ):
+            shape_is_rectangular = True
         else:
-            x_vals, y_vals = get_x_vals_and_y_vals(
-                face_surfaces_defined_by_2D_vertex_coordinates=transformed_faces_defined_by_vertex_coordinates,
-                numeric_scale=numeric_scale,
-                recenter_about_bounding_box=True,
-            )
-            x_pos_bb_center = (min(x_vals) + max(x_vals)) / 2
-            y_pos_bb_center = (min(y_vals) + max(y_vals)) / 2
-            some_point_lies_outside_a_hypothetical_circular_shape = False
-            for face in transformed_faces_defined_by_vertex_coordinates:
-                for vertex_of_face in face:
-                    point_is_in_circle = is_point_in_circle(
-                        point=vertex_of_face,
-                        center=(x_pos_bb_center, y_pos_bb_center),
-                        radius=1.1 * radius,
-                    )
-                    if not point_is_in_circle:
-                        some_point_lies_outside_a_hypothetical_circular_shape = True
-                        break
-                if some_point_lies_outside_a_hypothetical_circular_shape:
-                    break
-            if some_point_lies_outside_a_hypothetical_circular_shape:
-                shape_is_rectangular = True
-            else:
-                shape_is_rectangular = False
+            shape_is_rectangular = False
 
         # Narrow the classification and set dims
         if shape_is_rectangular:
@@ -471,48 +463,58 @@ def measure_dimensions_of_classified_shape_of_faces(
         )
 
     elif preset_beam_shape_classification == "CIRCLE_OR_RECT":
-        # Get dims for rectangle and circle
+
+        # Get dims assuming rectangle
         rect_dims = get_dims_for_rectangle_shape(
             face_surfaces_defined_by_2D_vertex_coordinates=transformed_faces_defined_by_vertex_coordinates,
             numeric_scale=numeric_scale,
         )
         xdim, ydim = (rect_dims[0], rect_dims[1])
+
+        # Get dims assuming circle
         circ_dims = get_dims_for_circle_shape(
             face_surfaces_defined_by_2D_vertex_coordinates=transformed_faces_defined_by_vertex_coordinates,
             numeric_scale=numeric_scale,
         )
         radius = circ_dims[0]
 
-        # Rect Case 1: one dimension is larger than the other
-        if max([xdim, ydim]) > 1.1 * min([xdim, ydim]):
-            shape_is_rectangular = True
+        # Get actual area
+        actual_area = 0.0
+        for (
+            transformed_face_defined_by_vertex_coordinates
+        ) in transformed_faces_defined_by_vertex_coordinates:
+            x1 = transformed_face_defined_by_vertex_coordinates[0][0]
+            x2 = transformed_face_defined_by_vertex_coordinates[1][0]
+            x3 = transformed_face_defined_by_vertex_coordinates[2][0]
+            y1 = transformed_face_defined_by_vertex_coordinates[0][1]
+            y2 = transformed_face_defined_by_vertex_coordinates[1][1]
+            y3 = transformed_face_defined_by_vertex_coordinates[2][1]
+            term1 = x1 * (y2 - y3)
+            term2 = x2 * (y3 - y1)
+            term3 = x3 * (y1 - y2)
+            face_area = 1 / 2 * abs(term1 + term2 + term3)
+            actual_area += face_area
 
-        # Rect Case 2: Check whether some point lies outside a hypothetical circle
+        # Determine whether shape is circle or rect
+        hypothetical_rect_area = xdim * ydim
+        hypothetical_circle_area = np.pi * (radius**2)
+        percent_diff_between_actual_area_and_hypothetical_circle_area = (
+            abs(actual_area - hypothetical_circle_area)
+            / np.mean([actual_area, hypothetical_circle_area])
+            * 100
+        )
+        percent_diff_between_actual_area_and_hypothetical_rect_area = (
+            abs(actual_area - hypothetical_rect_area)
+            / np.mean([actual_area, hypothetical_rect_area])
+            * 100
+        )
+        if (
+            percent_diff_between_actual_area_and_hypothetical_rect_area
+            < percent_diff_between_actual_area_and_hypothetical_circle_area
+        ):
+            shape_is_rectangular = True
         else:
-            x_vals, y_vals = get_x_vals_and_y_vals(
-                face_surfaces_defined_by_2D_vertex_coordinates=transformed_faces_defined_by_vertex_coordinates,
-                numeric_scale=numeric_scale,
-                recenter_about_bounding_box=True,
-            )
-            x_pos_bb_center = (min(x_vals) + max(x_vals)) / 2
-            y_pos_bb_center = (min(y_vals) + max(y_vals)) / 2
-            some_point_lies_outside_a_hypothetical_circular_shape = False
-            for face in transformed_faces_defined_by_vertex_coordinates:
-                for vertex_of_face in face:
-                    point_is_in_circle = is_point_in_circle(
-                        point=vertex_of_face,
-                        center=(x_pos_bb_center, y_pos_bb_center),
-                        radius=1.1 * radius,
-                    )
-                    if not point_is_in_circle:
-                        some_point_lies_outside_a_hypothetical_circular_shape = True
-                        break
-                if some_point_lies_outside_a_hypothetical_circular_shape:
-                    break
-            if some_point_lies_outside_a_hypothetical_circular_shape:
-                shape_is_rectangular = True
-            else:
-                shape_is_rectangular = False
+            shape_is_rectangular = False
 
         # Narrow the classification and set dims
         if shape_is_rectangular:

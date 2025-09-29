@@ -7,11 +7,11 @@ StructuralAnalysisView MVD"""
 import ifcopenshell
 import inlbim.api.file
 import ifcopenshell.util.selector
-from bim2fem.helpers.convert_frame_member_to_structural_item import (
-    convert_linear_frame_member_to_structural_item,
+from bim2fem.helpers.convert_linear_building_element import (
+    convert_linear_building_element_to_structural_curve_member,
 )
-from bim2fem.helpers.convert_slab_or_wall_to_strucutral_item import (
-    convert_planar_slab_or_wall_to_structural_item,
+from bim2fem.helpers.convert_planar_building_element import (
+    convert_planar_building_element_to_structural_surface_members,
 )
 from inlbim import REGION
 import ifcopenshell.util.element
@@ -146,11 +146,13 @@ def convert_ifc_to_fem(
         list(beams_slated_for_conversion_from_source_file)
     ):
         print(f"Converting Beam {index+1}/{num_beams} | {beam_from_source_file}")
-        structural_curve_member = convert_linear_frame_member_to_structural_item(
-            frame_member_from_source_file=beam_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
+        structural_curve_member = (
+            convert_linear_building_element_to_structural_curve_member(
+                linear_building_element_from_source_file=beam_from_source_file,
+                ifc4_destination_file=ifc4_destination_file,
+                region=region,
+                structural_analysis_model=structural_analysis_model,
+            )
         )
         conversion_results[beam_from_source_file] = structural_curve_member
 
@@ -160,11 +162,13 @@ def convert_ifc_to_fem(
         list(columns_slated_for_conversion_from_source_file)
     ):
         print(f"Converting Column {index+1}/{num_columns} | {column_from_source_file}")
-        structural_curve_member = convert_linear_frame_member_to_structural_item(
-            frame_member_from_source_file=column_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
+        structural_curve_member = (
+            convert_linear_building_element_to_structural_curve_member(
+                linear_building_element_from_source_file=column_from_source_file,
+                ifc4_destination_file=ifc4_destination_file,
+                region=region,
+                structural_analysis_model=structural_analysis_model,
+            )
         )
         conversion_results[column_from_source_file] = structural_curve_member
 
@@ -174,11 +178,13 @@ def convert_ifc_to_fem(
         list(members_slated_for_conversion_from_source_file)
     ):
         print(f"Converting Member {index+1}/{num_members}")
-        structural_curve_member = convert_linear_frame_member_to_structural_item(
-            frame_member_from_source_file=member_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
+        structural_curve_member = (
+            convert_linear_building_element_to_structural_curve_member(
+                linear_building_element_from_source_file=member_from_source_file,
+                ifc4_destination_file=ifc4_destination_file,
+                region=region,
+                structural_analysis_model=structural_analysis_model,
+            )
         )
         conversion_results[member_from_source_file] = structural_curve_member
 
@@ -188,11 +194,13 @@ def convert_ifc_to_fem(
         list(slabs_slated_for_conversion_from_source_file)
     ):
         print(f"Converting Slab {index+1}/{num_slabs}")
-        structural_surface_members = convert_planar_slab_or_wall_to_structural_item(
-            slab_or_wall_from_source_file=slab_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
+        structural_surface_members = (
+            convert_planar_building_element_to_structural_surface_members(
+                planar_building_element_from_source_file=slab_from_source_file,
+                ifc4_destination_file=ifc4_destination_file,
+                region=region,
+                structural_analysis_model=structural_analysis_model,
+            )
         )
         conversion_results[slab_from_source_file] = structural_surface_members
 
@@ -202,11 +210,13 @@ def convert_ifc_to_fem(
         list(walls_slated_for_conversion_from_source_file)
     ):
         print(f"Converting Wall {index+1}/{num_walls}")
-        structural_surface_members = convert_planar_slab_or_wall_to_structural_item(
-            slab_or_wall_from_source_file=wall_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
+        structural_surface_members = (
+            convert_planar_building_element_to_structural_surface_members(
+                planar_building_element_from_source_file=wall_from_source_file,
+                ifc4_destination_file=ifc4_destination_file,
+                region=region,
+                structural_analysis_model=structural_analysis_model,
+            )
         )
         conversion_results[wall_from_source_file] = structural_surface_members
 

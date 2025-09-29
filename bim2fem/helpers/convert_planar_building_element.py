@@ -19,34 +19,103 @@ import ifcopenshell.api.project
 import inlbim.util.file
 
 
-def convert_planar_slab_or_wall_to_structural_item(
-    slab_or_wall_from_source_file: ifcopenshell.entity_instance,
+def convert_planar_wall_to_structural_surface_members(
+    wall_from_source_file: ifcopenshell.entity_instance,
     ifc4_destination_file: ifcopenshell.file,
     region: REGION,
     structural_analysis_model: ifcopenshell.entity_instance,
 ) -> list[ifcopenshell.entity_instance] | None:
 
-    print("\tconvert_planar_slab_or_wall_to_structural_item()")
-    print(f"\tslab_or_wall_from_source_file: {slab_or_wall_from_source_file}")
+    # Check IFC Class
+    required_ifc_class = "IfcWall"
+    if not wall_from_source_file.is_a(required_ifc_class):
+        print(
+            " ".join(
+                [
+                    "\tWarning: Failed Conversion for",
+                    f"{wall_from_source_file}. ",
+                    f"IfcElement class must be {required_ifc_class}.",
+                ]
+            )
+        )
+        return None
+
+    # Convert Element
+    structural_surface_members_from_destination_file = (
+        convert_planar_building_element_to_structural_surface_members(
+            planar_building_element_from_source_file=wall_from_source_file,
+            ifc4_destination_file=ifc4_destination_file,
+            region=region,
+            structural_analysis_model=structural_analysis_model,
+        )
+    )
+
+    return structural_surface_members_from_destination_file
+
+
+def convert_planar_slab_to_structural_surface_members(
+    slab_from_source_file: ifcopenshell.entity_instance,
+    ifc4_destination_file: ifcopenshell.file,
+    region: REGION,
+    structural_analysis_model: ifcopenshell.entity_instance,
+) -> list[ifcopenshell.entity_instance] | None:
+
+    # Check IFC Class
+    required_ifc_class = "IfcSlab"
+    if not slab_from_source_file.is_a(required_ifc_class):
+        print(
+            " ".join(
+                [
+                    "\tWarning: Failed Conversion for",
+                    f"{slab_from_source_file}. ",
+                    f"IfcElement class must be {required_ifc_class}.",
+                ]
+            )
+        )
+        return None
+
+    # Convert Element
+    structural_surface_members_from_destination_file = (
+        convert_planar_building_element_to_structural_surface_members(
+            planar_building_element_from_source_file=slab_from_source_file,
+            ifc4_destination_file=ifc4_destination_file,
+            region=region,
+            structural_analysis_model=structural_analysis_model,
+        )
+    )
+
+    return structural_surface_members_from_destination_file
+
+
+def convert_planar_building_element_to_structural_surface_members(
+    planar_building_element_from_source_file: ifcopenshell.entity_instance,
+    ifc4_destination_file: ifcopenshell.file,
+    region: REGION,
+    structural_analysis_model: ifcopenshell.entity_instance,
+) -> list[ifcopenshell.entity_instance] | None:
+
+    print("\tconvert_planar_building_element_to_structural_surface_members()")
+    print(f"\telement_from_source_file: {planar_building_element_from_source_file}")
     print(f"\tregion: {region}")
     print(f"\tstructural_analysis_model: {structural_analysis_model}")
 
-    # Add Slab/Wall to destination file with the original IfcGlobalId
-    if slab_or_wall_from_source_file.is_a("IfcWall"):
-        element_class = "IfcWall"
-    elif slab_or_wall_from_source_file.is_a("IfcSlab"):
-        element_class = "IfcSlab"
-    else:
-        return None
-    slab_or_wall_copied_to_destination_file = ifcopenshell.api.root.create_entity(
-        file=ifc4_destination_file,
-        ifc_class=element_class,
-        name=slab_or_wall_from_source_file.Name,
+    # Copy Element to Destination File
+    planar_building_element_copied_to_destination_file = (
+        ifcopenshell.api.root.create_entity(
+            file=ifc4_destination_file,
+            ifc_class=planar_building_element_from_source_file.is_a(),
+            name=planar_building_element_from_source_file.Name,
+        )
     )
+    planar_building_element_copied_to_destination_file.GlobalId = (
+        planar_building_element_from_source_file.GlobalId
+    )
+
+    # Assign Element to Site
     site = ifc4_destination_file.by_type(type="IfcSite", include_subtypes=False)[0]
     ifcopenshell.api.spatial.assign_container(
         file=ifc4_destination_file,
-        products=[slab_or_wall_copied_to_destination_file],
+        products=[planar_building_element_copied_to_destination_file],
         relating_structure=site,
     )
 
@@ -62,7 +131,7 @@ def convert_planar_slab_or_wall_to_structural_item(
     )
     standard_material_name = (
         inlbim.util.material.get_best_matching_standard_material_from_element_metadata(
-            element=slab_or_wall_from_source_file,
+            element=planar_building_element_from_source_file,
             region=region,
             other_material_names=material_names_from_destination_file,
         )
@@ -87,7 +156,7 @@ def convert_planar_slab_or_wall_to_structural_item(
 
     # Triangular Mesh
     triangular_mesh = TriangularMesh.from_ifc_element(
-        element=slab_or_wall_from_source_file
+        element=planar_building_element_from_source_file
     )
     # triangular_mesh.plot_all()
 
@@ -155,9 +224,9 @@ def convert_planar_slab_or_wall_to_structural_item(
     )
 
     # Add and assign Type
-    if slab_or_wall_copied_to_destination_file.is_a("IfcSlab"):
+    if planar_building_element_copied_to_destination_file.is_a("IfcSlab"):
         element_type_class = "IfcSlabType"
-    elif slab_or_wall_copied_to_destination_file.is_a("IfcWall"):
+    elif planar_building_element_copied_to_destination_file.is_a("IfcWall"):
         element_type_class = "IfcWallType"
     else:
         element_type_class = "IfcPlateType"
@@ -169,7 +238,7 @@ def convert_planar_slab_or_wall_to_structural_item(
     )
     ifcopenshell.api.type.assign_type(
         file=ifc4_destination_file,
-        related_objects=[slab_or_wall_copied_to_destination_file],
+        related_objects=[planar_building_element_copied_to_destination_file],
         relating_type=element_type,
     )
 
@@ -205,7 +274,7 @@ def convert_planar_slab_or_wall_to_structural_item(
             thickness=thickness,
             material=material,
             structural_analysis_model=structural_analysis_model,
-            corresponding_product=slab_or_wall_copied_to_destination_file,
+            corresponding_product=planar_building_element_copied_to_destination_file,
         )
         structural_items.append(structural_items)
 

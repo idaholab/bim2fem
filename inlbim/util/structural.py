@@ -41,6 +41,19 @@ def get_assigned_product_of_structural_item(
     return assigned_product
 
 
+def get_structural_items_of_assigned_product(
+    assigned_product: ifcopenshell.entity_instance,
+) -> list[ifcopenshell.entity_instance]:
+
+    structural_items = []
+    for rel in assigned_product.ReferencedBy:
+        if rel.is_a("IfcRelAssignsToProduct"):
+            structural_items = rel.RelatedObjects
+            break
+
+    return structural_items
+
+
 def get_structural_analysis_model_of_structural_item(
     structural_item: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance | None:

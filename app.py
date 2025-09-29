@@ -20,7 +20,7 @@ import inlbim.api.file
 import bim2glb.convert_ifc_to_glb
 import bim2fem.convert_ifc_to_fem
 import bim2fem.recreate_fem_with_3d_body_shape_representation
-from bim2fem.adjust_element_connectivity_of_fem import (
+from bim2fem.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 from flask import (
