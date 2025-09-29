@@ -136,10 +136,10 @@ def main() -> int:
             relating_structure=site,
         )
         structural_curve_member = (
-            inlbim.api.structural.create_3pt_structural_curve_member(
-                p1=arguments_for_structural_curve_member["p1"],
-                p2=arguments_for_structural_curve_member["p2"],
-                p3=arguments_for_structural_curve_member["p3"],
+            inlbim.api.structural.create_linear_structural_curve_member(
+                start_point=arguments_for_structural_curve_member["p1"],
+                end_point=arguments_for_structural_curve_member["p2"],
+                orientation_point=arguments_for_structural_curve_member["p3"],
                 profile_def=ipe_400,
                 material=s335,
                 structural_analysis_model=structural_analysis_model,

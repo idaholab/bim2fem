@@ -99,10 +99,10 @@ def main() -> int:
         relating_structure=site,
     )
     structural_analysis_column_1 = (
-        inlbim.api.structural.create_3pt_structural_curve_member(
-            p1=(2.0, 2.0, 0.0),
-            p2=(2.0, 2.0, 4.0),
-            p3=(3.0, 2.0, 4.0),
+        inlbim.api.structural.create_linear_structural_curve_member(
+            start_point=(2.0, 2.0, 0.0),
+            end_point=(2.0, 2.0, 4.0),
+            orientation_point=(3.0, 2.0, 4.0),
             profile_def=ipe_400,
             material=s335,
             structural_analysis_model=structural_analysis_model,
@@ -121,10 +121,10 @@ def main() -> int:
         relating_structure=site,
     )
     structural_analysis_column_2 = (
-        inlbim.api.structural.create_3pt_structural_curve_member(
-            p1=(2.0, 2.0 + 4.0, 0.0),
-            p2=(2.0, 2.0 + 4.0, 4.0),
-            p3=(3.0, 2.0 + 4.0, 4.0),
+        inlbim.api.structural.create_linear_structural_curve_member(
+            start_point=(2.0, 2.0 + 4.0, 0.0),
+            end_point=(2.0, 2.0 + 4.0, 4.0),
+            orientation_point=(3.0, 2.0 + 4.0, 4.0),
             profile_def=ipe_400,
             material=s335,
             structural_analysis_model=structural_analysis_model,

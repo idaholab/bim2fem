@@ -469,6 +469,61 @@ def add_edge(
     return edge
 
 
+def add_curved_edge(
+    vertex_point_at_point_of_curvature: ifcopenshell.entity_instance,
+    vertex_point_at_point_of_tangency: ifcopenshell.entity_instance,
+    center_of_curvature: tuple[float, float, float],
+) -> ifcopenshell.entity_instance:
+
+    assert vertex_point_at_point_of_curvature.is_a("IfcVertexPoint")
+    assert vertex_point_at_point_of_tangency.is_a("IfcVertexPoint")
+
+    ifc4_file = vertex_point_at_point_of_curvature.file
+
+    point_of_curvature = vertex_point_at_point_of_curvature.VertexGeometry.Coordinates
+    point_of_tangency = vertex_point_at_point_of_tangency.VertexGeometry.Coordinates
+
+    radius_of_curvature = float(
+        np.linalg.norm(np.array(point_of_curvature) - np.array(center_of_curvature))
+    )
+
+    horizontal_curve = inlbim.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+        point_of_curvature=point_of_curvature,
+        point_on_center_of_curvature_side=center_of_curvature,
+        point_of_tangency=point_of_tangency,
+        radius_of_curvature=radius_of_curvature,
+    )
+
+    z_axis = horizontal_curve.direction_of_axis_of_rotation
+
+    x_axis = inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=horizontal_curve.point_of_curvature,
+        p2=horizontal_curve.point_of_tangency,
+    )
+
+    position = ifc4_file.createIfcAxis2Placement3D(
+        ifc4_file.createIfcCartesianPoint(center_of_curvature),
+        ifc4_file.createIfcDirection(z_axis),
+        ifc4_file.createIfcDirection(x_axis),
+    )
+
+    edge_geometry = ifc4_file.createIfcCircle(
+        position,
+        radius_of_curvature,
+    )
+
+    same_sense = True
+
+    edge_curve = ifc4_file.createIfcEdgeCurve(
+        vertex_point_at_point_of_curvature,
+        vertex_point_at_point_of_tangency,
+        edge_geometry,
+        same_sense,
+    )
+
+    return edge_curve
+
+
 def add_face_bound(
     face_bound_class: FACE_BOUND_CLASS,  # IfcFaceOuterBound | IfcFaceBound
     vertex_points_of_bound: list[ifcopenshell.entity_instance],

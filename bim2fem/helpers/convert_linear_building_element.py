@@ -14,7 +14,7 @@ import ifcopenshell.util.placement
 import numpy as np
 import inlbim.util.representation
 from inlbim.util.geometry import TriangularMesh
-import bim2fem.helpers.beam_shape_classification
+import bim2fem.helpers.classify_beam_shape
 import ifcopenshell.util.unit
 import inlbim.api.element_type
 import ifcopenshell.api.type
@@ -23,36 +23,136 @@ import inlbim.util.file
 import ifcopenshell.api.project
 
 
-def convert_linear_frame_member_to_structural_item(
-    frame_member_from_source_file: ifcopenshell.entity_instance,
+def convert_linear_member_to_structural_curve_member(
+    member_from_source_file: ifcopenshell.entity_instance,
     ifc4_destination_file: ifcopenshell.file,
     region: REGION,
     structural_analysis_model: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance | None:
 
-    print("\tconvert_frame_member_to_structural_item()")
-    print(f"\tframe_member_from_source_file: {frame_member_from_source_file}")
+    # Check IFC Class
+    required_ifc_class = "IfcMember"
+    if not member_from_source_file.is_a(required_ifc_class):
+        print(
+            " ".join(
+                [
+                    "\tWarning: Failed Conversion for",
+                    f"{member_from_source_file}. ",
+                    f"IfcElement class must be {required_ifc_class}.",
+                ]
+            )
+        )
+        return None
+
+    # Convert Element
+    structural_curve_member_from_destination_file = (
+        convert_linear_building_element_to_structural_curve_member(
+            linear_building_element_from_source_file=member_from_source_file,
+            ifc4_destination_file=ifc4_destination_file,
+            region=region,
+            structural_analysis_model=structural_analysis_model,
+        )
+    )
+
+    return structural_curve_member_from_destination_file
+
+
+def convert_linear_column_to_structural_curve_member(
+    column_from_source_file: ifcopenshell.entity_instance,
+    ifc4_destination_file: ifcopenshell.file,
+    region: REGION,
+    structural_analysis_model: ifcopenshell.entity_instance,
+) -> ifcopenshell.entity_instance | None:
+
+    # Check IFC Class
+    required_ifc_class = "IfcColumn"
+    if not column_from_source_file.is_a(required_ifc_class):
+        print(
+            " ".join(
+                [
+                    "\tWarning: Failed Conversion for",
+                    f"{column_from_source_file}. ",
+                    f"IfcElement class must be {required_ifc_class}.",
+                ]
+            )
+        )
+        return None
+
+    # Convert Element
+    structural_curve_member_from_destination_file = (
+        convert_linear_building_element_to_structural_curve_member(
+            linear_building_element_from_source_file=column_from_source_file,
+            ifc4_destination_file=ifc4_destination_file,
+            region=region,
+            structural_analysis_model=structural_analysis_model,
+        )
+    )
+
+    return structural_curve_member_from_destination_file
+
+
+def convert_linear_beam_to_structural_curve_member(
+    beam_from_source_file: ifcopenshell.entity_instance,
+    ifc4_destination_file: ifcopenshell.file,
+    region: REGION,
+    structural_analysis_model: ifcopenshell.entity_instance,
+) -> ifcopenshell.entity_instance | None:
+
+    # Check IFC Class
+    required_ifc_class = "IfcBeam"
+    if not beam_from_source_file.is_a(required_ifc_class):
+        print(
+            " ".join(
+                [
+                    "\tWarning: Failed Conversion for",
+                    f"{beam_from_source_file}. ",
+                    f"IfcElement class must be {required_ifc_class}.",
+                ]
+            )
+        )
+        return None
+
+    # Convert Element
+    structural_curve_member_from_destination_file = (
+        convert_linear_building_element_to_structural_curve_member(
+            linear_building_element_from_source_file=beam_from_source_file,
+            ifc4_destination_file=ifc4_destination_file,
+            region=region,
+            structural_analysis_model=structural_analysis_model,
+        )
+    )
+
+    return structural_curve_member_from_destination_file
+
+
+def convert_linear_building_element_to_structural_curve_member(
+    linear_building_element_from_source_file: ifcopenshell.entity_instance,
+    ifc4_destination_file: ifcopenshell.file,
+    region: REGION,
+    structural_analysis_model: ifcopenshell.entity_instance,
+    plot_each_step: bool = False,
+) -> ifcopenshell.entity_instance | None:
+
+    print("\tconvert_linear_building_element_to_structural_curve_member()")
+    print(f"\telement_from_source_file: {linear_building_element_from_source_file}")
     print(f"\tregion: {region}")
     print(f"\tstructural_analysis_model: {structural_analysis_model}")
 
-    # Add Beam/Column/Member to destination file with the original IfcGlobalId
-    if frame_member_from_source_file.is_a("IfcBeam"):
-        element_class = "IfcBeam"
-    elif frame_member_from_source_file.is_a("IfcColumn"):
-        element_class = "IfcColumn"
-    elif frame_member_from_source_file.is_a("IfcColumn"):
-        element_class = "IfcMember"
-    else:
-        return None
-    frame_member_copied_to_destination_file = ifcopenshell.api.root.create_entity(
+    # Copy Element to Destination File
+    building_element_copied_to_destination_file = ifcopenshell.api.root.create_entity(
         file=ifc4_destination_file,
-        ifc_class=element_class,
-        name=frame_member_from_source_file.Name,
+        ifc_class=linear_building_element_from_source_file.is_a(),
+        name=linear_building_element_from_source_file.Name,
     )
+    building_element_copied_to_destination_file.GlobalId = (
+        linear_building_element_from_source_file.GlobalId
+    )
+
+    # Assign Element to Site
     site = ifc4_destination_file.by_type(type="IfcSite", include_subtypes=False)[0]
     ifcopenshell.api.spatial.assign_container(
         file=ifc4_destination_file,
-        products=[frame_member_copied_to_destination_file],
+        products=[building_element_copied_to_destination_file],
         relating_structure=site,
     )
 
@@ -68,7 +168,7 @@ def convert_linear_frame_member_to_structural_item(
     )
     standard_material_name = (
         inlbim.util.material.get_best_matching_standard_material_from_element_metadata(
-            element=frame_member_from_source_file,
+            element=linear_building_element_from_source_file,
             region=region,
             other_material_names=material_names_from_destination_file,
         )
@@ -94,7 +194,7 @@ def convert_linear_frame_member_to_structural_item(
     )
     standard_profile_name = (
         inlbim.util.profile.get_best_matching_standard_profile_from_element_metadata(
-            element=frame_member_from_source_file,
+            element=linear_building_element_from_source_file,
             region=region,
             other_standard_profile_names=profile_names_from_destination_file,
         )
@@ -104,35 +204,45 @@ def convert_linear_frame_member_to_structural_item(
     # Get the IfcExtrudedAreaSolid, if it exists
     extruded_area_solid = (
         inlbim.util.representation.get_single_extruded_area_solid_representation(
-            element=frame_member_from_source_file
+            element=linear_building_element_from_source_file
         )
     )
     print(f"\textruded_area_solid: {extruded_area_solid}")
 
-    # Create the StructuralItem
-    if standard_profile_name and extruded_area_solid:
+    if extruded_area_solid and standard_profile_name:
         structural_curve_member = convert_frame_member_to_fem_for_case_1(
             ifc4_destination_file=ifc4_destination_file,
             region=region,
             standard_material_name=standard_material_name,
             standard_profile_name=standard_profile_name,
             structural_analysis_model=structural_analysis_model,
-            frame_member_from_source_file=frame_member_from_source_file,
-            frame_member_copied_to_destination_file=frame_member_copied_to_destination_file,
+            frame_member_from_source_file=linear_building_element_from_source_file,
+            frame_member_copied_to_destination_file=building_element_copied_to_destination_file,
             extruded_area_solid=extruded_area_solid,
+            plot_each_step=plot_each_step,
         )
-    elif not extruded_area_solid:
+    else:
         structural_curve_member = convert_frame_member_to_fem_for_case_2(
             ifc4_destination_file=ifc4_destination_file,
             region=region,
             standard_material_name=standard_material_name,
             standard_profile_name=standard_profile_name,
             structural_analysis_model=structural_analysis_model,
-            frame_member_from_source_file=frame_member_from_source_file,
-            frame_member_copied_to_destination_file=frame_member_copied_to_destination_file,
+            frame_member_from_source_file=linear_building_element_from_source_file,
+            frame_member_copied_to_destination_file=building_element_copied_to_destination_file,
+            plot_each_step=plot_each_step,
         )
-    else:
-        structural_curve_member = None
+    # else:
+    #     print(
+    #         " ".join(
+    #             [
+    #                 "\tWarning: Failed Conversion for",
+    #                 f"{frame_member_from_source_file}. ",
+    #                 "Beyond scope of conversion functions.",
+    #             ]
+    #         )
+    #     )
+    #     structural_curve_member = None
     print(f"\tstructural_curve_member: {structural_curve_member}")
 
     return structural_curve_member
@@ -147,6 +257,7 @@ def convert_frame_member_to_fem_for_case_1(
     frame_member_from_source_file: ifcopenshell.entity_instance,
     frame_member_copied_to_destination_file: ifcopenshell.entity_instance,
     extruded_area_solid: ifcopenshell.entity_instance,
+    plot_each_step: bool = False,
 ) -> ifcopenshell.entity_instance | None:
     """Case 1: Standard Profile Name is identified and RepresentationItem is IfcExtrudedAreaSolid"""
 
@@ -177,9 +288,13 @@ def convert_frame_member_to_fem_for_case_1(
         element_type_class = "IfcBeamType"
     elif frame_member_copied_to_destination_file.is_a("IfcColumn"):
         element_type_class = "IfcColumnType"
+    elif frame_member_copied_to_destination_file.is_a("IfcMember"):
+        element_type_class = "IfcMemberType"
+    elif frame_member_copied_to_destination_file.is_a("IfcPipeSegment"):
+        element_type_class = "IfcPipeSegmentType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = inlbim.api.element_type.add_beam_or_column_or_member_type(
+    element_type = inlbim.api.element_type.add_prismatic_homogenous_linear_elment_type(
         ifc_class=element_type_class,
         material=material,
         profile=profile_def,
@@ -279,7 +394,8 @@ def convert_frame_member_to_fem_for_case_1(
         triangular_mesh = TriangularMesh.from_ifc_element(
             element=frame_member_from_source_file
         )
-        # triangular_mesh.plot_all()
+        if plot_each_step:
+            triangular_mesh.plot_all()
         indices_of_faces_with_normals_acute_to_extrusion_direction = []
         for index_of_face, _ in enumerate(triangular_mesh.faces):
             face_normal_vector = triangular_mesh.calculate_normal_vector_of_face(
@@ -316,7 +432,7 @@ def convert_frame_member_to_fem_for_case_1(
             and assumed_local_y_axis_is_global_negative_z_direction
         ):
             assumed_local_y_axis_in_global_coordinates = (0.0, 0.0, 1.0)
-        result = bim2fem.helpers.beam_shape_classification.classify_shape_and_determine_orientation_of_faces(
+        result = bim2fem.helpers.classify_beam_shape.classify_shape_and_determine_orientation_of_faces(
             local_z_axis_in_global_coordinates=extrusion_direction_in_global_coordinates,
             assumed_local_y_axis_in_global_coordinates=assumed_local_y_axis_in_global_coordinates,
             faces_defined_by_vertex_coordinates=triangular_mesh.get_coordinates_of_faces(
@@ -328,15 +444,15 @@ def convert_frame_member_to_fem_for_case_1(
             result["local_x_axis_in_global_coordinates"],
         )
         if not matching_shape and not local_x_axis_in_global_coordinates:
-            # print(
-            #     " ".join(
-            #         [
-            #             "\tWarning: Failed Conversion for",
-            #             f"{frame_member_from_source_file}.",
-            #             "Could not determine orientation for Case 1b",
-            #         ]
-            #     )
-            # )
+            print(
+                " ".join(
+                    [
+                        "\tWarning: Failed Conversion for",
+                        f"{frame_member_from_source_file}.",
+                        "Could not determine orientation for Case 1b",
+                    ]
+                )
+            )
             return None
         origin_in_global_coordinates = tuple(
             [float(val) for val in transformation_matrix[:3, 3]]
@@ -373,14 +489,16 @@ def convert_frame_member_to_fem_for_case_1(
     assert len(p3) == 3
 
     # Create StructuralItem
-    structural_curve_member = inlbim.api.structural.create_3pt_structural_curve_member(
-        p1=p1,
-        p2=p2,
-        p3=p3,
-        profile_def=profile_def,
-        material=material,
-        structural_analysis_model=structural_analysis_model,
-        corresponding_product=frame_member_copied_to_destination_file,
+    structural_curve_member = (
+        inlbim.api.structural.create_linear_structural_curve_member(
+            start_point=p1,
+            end_point=p2,
+            orientation_point=p3,
+            profile_def=profile_def,
+            material=material,
+            structural_analysis_model=structural_analysis_model,
+            corresponding_product=frame_member_copied_to_destination_file,
+        )
     )
 
     return structural_curve_member
@@ -394,8 +512,9 @@ def convert_frame_member_to_fem_for_case_2(
     structural_analysis_model: ifcopenshell.entity_instance,
     frame_member_from_source_file: ifcopenshell.entity_instance,
     frame_member_copied_to_destination_file: ifcopenshell.entity_instance,
+    plot_each_step: bool = False,
 ) -> ifcopenshell.entity_instance | None:
-    """Case 2: Standard Profile Name is either identified or not and
+    """Case 2: Standard Profile Name is None or
     RepresentationItem is not a single IfcExtrudedAreaSolid"""
 
     print("\tCase 2: RepresentationItem is not a single IfcExtrudedAreaSolid")
@@ -413,7 +532,8 @@ def convert_frame_member_to_fem_for_case_2(
     triangular_mesh = TriangularMesh.from_ifc_element(
         element=frame_member_from_source_file
     )
-    # triangular_mesh.plot_all()
+    if plot_each_step:
+        triangular_mesh.plot_all()
 
     # Calculate Centroid
     centroid_of_triangular_mesh = (
@@ -438,33 +558,25 @@ def convert_frame_member_to_fem_for_case_2(
     index_of_furthest_face = distances_from_centroid_to_faces.index(furthest_distance)
 
     # Get faces that are near the endpoints of the frame member
-    rough_estimate_of_length_of_frame_member = furthest_distance * 2.0
     indices_of_faces_near_endpoints_of_frame_member = []
-    coordinates_of_faces = triangular_mesh.get_coordinates_of_faces(
-        indices_of_faces=[_ for _ in range(len(triangular_mesh.faces))]
-    )
-    for index_of_face, coordinates_of_face in enumerate(coordinates_of_faces):
-        face_is_within_specified_bounds_around_endpoints = True
-        for coordinate_of_face in coordinates_of_face:
-            distance_from_centroid_of_triangular_mesh_to_coordinate = np.linalg.norm(
-                np.array(coordinate_of_face) - np.array(centroid_of_triangular_mesh)
+    for face_index, distance_from_centroid_to_face in enumerate(
+        distances_from_centroid_to_faces
+    ):
+        if (
+            0.75 * furthest_distance
+            <= distance_from_centroid_to_face
+            <= 1.25 * furthest_distance
+        ):
+            indices_of_faces_near_endpoints_of_frame_member.append(face_index)
+    if plot_each_step:
+        triangular_mesh.plot_faces_3d(
+            faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
+                indices_of_faces=indices_of_faces_near_endpoints_of_frame_member
             )
-            if not (
-                rough_estimate_of_length_of_frame_member * 0.25
-                <= distance_from_centroid_of_triangular_mesh_to_coordinate
-                <= rough_estimate_of_length_of_frame_member * 0.75
-            ):
-                face_is_within_specified_bounds_around_endpoints = False
-                break
-        if face_is_within_specified_bounds_around_endpoints:
-            indices_of_faces_near_endpoints_of_frame_member.append(index_of_face)
-    # triangular_mesh.plot_faces_3d(
-    #     faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
-    #         indices_of_faces=indices_of_faces_near_endpoints_of_frame_member
-    #     )
-    # )
+        )
 
     # Separate faces into two groups of faces corresponding to the two endpoints
+    rough_estimate_of_length_of_frame_member = 2.0 * furthest_distance
     indices_of_faces_at_first_endpoint = []
     indices_of_faces_at_second_endpoint = []
     centroid_of_furthest_face = triangular_mesh.calculate_centroid_of_face(
@@ -479,21 +591,22 @@ def convert_frame_member_to_fem_for_case_2(
         )
         if (
             distance_from_trial_face_to_furthest_face
-            <= rough_estimate_of_length_of_frame_member * 0.25
+            <= rough_estimate_of_length_of_frame_member * 0.50
         ):
             indices_of_faces_at_first_endpoint.append(index_of_trial_face)
         else:
             indices_of_faces_at_second_endpoint.append(index_of_trial_face)
-    # triangular_mesh.plot_faces_3d(
-    #     faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
-    #         indices_of_faces=indices_of_faces_at_first_endpoint
-    #     )
-    # )
-    # triangular_mesh.plot_faces_3d(
-    #     faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
-    #         indices_of_faces=indices_of_faces_at_second_endpoint
-    #     )
-    # )
+    if plot_each_step:
+        triangular_mesh.plot_faces_3d(
+            faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
+                indices_of_faces=indices_of_faces_at_first_endpoint
+            )
+        )
+        triangular_mesh.plot_faces_3d(
+            faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
+                indices_of_faces=indices_of_faces_at_second_endpoint
+            )
+        )
 
     # Calculate endpoints
     origin_in_global_coordinates = triangular_mesh.calculate_centroid_of_given_faces(
@@ -545,7 +658,7 @@ def convert_frame_member_to_fem_for_case_2(
         and assumed_local_y_axis_is_global_negative_z_direction
     ):
         assumed_local_y_axis_in_global_coordinates = (0.0, 0.0, 1.0)
-    result_for_beam_shape_classification = bim2fem.helpers.beam_shape_classification.classify_shape_and_determine_orientation_of_faces(
+    result_for_beam_shape_classification = bim2fem.helpers.classify_beam_shape.classify_shape_and_determine_orientation_of_faces(
         local_z_axis_in_global_coordinates=extrusion_direction_in_global_coordinates,
         assumed_local_y_axis_in_global_coordinates=assumed_local_y_axis_in_global_coordinates,
         faces_defined_by_vertex_coordinates=triangular_mesh.get_coordinates_of_faces(
@@ -557,15 +670,15 @@ def convert_frame_member_to_fem_for_case_2(
         result_for_beam_shape_classification["local_x_axis_in_global_coordinates"],
     )
     if not matching_shape and not local_x_axis_in_global_coordinates:
-        # print(
-        #     " ".join(
-        #         [
-        #             "\tWarning: Failed Conversion for",
-        #             f"{frame_member_from_source_file}.",
-        #             "Could not determine orientation for Case 1b",
-        #         ]
-        #     )
-        # )
+        print(
+            " ".join(
+                [
+                    "\tWarning: Failed Conversion for",
+                    f"{frame_member_from_source_file}.",
+                    "Could not determine orientation for Case 1b",
+                ]
+            )
+        )
         return None
     local_y_axis_in_global_coordinates = (
         inlbim.util.geometry.calculate_cross_product_of_two_vectors(
@@ -579,7 +692,7 @@ def convert_frame_member_to_fem_for_case_2(
         numeric_scale = inlbim.util.file.get_numeric_scale_of_project(
             ifc4_file=ifc4_destination_file
         )
-        result_for_beam_shape_measurement = bim2fem.helpers.beam_shape_classification.measure_dimensions_of_classified_shape_of_faces(
+        result_for_beam_shape_measurement = bim2fem.helpers.classify_beam_shape.measure_dimensions_of_classified_shape_of_faces(
             local_z_axis_in_global_coordinates=extrusion_direction_in_global_coordinates,
             local_x_axis_in_global_coordinates=local_x_axis_in_global_coordinates,
             faces_defined_by_vertex_coordinates=triangular_mesh.get_coordinates_of_faces(
@@ -593,6 +706,15 @@ def convert_frame_member_to_fem_for_case_2(
             result_for_beam_shape_measurement["dimensions"],
         )
         if not parameterized_profile_class and not dimensions:
+            print(
+                " ".join(
+                    [
+                        "\tWarning: Failed Conversion for",
+                        f"{frame_member_from_source_file}. ",
+                        "Could not determine profile nor measure dimensions.",
+                    ]
+                )
+            )
             return None
         profile_def = inlbim.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_destination_file,
@@ -617,9 +739,13 @@ def convert_frame_member_to_fem_for_case_2(
         element_type_class = "IfcBeamType"
     elif frame_member_copied_to_destination_file.is_a("IfcColumn"):
         element_type_class = "IfcColumnType"
+    elif frame_member_copied_to_destination_file.is_a("IfcMember"):
+        element_type_class = "IfcMemberType"
+    elif frame_member_copied_to_destination_file.is_a("IfcPipeSegment"):
+        element_type_class = "IfcPipeSegmentType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = inlbim.api.element_type.add_beam_or_column_or_member_type(
+    element_type = inlbim.api.element_type.add_prismatic_homogenous_linear_elment_type(
         ifc_class=element_type_class,
         material=material,
         profile=profile_def,
@@ -666,14 +792,16 @@ def convert_frame_member_to_fem_for_case_2(
     assert len(p3) == 3
 
     # Create StructuralItem
-    structural_curve_member = inlbim.api.structural.create_3pt_structural_curve_member(
-        p1=p1,
-        p2=p2,
-        p3=p3,
-        profile_def=profile_def,
-        material=material,
-        structural_analysis_model=structural_analysis_model,
-        corresponding_product=frame_member_copied_to_destination_file,
+    structural_curve_member = (
+        inlbim.api.structural.create_linear_structural_curve_member(
+            start_point=p1,
+            end_point=p2,
+            orientation_point=p3,
+            profile_def=profile_def,
+            material=material,
+            structural_analysis_model=structural_analysis_model,
+            corresponding_product=frame_member_copied_to_destination_file,
+        )
     )
 
     return structural_curve_member

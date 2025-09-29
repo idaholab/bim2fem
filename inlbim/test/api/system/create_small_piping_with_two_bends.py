@@ -39,19 +39,19 @@ def main() -> int:
     # Get Project
     project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
 
-    # Add Building
-    building = ifcopenshell.api.root.create_entity(
+    # Add Site
+    site = ifcopenshell.api.root.create_entity(
         file=ifc4_file,
-        ifc_class="IfcBuilding",
-        name="Building-01",
+        ifc_class="IfcSite",
+        name="Site-01",
     )
     ifcopenshell.api.aggregate.assign_object(
         file=ifc4_file,
-        products=[building],
+        products=[site],
         relating_object=project,
     )
     inlbim.api.geometry.edit_object_placement(
-        product=building,
+        product=site,
         place_object_relative_to_parent=True,
     )
 
@@ -67,7 +67,7 @@ def main() -> int:
     # Add DistributionSystem
     distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
     distribution_system.Name = "WS"
-    distribution_system.LongName = "Water Supply for Building"
+    distribution_system.LongName = "Water Supply for Site"
     distribution_system.PredefinedType = "WATERSUPPLY"
 
     # Set pipe nominal diameter and thickness
@@ -83,12 +83,12 @@ def main() -> int:
     ]
 
     # Create Element
-    piping_elements = inlbim.api.system.create_piping_system_with_polyline(
+    piping_elements = inlbim.api.system.create_piping_system_from_polyline(
         polyline=polyline,
         nominal_diameter=nominal_diameter,
         thickness=thickness,
         material=steel_material,
-        spatial_element=building,
+        spatial_element=site,
         distribution_system=distribution_system,
         place_objects_relative_to_parent=True,
         add_shape_representation_to_ports=False,
@@ -99,7 +99,7 @@ def main() -> int:
     ifc_filename = os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
-            "test_create_piping_system_with_polyline.ifc",
+            "small_piping_with_two_bends.ifc",
         )
     )
     inlbim.api.file.write_to_ifc_spf(

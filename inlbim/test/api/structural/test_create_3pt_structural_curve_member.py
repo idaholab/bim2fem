@@ -230,10 +230,10 @@ def main() -> int:
         )
 
         # Create StructuralItem
-        inlbim.api.structural.create_3pt_structural_curve_member(
-            p1=element_information["p1"],
-            p2=element_information["p2"],
-            p3=element_information["p3"],
+        inlbim.api.structural.create_linear_structural_curve_member(
+            start_point=element_information["p1"],
+            end_point=element_information["p2"],
+            orientation_point=element_information["p3"],
             profile_def=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,

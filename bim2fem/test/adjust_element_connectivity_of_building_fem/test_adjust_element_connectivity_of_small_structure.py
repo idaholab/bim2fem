@@ -16,7 +16,7 @@ import time
 import chime
 import inlbim.api.file
 import ifcopenshell
-from bim2fem.adjust_element_connectivity_of_fem import (
+from bim2fem.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 
@@ -32,8 +32,8 @@ def main() -> int:
         os.path.join(
             os.path.dirname(__file__),
             "..",
-            "convert_ifc_to_fem",
-            "test_convert_SteelConstruction_RV_to_fem.ifc",
+            "convert_building_to_fem",
+            "test_convert_small_structure_RV_to_fem.ifc",
         )
     )
 
@@ -57,7 +57,7 @@ def main() -> int:
         file_path=os.path.abspath(
             os.path.join(
                 os.path.dirname(__file__),
-                "test_adjust_element_connectivity_of_SteelConstruction_RV_fem.ifc",
+                "small_structure_SAV_snapped.ifc",
             )
         ),
         add_annotations=True,

@@ -8,10 +8,11 @@ import inlbim.api.material
 from typing import Literal
 
 
-BEAM_OR_COLUMN_OR_MEMBER_TYPE_CLASS = Literal[
+LINEAR_ELEMENT_TYPE_CLASS = Literal[
     "IfcBeamType",
     "IfcColumnType",
     "IfcMemberType",
+    "IfcPipeSegmentType",
 ]
 
 SLAB_OR_WALL_PLATE_TYPE_CLASS = Literal[
@@ -21,15 +22,14 @@ SLAB_OR_WALL_PLATE_TYPE_CLASS = Literal[
 ]
 
 
-def add_beam_or_column_or_member_type(
-    ifc_class: BEAM_OR_COLUMN_OR_MEMBER_TYPE_CLASS,
+def add_prismatic_homogenous_linear_elment_type(
+    ifc_class: LINEAR_ELEMENT_TYPE_CLASS,
     material: ifcopenshell.entity_instance,
     profile: ifcopenshell.entity_instance,
     name: str | None = None,
     check_for_duplicate: bool = False,
 ) -> ifcopenshell.entity_instance:
-    """Add an IfcBeamType, IfcColumnType, or IfcMemberType that is prismatic and
-    homogeneous."""
+    """Add an IfcElementType that is prismatic, homogeneous, and linear."""
 
     ifc4_file = material.file
 
