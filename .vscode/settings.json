@@ -1,0 +1,10 @@
+{
+    "python.testing.pytestEnabled": true,  // Fixes import warnings (Pylance)
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false // Fixes autocomplete
+}
