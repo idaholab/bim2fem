@@ -351,3 +351,7 @@ MigrationBackup/
 
 # Scratch folder
 scratch/
+
+# Ignore files generated during tests.
+tests/output/
+*.ifc.tmp
