@@ -5,20 +5,21 @@ StructuralAnalysisView MVD"""
 
 
 import ifcopenshell
-import inlbim.api.file
+import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.project
 import ifcopenshell.util.selector
-from bim2fem.helpers.convert_linear_building_element import (
+from bim2fem.core.helpers.convert_linear_building_element import (
     convert_linear_building_element_to_structural_curve_member,
 )
-from bim2fem.helpers.convert_planar_building_element import (
+from bim2fem.core.helpers.convert_planar_building_element import (
     convert_planar_building_element_to_structural_surface_members,
 )
-from inlbim import REGION
+from bim2fem.ifcplus import REGION
 import ifcopenshell.util.element
-import inlbim.api.structural
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import inlbim.api.geometry
+import bim2fem.ifcplus.api.geometry
 
 
 def convert_ifc_to_fem(
@@ -30,7 +31,7 @@ def convert_ifc_to_fem(
     """Convert IFC to FEM"""
 
     # Create empty IFC4 StructuralAnalysisView File
-    ifc4_destination_file = inlbim.api.file.create_ifc4_file(
+    ifc4_destination_file = bim2fem.ifcplus.api.project.create_ifc4_file(
         model_view_definition="StructuralAnalysisView",
         precision=1e-4,
     )
@@ -51,7 +52,7 @@ def convert_ifc_to_fem(
         products=[site],
         relating_object=project,
     )
-    inlbim.api.geometry.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
     )
@@ -132,9 +133,11 @@ def convert_ifc_to_fem(
     print(f"walls: {len(walls_slated_for_conversion_from_source_file)}")
 
     # Add StructuralAnalysisModel
-    structural_analysis_model = inlbim.api.structural.add_structural_analysis_model(
-        ifc4_file=ifc4_destination_file,
-        name=None,
+    structural_analysis_model = (
+        bim2fem.ifcplus.api.structural.add_structural_analysis_model(
+            ifc4_file=ifc4_destination_file,
+            name=None,
+        )
     )
 
     # Track conversion results
@@ -248,7 +251,7 @@ def convert_ifc_to_fem(
         print(f"\t{key.GlobalId} {key.is_a()}: {result}")
 
     # Merge Nodes
-    inlbim.api.structural.merge_all_coincident_structural_point_connections(
+    bim2fem.ifcplus.api.structural.merge_all_coincident_structural_point_connections(
         ifc4sav_file=ifc4_destination_file
     )
 

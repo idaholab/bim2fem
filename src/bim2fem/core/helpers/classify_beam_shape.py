@@ -3,7 +3,7 @@
 from shapely.geometry import Polygon, Point
 import ifcopenshell.util.placement
 import numpy as np
-import inlbim.util.geometry
+import bim2fem.ifcplus.util.geometry
 from typing import Literal
 import math
 
@@ -63,7 +63,7 @@ def classify_shape_and_determine_orientation_of_faces(
     faces_defined_by_vertex_coordinates: list[list[tuple[float, float, float]]],
 ) -> dict:
 
-    # inlbim.util.geometry.TriangularMesh.plot_faces_3d(
+    # bim2fem.ifcplus.util.geometry.TriangularMesh.plot_faces_3d(
     #     faces_as_tuples_with_coordinates=faces_defined_by_vertex_coordinates
     # )
 
@@ -76,10 +76,12 @@ def classify_shape_and_determine_orientation_of_faces(
         p3 = face[2]
         vec1 = tuple(np.array(p2) - np.array(p1))
         vec2 = tuple(np.array(p3) - np.array(p1))
-        cross_product = inlbim.util.geometry.calculate_cross_product_of_two_vectors(
-            vector1=vec1,
-            vector2=vec2,
-            unit_normalize=False,
+        cross_product = (
+            bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+                vector1=vec1,
+                vector2=vec2,
+                unit_normalize=False,
+            )
         )
         areas_of_faces.append(float(0.5 * np.linalg.norm(cross_product)))
         centroids_of_faces.append((np.array(p1) + np.array(p2) + np.array(p3)) / 3.0)
@@ -99,7 +101,7 @@ def classify_shape_and_determine_orientation_of_faces(
 
     # Get assumed x-axis in global coordinates
     assumed_local_x_axis_in_global_coordinates = (
-        inlbim.util.geometry.calculate_cross_product_of_two_vectors(
+        bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
             vector1=assumed_local_y_axis_in_global_coordinates,
             vector2=local_z_axis_in_global_coordinates,
         )
@@ -205,7 +207,7 @@ def classify_shape_and_determine_orientation_of_faces(
         if shapes_match:
             break
         trial_local_x_axis_in_global_coordinates = (
-            inlbim.util.geometry.calculate_cross_product_of_two_vectors(
+            bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                 vector1=local_z_axis_in_global_coordinates,
                 vector2=trial_local_x_axis_in_global_coordinates,
             )

@@ -1,26 +1,23 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
-"""BIM2FEM Web User Interface
-
-Navigate to the repository in your terminal/command line/Powershell and type
-'python ./app.py'
+"""
+BIM2FEM Web Interface
+Flask application for non-developers users to interact with bim2fem functionality
 """
 
-import os
 import sys
+import os
+from pathlib import Path
 
-
-# Insert Root directory to path
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 import glob
 import json
 import ifcopenshell
-import inlbim.api.file
-import bim2glb.convert_ifc_to_glb
-import bim2fem.convert_ifc_to_fem
-import bim2fem.recreate_fem_with_3d_body_shape_representation
-from bim2fem.adjust_element_connectivity_of_building_fem import (
+import bim2fem.ifcplus.api.project
+import bim2fem.bim2glb.convert_ifc_to_glb
+import bim2fem.core.convert_ifc_to_fem
+import bim2fem.core.recreate_fem_with_3d_body_shape_representation
+from bim2fem.core.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 from flask import (
@@ -35,8 +32,8 @@ from flask import (
 
 app = Flask(
     __name__,
-    template_folder="web/templates",
-    static_folder="web/static",
+    template_folder="templates",
+    static_folder="static",
 )
 
 JOB_OPTIONS = [
@@ -46,43 +43,27 @@ JOB_OPTIONS = [
     # "Adjust Element Connectivity of Finite Element Model",
 ]
 
-PATH_TO_INPUT_DIRECTORY = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "web",
-        "input",
-    )
-)
+PATH_TO_INPUT_DIRECTORY = Path(__file__).parent / "input"
+PATH_TO_OUTPUT_DIRECTORY = Path(__file__).parent / "output"
+PATH_TO_METADATA_DIRECTORY = Path(__file__).parent / "metadata"
 
-PATH_TO_OUTPUT_DIRECTORY = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "web",
-        "output",
-    )
-)
-
-PATH_TO_METADATA_DIRECTORY = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "web",
-        "metadata",
-    )
-)
+PATH_TO_INPUT_DIRECTORY.mkdir(exist_ok=True)
+PATH_TO_OUTPUT_DIRECTORY.mkdir(exist_ok=True)
+PATH_TO_METADATA_DIRECTORY.mkdir(exist_ok=True)
 
 
-def remove_all_files(directory: str):
+def remove_all_files(directory: Path):
     """Remove all files in a directory"""
-    # Get a list of all files in the directory
-    files = glob.glob(os.path.join(directory, "*"))
+    if not directory.exists():
+        return
 
-    # Remove each file in the directory
-    for file in files:
-        if os.path.isfile(file):
-            os.remove(file)
-            print(f"Removed: {file}")
-        else:
-            print(f"Skipped: {file} (Not a file)")
+    for file_path in directory.glob("*"):
+        if file_path.is_file():
+            try:
+                file_path.unlink()
+                print(f"Removed: {file_path.name}")
+            except Exception as e:
+                print(f"Error removing {file_path.name}: {e}")
 
 
 @app.route(rule="/", methods=["GET", "POST"])
@@ -105,11 +86,12 @@ def index():
         elif selected_job == "Convert IFC to GLB":
             return redirect(location=url_for(endpoint="convert_to_glb"))
         elif selected_job == "Convert IFC to Finite Element Model":
-            return redirect(location=url_for(endpoint="convert_to_fem"))
+            # return redirect(location=url_for(endpoint="convert_to_fem"))
+            return "This feature is currently broken"
         elif selected_job == "Adjust Element Connectivity of Finite Element Model":
-            return "Work In Progress"
+            return "This feature is currently broken"
         else:
-            return "Work In Progress"
+            return "Unknown Job"
 
     return render_template(
         template_name_or_list="index.html",
@@ -155,7 +137,7 @@ def convert_to_fem():
         ifc_source_file = ifcopenshell.open(input_ifc_file_path)
         assert isinstance(ifc_source_file, ifcopenshell.file)
         assert region == "Europe" or region == "UnitedStates"
-        ifc4_sav_file = bim2fem.convert_ifc_to_fem.convert_ifc_to_fem(
+        ifc4_sav_file = bim2fem.core.convert_ifc_to_fem.convert_ifc_to_fem(
             ifc4_source_file=ifc_source_file,
             element_selection_query=element_selection_query,
             element_deselection_query=element_deselection_query,
@@ -182,7 +164,7 @@ def convert_to_fem():
             PATH_TO_OUTPUT_DIRECTORY,
             output_ifc_filename,
         )
-        inlbim.api.file.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_sav_file,
             file_path=output_ifc_file_path,
             add_annotations=False,
@@ -227,7 +209,7 @@ def convert_to_fem_done(
             return "IFC file could not be opened by IfcOpenShell"
 
         # Recreate the IFC4 SAV file with Body Shape Representations
-        recreated_ifc4_sav_file = bim2fem.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
+        recreated_ifc4_sav_file = bim2fem.core.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
             ifc4_sav_file=ifc4_sav_file,
             view_option="Wireframe_3D",
         )
@@ -245,7 +227,7 @@ def convert_to_fem_done(
         )
 
         # Write the Recreated IFC4 SAV file to disk
-        inlbim.api.file.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=recreated_ifc4_sav_file,
             file_path=recreated_ifc4_sav_file_path,
             add_annotations=False,
@@ -261,7 +243,7 @@ def convert_to_fem_done(
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=recreated_ifc4_sav_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -327,7 +309,7 @@ def convert_to_glb():
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=input_ifc_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -473,7 +455,7 @@ def view_ifc():
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=input_ifc_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -510,12 +492,12 @@ def viewer_for_glb_from_ifc(filename, metadata_filename):
     )
 
 
-@app.route("/web/output/<path:filename>")
+@app.route("/output/<path:filename>")
 def outputted_file(filename):
-    return send_from_directory("web/output", filename)
+    return send_from_directory("output", filename)
 
 
-@app.route("/web/metadata/<metadata_filename>")
+@app.route("/metadata/<metadata_filename>")
 def get_metadata(metadata_filename):
     """Serve the requested metadata JSON file."""
     metadata_path = os.path.join(PATH_TO_METADATA_DIRECTORY, metadata_filename)
@@ -527,8 +509,28 @@ def get_metadata(metadata_filename):
         return jsonify({"error": "Metadata file not found"}), 404
 
 
-if __name__ == "__main__":
+def main():
+    """Run the Flask development server"""
+    port = int(os.environ.get("PORT", 5000))
+
+    # For casual users via launcher, default to production mode
+    # Developers can set FLASK_DEBUG=true manually
+    debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+
+    print("=" * 50)
+    print(f"BIM2FEM Web Interface")
+    print(f"Navigate to: http://localhost:{port}")
+    print(f"Debug mode: {debug}")
+    print("Press Ctrl+C to stop")
+    print("=" * 50)
+
     app.run(
-        debug=False,
-        port=8000,
+        host="127.0.0.1",  # More secure than 0.0.0.0 for local use
+        port=port,
+        debug=debug,
+        use_reloader=debug,
     )
+
+
+if __name__ == "__main__":
+    main()

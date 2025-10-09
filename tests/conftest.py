@@ -9,6 +9,7 @@ import ifcopenshell
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
 import ifcopenshell.api.spatial
+import ifcopenshell.api.system
 import bim2fem.ifcplus.api.project
 import bim2fem.ifcplus.api.placement
 from pathlib import Path

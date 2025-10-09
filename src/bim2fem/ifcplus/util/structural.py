@@ -1,7 +1,7 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell
-import ifcplus.util.geometry
+import bim2fem.ifcplus.util.geometry
 import numpy as np
 import ifcopenshell.util.representation
 
@@ -97,8 +97,10 @@ def get_coordinates_of_structural_point_connection(
     )
 
     # Get coordinates of VertexPoint of StructuralPointConnection
-    coordinates_of_vertex_point = ifcplus.util.geometry.get_coordinates_of_vertex_point(
-        vertex_point=vertex_point,
+    coordinates_of_vertex_point = (
+        bim2fem.ifcplus.util.geometry.get_coordinates_of_vertex_point(
+            vertex_point=vertex_point,
+        )
     )
 
     return coordinates_of_vertex_point

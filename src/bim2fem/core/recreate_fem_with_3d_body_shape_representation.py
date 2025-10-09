@@ -2,33 +2,35 @@
 
 import ifcopenshell
 import numpy as np
-import inlbim.api.representation
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.geometry
-import inlbim.api.geometry
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.util.element
-import inlbim.merge_projects
-import inlbim.util.geometry
-import inlbim.util.structural
+import bim2fem.ifcplus.merge_projects
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.structural
 import ifcopenshell
 import ifcopenshell.api.root
-import inlbim.api.geometry
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.geometry
-import inlbim.api.representation
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.spatial
 import ifcopenshell.api.root
 import ifcopenshell
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import inlbim.api.geometry
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.spatial
 import ifcopenshell.api.geometry
-import inlbim.api.representation
+import bim2fem.ifcplus.api.geometry
 from typing import Literal
-import inlbim.api.profile
-import inlbim
+import bim2fem.ifcplus.api.profile
+import bim2fem.ifcplus
 import ifcopenshell.util.placement
-import inlbim.util.material
-import inlbim.api.style
+import bim2fem.ifcplus.util.material
+import bim2fem.ifcplus.api.style
+import bim2fem.ifcplus.api.placement
+import ifcopenshell.util.representation
 
 VIEW_OPTION = Literal["Extruded", "Wireframe_3D"]
 
@@ -46,7 +48,7 @@ def recreate_ifc4_sav_with_3d_body_shape_representation(
     ifcopenshell.api.root.create_entity(file=ifc4_arch_file, ifc_class="IfcProject")
 
     # Merge Projects
-    inlbim.merge_projects.merge_projects(
+    bim2fem.ifcplus.merge_projects.merge_projects(
         destination_ifc4_file=ifc4_arch_file,
         source_ifc4_files=[ifc4_sav_file],
     )
@@ -144,7 +146,7 @@ def recreate_structural_surface_members(
 
         # Get assigned product
         assigned_product = (
-            inlbim.util.structural.get_assigned_product_of_structural_item(
+            bim2fem.ifcplus.util.structural.get_assigned_product_of_structural_item(
                 structural_item=structural_surface_member
             )
         )
@@ -162,13 +164,13 @@ def recreate_structural_surface_members(
             products=[decomposing_element_of_assigned_product],
             relating_object=assigned_product,
         )
-        inlbim.api.geometry.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=decomposing_element_of_assigned_product,
             place_object_relative_to_parent=True,
         )
 
         # Get coordinates of outer bound vertices
-        points_3d = inlbim.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
+        points_3d = bim2fem.ifcplus.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
             triangular_structural_surface_member=structural_surface_member
         )
 
@@ -176,14 +178,12 @@ def recreate_structural_surface_members(
         v12 = tuple((np.array(points_3d[1]) - np.array(points_3d[0])).tolist())
         v23 = tuple((np.array(points_3d[2]) - np.array(points_3d[1])).tolist())
         local_z_axis_in_global_coordinates = (
-            inlbim.util.geometry.calculate_cross_product_of_two_vectors(
+            bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                 vector1=v12, vector2=v23
             )
         )
-        local_x_axis_in_global_coordinates = (
-            inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
-                p1=points_3d[0], p2=points_3d[1]
-            )
+        local_x_axis_in_global_coordinates = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=points_3d[0], p2=points_3d[1]
         )
         transformation_matrix = ifcopenshell.util.placement.a2p(
             o=points_3d[0],
@@ -217,16 +217,16 @@ def recreate_structural_surface_members(
 
         # Calculate thickness
         if view_option == "Extruded":
-            thickness = inlbim.util.material.sum_material_layer_thicknesses(
+            thickness = bim2fem.ifcplus.util.material.sum_material_layer_thicknesses(
                 material_layer_set=material_layer_set
             )
         else:
             thickness = thickness_of_flat_shells
 
         # Add and assign representation
-        representation_item = inlbim.api.representation.add_extruded_area_solid(
+        representation_item = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
             ifc4_file=ifc4_arch_file,
-            profile=inlbim.api.profile.add_arbitrary_profile_with_or_without_voids(
+            profile=bim2fem.ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
                 file=ifc4_arch_file,
                 outer_profile=points_2d_relative,
                 inner_profiles=[],
@@ -235,7 +235,7 @@ def recreate_structural_surface_members(
             repositioned_origin=(0.0, 0.0, -thickness / 2),
             extrusion_depth=thickness,
         )
-        shape_model = inlbim.api.representation.add_shape_model(
+        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_arch_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -251,7 +251,7 @@ def recreate_structural_surface_members(
         )
 
         # Edit Placement
-        inlbim.api.geometry.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=decomposing_element_of_assigned_product,
             repositioned_origin=points_3d[0],
             repositioned_z_axis=local_z_axis_in_global_coordinates,
@@ -277,7 +277,7 @@ def recreate_linear_structural_curve_members(
 
         # Get assigned product
         assigned_product = (
-            inlbim.util.structural.get_assigned_product_of_structural_item(
+            bim2fem.ifcplus.util.structural.get_assigned_product_of_structural_item(
                 structural_item=structural_curve_member
             )
         )
@@ -295,14 +295,14 @@ def recreate_linear_structural_curve_members(
             products=[decomposing_element_of_assigned_product],
             relating_object=assigned_product,
         )
-        inlbim.api.geometry.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=decomposing_element_of_assigned_product,
             place_object_relative_to_parent=True,
         )
 
         # Get points
         p1, p2, p3 = (
-            inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+            bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
                 linear_structural_curve_member=structural_curve_member
             )
         )
@@ -324,7 +324,7 @@ def recreate_linear_structural_curve_members(
             assert isinstance(material_profile_set, ifcopenshell.entity_instance)
             profile_def = material_profile_set.MaterialProfiles[0].Profile
         else:
-            profile_def = inlbim.api.profile.add_parameterized_profile(
+            profile_def = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_arch_file,
                 profile_class="IfcRectangleProfileDef",
                 dimensions=[size_of_wireframe_bodies, size_of_wireframe_bodies],
@@ -333,12 +333,12 @@ def recreate_linear_structural_curve_members(
             )
 
         # Add and assign representation
-        representation_item = inlbim.api.representation.add_extruded_area_solid(
+        representation_item = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
             ifc4_file=ifc4_arch_file,
             profile=profile_def,
             extrusion_depth=length,
         )
-        shape_model = inlbim.api.representation.add_shape_model(
+        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_arch_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -354,7 +354,7 @@ def recreate_linear_structural_curve_members(
         )
 
         # Edit Placement
-        inlbim.api.geometry.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=decomposing_element_of_assigned_product,
             repositioned_origin=p1,
             repositioned_z_axis=z_axis,
@@ -393,47 +393,44 @@ def recreate_structural_point_connections(
                 products=[proxy_element_for_node],
                 relating_structure=site,
             )
-            inlbim.api.geometry.edit_object_placement(
+            bim2fem.ifcplus.api.placement.edit_object_placement(
                 product=proxy_element_for_node,
                 place_object_relative_to_parent=True,
             )
 
             # Get point
-            coordinates_of_node = (
-                inlbim.util.structural.get_coordinates_of_structural_point_connection(
-                    structural_point_connection=structural_point_connection
-                )
+            coordinates_of_node = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                structural_point_connection=structural_point_connection
             )
 
             # Add and assign representation
-            representation_item = inlbim.api.representation.add_csg_solid(
-                operands=[
-                    # inlbim.api.representation.add_sphere(  # Sphere
-                    #     ifc4_file=ifc4_arch_file,
-                    #     radius=size_of_node_bodies,
-                    # )
-                    inlbim.api.representation.add_block(  # Block
-                        ifc4_file=ifc4_arch_file,
-                        length=size_of_node_bodies,
-                        width=size_of_node_bodies,
-                        height=size_of_node_bodies,
-                        repositioned_origin=(
-                            -size_of_node_bodies / 2.0,
-                            -size_of_node_bodies / 2.0,
-                            -size_of_node_bodies / 2.0,
-                        ),
-                    )
-                ],
-                boolean_operators=[],
+            block = bim2fem.ifcplus.api.geometry.add_block(  # Block
+                ifc4_file=ifc4_arch_file,
+                length=size_of_node_bodies,
+                width=size_of_node_bodies,
+                height=size_of_node_bodies,
+                repositioned_origin=(
+                    -size_of_node_bodies / 2.0,
+                    -size_of_node_bodies / 2.0,
+                    -size_of_node_bodies / 2.0,
+                ),
             )
-            shape_model = inlbim.api.representation.add_shape_model(
+
+            csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+                boolean_result_or_primitive=block,
+            )
+
+            representation_type = ifcopenshell.util.representation.guess_type(
+                items=[csg_solid]
+            )
+            assert isinstance(representation_type, str)
+
+            shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
                 ifc4_file=ifc4_arch_file,
                 shape_model_class="IfcShapeRepresentation",
                 representation_identifier="Body",
-                representation_type="CSG",
-                context_type="Model",
-                target_view="MODEL_VIEW",
-                items=[representation_item],
+                representation_type=representation_type,
+                items=[csg_solid],
             )
             ifcopenshell.api.geometry.assign_representation(
                 file=ifc4_arch_file,
@@ -442,14 +439,14 @@ def recreate_structural_point_connections(
             )
 
             # Edit Element Placement
-            inlbim.api.geometry.edit_object_placement(
+            bim2fem.ifcplus.api.placement.edit_object_placement(
                 product=proxy_element_for_node,
                 repositioned_origin=coordinates_of_node,
                 place_object_relative_to_parent=True,
             )
 
             # Add Color
-            inlbim.api.style.assign_color_to_element(
+            bim2fem.ifcplus.api.style.assign_color_to_element(
                 element=proxy_element_for_node,
                 rgb_triplet=(0.0, 0.0, 0.0),
             )

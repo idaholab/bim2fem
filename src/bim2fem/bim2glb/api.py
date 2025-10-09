@@ -22,7 +22,7 @@ from pygltflib import (
     PbrMetallicRoughness,
 )
 import numpy as np
-import bim2glb.util
+import bim2fem.bim2glb.util
 
 
 def create_material(
@@ -374,7 +374,7 @@ def assign_materials_to_mesh(
 
 
 def set_node_matrix(node: Node, matrix_array: np.ndarray):
-    if bim2glb.util.is_identity_matrix(matrix_array=matrix_array):
+    if bim2fem.bim2glb.util.is_identity_matrix(matrix_array=matrix_array):
         node.matrix = None
     else:
         node.matrix = matrix_array.T.flatten().tolist()

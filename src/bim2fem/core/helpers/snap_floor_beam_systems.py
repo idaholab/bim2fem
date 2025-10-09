@@ -1,13 +1,13 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell
-import inlbim.util.geometry
-import inlbim.util.structural
-import inlbim.api.structural
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.structural
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
-import inlbim.util.profile
-import inlbim.util.material
+import bim2fem.ifcplus.util.profile
+import bim2fem.ifcplus.util.material
 
 
 def snap_floor_beam_systems(
@@ -19,38 +19,30 @@ def snap_floor_beam_systems(
     print("\nSnap Floor Beam Systems")
 
     # Get Beams
-    beams = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcBeam",
-        )
+    beams = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcBeam",
     )
     print(f"\tlen(beams): {len(beams)}")
 
     # Get Columns
-    columns = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcColumn",
-        )
+    columns = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcColumn",
     )
     print(f"\tlen(columns): {len(columns)}")
 
     # Get Members
-    members = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcMember",
-        )
+    members = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcMember",
     )
     print(f"\tlen(members): {len(members)}")
 
     # Get slabs
-    slabs = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcSlab",
-        )
+    slabs = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcSlab",
     )
     print(f"\tlen(slabs): {len(slabs)}")
 
@@ -62,7 +54,7 @@ def snap_floor_beam_systems(
     for frame_member in beams + columns + members:
 
         # Get Nodes
-        nodes = inlbim.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
+        nodes = bim2fem.ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
             linear_structural_curve_member=frame_member
         )
         all_frame_member_nodes += nodes
@@ -76,10 +68,8 @@ def snap_floor_beam_systems(
         profile_def = material_profile_set.MaterialProfiles[0].Profile
 
         # Get largest dimension
-        largest_dimension = (
-            inlbim.util.profile.get_large_dimension_of_parameterized_profile_def(
-                parameterized_profile_def=profile_def
-            )
+        largest_dimension = bim2fem.ifcplus.util.profile.get_large_dimension_of_parameterized_profile_def(
+            parameterized_profile_def=profile_def
         )
 
         # Assign largest profile dimension information to nodes
@@ -101,7 +91,7 @@ def snap_floor_beam_systems(
             should_skip_usage=True,
         )
         assert material_layer_set
-        thickness = inlbim.util.material.sum_material_layer_thicknesses(
+        thickness = bim2fem.ifcplus.util.material.sum_material_layer_thicknesses(
             material_layer_set=material_layer_set
         )
         thicknesses_for_slabs[slab] = thickness
@@ -127,20 +117,18 @@ def snap_floor_beam_systems(
             )
 
             # Get beam coordinates
-            beam_node_coordinates = (
-                inlbim.util.structural.get_coordinates_of_structural_point_connection(
-                    structural_point_connection=beam_node
-                )
+            beam_node_coordinates = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                structural_point_connection=beam_node
             )
 
             # Get slab coordinates
-            slab_coordinates = inlbim.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
+            slab_coordinates = bim2fem.ifcplus.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
                 triangular_structural_surface_member=slab
             )
 
             # Project Beam Node onto slab and test inside
             projected_beam_node_coordinates, _, signed_distance, inside, _ = (
-                inlbim.util.geometry.project_point_onto_triangle_plane_and_test_inside(
+                bim2fem.ifcplus.util.geometry.project_point_onto_triangle_plane_and_test_inside(
                     p=np.array(beam_node_coordinates),
                     a=np.array(slab_coordinates[0]),
                     b=np.array(slab_coordinates[1]),
@@ -165,7 +153,7 @@ def snap_floor_beam_systems(
                 )
                 translation = tuple(float(val) for val in translation_vector.tolist())
                 assert len(translation) == 3
-                inlbim.api.structural.translate_structural_point_connection(
+                bim2fem.ifcplus.api.structural.translate_structural_point_connection(
                     structural_point_connection=beam_node,
                     translation=translation,
                 )

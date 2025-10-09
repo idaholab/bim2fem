@@ -354,4 +354,36 @@ scratch/
 
 # Ignore files generated during tests.
 tests/output/
-*.ifc.tmp
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Also add these if not already present
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project specific
+web/input/
+web/output/
+web/metadata/

@@ -2,13 +2,13 @@
 
 
 import ifcopenshell
-import inlbim.util.geometry
-import inlbim.util.structural
-import inlbim.api.structural
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.structural
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
-import inlbim.util.file
-import inlbim.util.profile
+import bim2fem.ifcplus.util.file
+import bim2fem.ifcplus.util.profile
 
 
 def snap_frame_members(
@@ -19,29 +19,23 @@ def snap_frame_members(
     print("\nSnap Structural Framing Together")
 
     # Get Columns
-    columns = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcColumn",
-        )
+    columns = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcColumn",
     )
     print(f"\tlen(columns): {len(columns)}")
 
     # Get Beams
-    beams = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcBeam",
-        )
+    beams = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcBeam",
     )
     print(f"\tlen(beams): {len(beams)}")
 
     # Get Members
-    members = (
-        inlbim.util.structural.get_structural_items_assigned_to_specified_element_class(
-            ifc4_sav_file=ifc4_sav_file,
-            ifc_element_class="IfcMember",
-        )
+    members = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+        ifc4_sav_file=ifc4_sav_file,
+        ifc_element_class="IfcMember",
     )
     print(f"\tlen(members): {len(members)}")
 
@@ -130,7 +124,7 @@ def divide_structural_curve_members_at_intersection_points_on_spans_with_other_m
 
         # Get coordinates of indivisible member
         start_point_of_indivisble_member, end_point_of_indivisble_member, _ = (
-            inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+            bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
                 linear_structural_curve_member=indivisible_member
             )
         )
@@ -148,7 +142,7 @@ def divide_structural_curve_members_at_intersection_points_on_spans_with_other_m
 
             # Get coordinates of divisible member
             start_point_of_divisble_member, end_point_of_divisble_member, _ = (
-                inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+                bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
                     linear_structural_curve_member=divisible_member
                 )
             )
@@ -157,7 +151,7 @@ def divide_structural_curve_members_at_intersection_points_on_spans_with_other_m
             (
                 start_point_of_connecting_line,
                 end_point_of_connecting_line,
-            ) = inlbim.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
+            ) = bim2fem.ifcplus.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
                 coordinates_of_start_of_line_1=start_point_of_indivisble_member,
                 coordinates_of_end_of_line_1=end_point_of_indivisble_member,
                 coordinates_of_start_of_line_2=start_point_of_divisble_member,
@@ -223,7 +217,7 @@ def divide_structural_curve_members_at_intersection_points_on_spans_with_other_m
                 divisible_member
             ]
         )
-        new_structural_curve_members = inlbim.api.structural.divide_structural_curve_member(
+        new_structural_curve_members = bim2fem.ifcplus.api.structural.divide_structural_curve_member(
             structural_curve_member=divisible_member,
             division_locations_as_proportions_of_length=division_locations_as_proportion_of_length,
         )
@@ -336,10 +330,8 @@ def get_allowable_snapping_distance_between_structural_curve_members(
         #         ]
         #     )
 
-        largest_dimension = (
-            inlbim.util.profile.get_large_dimension_of_parameterized_profile_def(
-                parameterized_profile_def=profile_def
-            )
+        largest_dimension = bim2fem.ifcplus.util.profile.get_large_dimension_of_parameterized_profile_def(
+            parameterized_profile_def=profile_def
         )
 
         # Append to list
@@ -355,7 +347,7 @@ def get_allowable_snapping_distance_between_structural_curve_members(
         structural_curve_member_2,
     ]:
         assigned_product = (
-            inlbim.util.structural.get_assigned_product_of_structural_item(
+            bim2fem.ifcplus.util.structural.get_assigned_product_of_structural_item(
                 structural_item=structural_curve_member
             )
         )
@@ -379,7 +371,9 @@ def snap_sets_of_structural_curve_members_together(
     snapping_members: list[ifcopenshell.entity_instance],
 ):
     # Get Numeric Scale of Project
-    numeric_scale = inlbim.util.file.get_numeric_scale_of_project(ifc4_file=ifc_file)
+    numeric_scale = bim2fem.ifcplus.util.file.get_numeric_scale_of_project(
+        ifc4_file=ifc_file
+    )
 
     # Record total number of members
     total_number_of_members_before_operation = len(static_members + snapping_members)
@@ -394,7 +388,7 @@ def snap_sets_of_structural_curve_members_together(
 
         # Get coordinates of indivisible member
         start_point_of_static_member, end_point_of_static_member, _ = (
-            inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+            bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
                 linear_structural_curve_member=static_member
             )
         )
@@ -415,7 +409,7 @@ def snap_sets_of_structural_curve_members_together(
             )
 
             # Get StructuralPointConnections of snapping member
-            structural_point_connections_of_snapping_member = inlbim.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
+            structural_point_connections_of_snapping_member = bim2fem.ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
                 linear_structural_curve_member=snapping_member,
             )
 
@@ -425,12 +419,12 @@ def snap_sets_of_structural_curve_members_together(
             ) in structural_point_connections_of_snapping_member:
 
                 # Get coordinates of StructuralPointConnection of snapping member
-                coordinates_of_structural_point_connection = inlbim.util.structural.get_coordinates_of_structural_point_connection(
+                coordinates_of_structural_point_connection = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
                     structural_point_connection=structural_point_connection_of_snapping_member
                 )
 
                 # Get coordinates of VertexPoint projected onto Edge
-                projected_coordinates_of_structural_point_connection = inlbim.util.geometry.calculate_coordinates_of_point_projected_onto_line(
+                projected_coordinates_of_structural_point_connection = bim2fem.ifcplus.util.geometry.calculate_coordinates_of_point_projected_onto_line(
                     point=coordinates_of_structural_point_connection,
                     start_point_of_line=start_point_of_static_member,
                     end_point_of_line=end_point_of_static_member,
@@ -460,7 +454,7 @@ def snap_sets_of_structural_curve_members_together(
                             float(val) for val in translation_vector.tolist()
                         )
                         assert len(translation) == 3
-                        inlbim.api.structural.translate_structural_point_connection(
+                        bim2fem.ifcplus.api.structural.translate_structural_point_connection(
                             structural_point_connection=structural_point_connection_of_snapping_member,
                             translation=translation,
                         )
