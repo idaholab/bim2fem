@@ -1,9 +1,7 @@
-chime
-Flask
-Flask_Cors
-ifcopenshell
-matplotlib
-numpy
-ortools
-pygltflib
-xmltodict
+Flask==3.1.2
+ifcopenshell==0.8.3.post2
+matplotlib==3.10.7
+numpy==2.3.3
+pygltflib==1.16.5
+pytest==8.4.2
+Shapely==2.1.2
