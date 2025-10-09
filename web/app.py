@@ -10,7 +10,6 @@ import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-import glob
 import json
 import ifcopenshell
 import bim2fem.ifcplus.api.project
@@ -29,6 +28,7 @@ from flask import (
     send_from_directory,
     jsonify,
 )
+
 
 app = Flask(
     __name__,

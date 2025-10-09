@@ -12,8 +12,8 @@ from pathlib import Path
 
 
 def check_python():
-    if sys.version_info < (3, 8):
-        print("Python 3.8+ is required!")
+    if sys.version_info < (3, 11):
+        print("Python 3.11+ is required!")
         input("Press Enter to exit...")
         sys.exit(1)
 
