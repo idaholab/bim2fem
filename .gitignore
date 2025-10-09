@@ -387,3 +387,17 @@ Thumbs.db
 web/input/
 web/output/
 web/metadata/
+
+# Test outputs - ignore everything in these folders
+tests/output/**
+tests/output/*
+
+# Web app generated files
+web/input/*.ifc
+web/input/*.ifczip
+web/output/*.glb
+web/output/*.ifc
+web/metadata/*.json
+
+# But keep the .gitkeep files if you have them
+!**/.gitkeep
