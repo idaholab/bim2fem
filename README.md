@@ -1,6 +1,6 @@
 # bim2fem
 
-<!-- ![Tests](https://github.com/YOUR_USERNAME/bim2fem/workflows/Tests/badge.svg) -->
+<!-- ![Tests](https://github.com/idaholab/bim2fem/workflows/Tests/badge.svg) -->
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License](https://img.shields.io/badge/license-LGPL-green)
 
@@ -44,7 +44,7 @@ Convert Building Information Models (BIM) to Finite Element Models (FEM) for str
 
 ## Getting Started
 
-### For Casual Users (GUI)
+### Interactive GUI (for non-developers)
 
 If you just want to convert files using the graphical interface:
 
@@ -53,7 +53,7 @@ If you just want to convert files using the graphical interface:
 
 2. **Download this project**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/bim2fem.git
+   git clone https://github.com/idaholab/bim2fem.git
    cd bim2fem
    ```
 
@@ -61,6 +61,7 @@ If you just want to convert files using the graphical interface:
    ```bash
    python run_bim2fem.py
    ```
+   Note: Initial setup may take a couple minutes.
 
 4. **Your browser will open** with the web interface at `http://localhost:5000`
 
@@ -76,7 +77,7 @@ pip install bim2fem
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/bim2fem.git
+git clone https://github.com/idaholab/bim2fem.git
 cd bim2fem
 
 # Create virtual environment (recommended)
@@ -84,8 +85,7 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
-pip install -r requirements-dev.txt  # For development tools
+pip install -r requirements-dev.txt  # For development tools and base requirements
 ```
 
 #### Basic Usage (coming soon)
@@ -96,20 +96,22 @@ from bim2fem.core import convert_ifc_to_fem
 from bim2fem.bim2glb import convert_ifc_to_glb
 
 # Additional Details Coming Soon!
-
-
 ```
 
 ## Development
+
+### Development Setup
+
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+```
 
 ### Running Tests
 
 ```bash
 # Run all tests
 pytest tests/
-
-# Run with coverage
-pytest tests/ --cov=src/bim2fem
 
 # Run specific test file
 pytest tests/ifcplus/api/test_geometry.py
@@ -125,21 +127,7 @@ pytest tests/ifcplus/api/test_geometry.py
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
-### Development Setup
 
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run tests before committing
-pytest
-
-# Format code (when we add black)
-black src/ tests/
-
-# Type checking (when we add mypy)
-mypy src/
-```
 
 ## Requirements
 
