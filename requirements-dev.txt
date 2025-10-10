@@ -1,0 +1,7 @@
+# Include base requirements
+-r requirements.txt
+
+# Dev-only tools
+pytest==8.4.2
+# black
+# flake8

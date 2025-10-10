@@ -1,102 +1,182 @@
 # bim2fem
-Convert 3D architectural models of buildings to 3D finite element models for structural anaysis. 
 
-Specifically, this programs converts IFC SPF files from the architectural coordination domain (IFC4 ReferenceView/DesignTransferView) to the structural analysis domain (IFC4 StructuralAnalysisView). IFC is an open, internaional standardized schema for Building Information Modeling (BIM) and is the input and output of this program. 
+<!-- ![Tests](https://github.com/idaholab/bim2fem/workflows/Tests/badge.svg) -->
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![License](https://img.shields.io/badge/license-LGPL-green)
 
-
-# Usage
-
-## Launch Web App
-
-1. Install the latest version of [Docker](https://docs.docker.com/get-docker/). Then, open Docker Desktop and leave it running in the background.
-
-
-2. Clone the repository:
-    ```sh
-    git clone https://github.com/idaholab/bim2fem
-    ```
-
-3. Navigate to the repository:
-    ```sh
-    cd YourDocuments/bim2fem
-    ```
-
-4. Run the following command and wait for the process to finish. The initial startup might take a while as the operation must first fetch the pre-built containers from the internet.
-    ```sh
-    docker compose up --build
-    ```
-
-5. Access the locally hosted web app via http://localhost:8000/
-
-6. To terminate hit Ctrl-C or Ctrl-D
-
-## Example Walkthrough: Convert Revit Steel Frame Construction Model to Finite Element Model
-
+Convert Building Information Models (BIM) to Finite Element Models (FEM) for structural analysis.
 
 <table>
   <tr>
-    <td><strong>Before (Revit)</strong></td>
-    <td><strong>After (IFC4)</strong></td>
+    <td align="center"><strong>Revit Model</strong></td>
+    <td align="center"><strong>IFC4 ReferenceView</strong></td>
+    <td align="center"><strong>IFC4 StructuralAnalysisView</strong></td>
   </tr>
   <tr>
-    <td><img src="images/Revit_original.png" alt="Before Image" style="width: 300px;"/></td>
-    <td><img src="images/Revit_IFC4_StructuralAnalysisView.png" alt="After Image" style="width: 300px;"/></td>
+    <td><img src="src/bim2fem/images/Revit_original.png" alt="Original Revit model" width="300"/></td>
+    <td><img src="src/bim2fem/images/Revit_IFC4_ReferenceView.png" alt="IFC4 ReferenceView" width="300"/></td>
+    <td><img src="src/bim2fem/images/Revit_IFC4_StructuralAnalysisView.png" alt="IFC4 StructuralAnalysisView" width="300"/></td>
   </tr>
 </table>
 
+## What is bim2fem?
 
-1. Launch the Web App.
+**bim2fem** is an open-source ([LGPL]) Python-based software that converts 3D architectural [BIM] models into [FEM] models ready for structural analysis. Support for transforming 3D building and piping models is implemented for the Industry Foundation Classes ([IFC]) standard. 
 
-2. Select "Convert IFC to Finite Element Model".
+### Key Features
 
-3. Upload the SteelConstruction_RV.ifc file, which can be found in the bim2fem/test/files directory.
-
-4. In the "Selector Query" field, specify which IfcElement classes you want to run throught the FEM converter. Let's choose some typical structural building elements. Input the following in the "Selector Query" field:
-    ```sh
-    IfcBeam, IfcColumn, IfcSlab, IfcWall
-    ```
-
-5. We don't need to include the spread footings in our FEM, so let's deselect all the spread footings in the model using the "Deselector Query" field. Revit has assigned the IfcElementType of "M_Footing-Rectangular:1800 x 1200 x 450mm" to all spread footings, so we can use this to select all the spread footings that we don't want to run through the converter. (Note: Revit has erroneously classified the spread footings as instances of IfcSlab. The correct classification for these elements should be IfcFooting). Input the following in the "Deselector Query" field:
-    ```sh
-    type = "M_Footing-Rectangular:1800 x 1200 x 450mm"
-    ```
-
-6. The building elements in this Revit file are from Euro standards, so specify "Europe" as the region. (Note: The other option for region is "UnitedStates". However, the units in the output FEM are always standard SI units: meters, kilograms, celsius, seconds). Input the following in the "Region" field:
-    ```sh
-    Europe
-    ```
-
-7. Select "No" for the element connectivity adjustment option. But, re-run this example again after step 9 and "Yes" to see the change in the model. 
-
-8. Click "Upload and Process". 
-
-9. After the conversion is complete, you can download the new IFC4 StructuralAnalysisView file and/or view it in the browser. 
+- **BIM to FEM conversion** - Transform architectural models into structural analysis models (support for building and piping elements)
+- **IFC4 support** - Compatibility with IFC standard (release [IFC4 Add2 TC1])
+- **Enhanced IFC manipulation** - Extended IfcOpenShell functionality for building and piping elements via IfcPlus subpackage
+- **GLB export** - Convert IFC to GLB format for 3D visualization
+- **Web interface** - User-friendly GUI for non-programmers
+- **Python API** - Full programmatic control for developers
 
 
-# OpenBIM Resources
+### Contents
 
-## buildingSMART
+| Module | Description |
+|--------|-------------|
+| `bim2fem.core` | Core utility for converting IFC4 from ReferenceView/DesignTransferView to StructuralAnalysisView |
+| `bim2fem.ifcplus` | Extension of the IfcOpenShell-Python library for enhanced IFC manipulation of building and piping models      |
+| `bim2fem.bim2glb` | Extension of IfcConvert for improved IFC to GLB conversion for 3D visualization |
 
-* [buildingSMART Homepage](https://www.buildingsmart.org/)
 
-## Industry Foundation Classes (IFC)
+## Getting Started
 
-* [Intro to IFC](https://technical.buildingsmart.org/standards/ifc/)
-* [IFC Specifications Database](https://technical.buildingsmart.org/standards/ifc/ifc-schema-specifications/)
-* [IFC4 Documentation](https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/)
-* [IFC4x3 Documentation (more reader friendly than IFC4 Docs)](https://ifc43-docs.standards.buildingsmart.org/)
-* [IFC Validation Service](https://www.buildingsmart.org/users/services/validation-service/)
+### Interactive GUI (for non-developers)
 
-## IfcOpenShell
+If you just want to convert files using the graphical interface:
 
-* [IfcOpenShell Homepage](https://ifcopenshell.org/)
+1. **Install Python** (<3.14, >=3.9) from [python.org](https://python.org)
+   - ✅ During installation, check "Add Python to PATH"
 
-## IFC Editors/Viewers
+2. **Download this project**
+   ```bash
+   git clone https://github.com/idaholab/bim2fem.git
+   cd bim2fem
+   ```
 
-* [Bonsai (formely BlenderBIM)](https://ifcopenshell.org/)
+3. **Double-click `run_bim2fem.py`** or run:
+   ```bash
+   python run_bim2fem.py
+   ```
+   Note: Initial setup may take a couple minutes.
 
-## Contact
+4. **Your browser will open** with the web interface at `http://localhost:5000`
 
-If you have any questions, suggestions, or would like to contribute, please feel free to reach out to me at:
+### For Developers (API)
 
-**Email:** [nicholas.crowder@inl.gov](mailto:nicholas.crowder@inl.gov)
+#### Installation from PyPI (Coming Soon)
+
+```bash
+pip install bim2fem
+```
+
+#### Installation from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/idaholab/bim2fem.git
+cd bim2fem
+
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements-dev.txt  # For development tools and base requirements
+```
+
+#### Basic Usage (coming soon)
+
+```python
+import ifcopenshell
+from bim2fem.core import convert_ifc_to_fem
+from bim2fem.bim2glb import convert_ifc_to_glb
+
+# Additional Details Coming Soon!
+```
+
+## Development
+
+### Development Setup
+
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest tests/
+
+# Run specific test file
+pytest tests/ifcplus/api/test_geometry.py
+```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and add tests
+4. Run tests to ensure everything works
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+
+
+## Requirements
+
+- Python <3.14, >=3.9
+- IfcOpenShell
+- NumPy
+- Flask (for web interface)
+- See `requirements.txt` for full list
+
+## Platform Support
+
+- ✅ Windows
+- ✅ Linux
+- ✅ macOS
+
+Note: The project includes platform-specific IfcConvert executables for each OS.
+
+## License
+
+This project is licensed under the LGPL License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Developed at [Idaho National Lab]
+- Built on top of [IfcOpenShell]
+- IFC standard by [buildingSMART]
+
+## Roadmap
+
+- [ ] PyPI package publication
+- [ ] Detailed Documentation
+- [ ] Extension of capabilities for complex building and piping elements
+- [ ] Support for IFC4x3 input files
+
+## Support
+
+- 📖 [Documentation](https://github.com/Crowder44/bim2fem/wiki) (Coming Soon)
+- 🐛 [Report Issues](https://github.com/Crowder44/bim2fem/issues)
+- 💬 [Discussions](https://github.com/Crowder44/bim2fem/discussions)
+
+---
+
+**Note**: This project is under active development. APIs may change in future versions.
+
+[BIM]: https://en.wikipedia.org/wiki/Building_information_modeling "BIM"
+[FEM]: https://en.wikipedia.org/wiki/Finite_element_method "FEM"
+[LGPL]: https://github.com/IfcOpenShell/IfcOpenShell/tree/master/COPYING.LESSER "LGPL-3.0-or-later"
+[IFC]: https://technical.buildingsmart.org/standards/ifc/ "IFC"
+[IFC4 Add2 TC1]: https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/ "IFC4 Add2 TC1"
+[IfcOpenShell]: http://ifcopenshell.org/ "IfcOpenShell"
+[buildingSMART]: https://www.buildingsmart.org/ "buildingSMART"
+[Idaho National Lab]: https://inl.gov/ "Idaho National Lab"
