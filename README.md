@@ -475,8 +475,34 @@ These resources can help:
 ---
 
 
+### VS Code Setup (Optional)
 
+If you're using VS Code, you can use our recommended settings for better Python and pytest integration:
 
+1. Create a `.vscode` folder in the project root (if it doesn't exist)
+2. Create a `settings.json` file inside `.vscode/`
+3. Add the following configuration:
+```json
+{
+    "python.testing.pytestEnabled": true,
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false
+}
+```
+
+This configuration:
+
+- Enables pytest as the test framework
+- Adds the src/ directory to Python paths (fixes import warnings)
+- Configures pytest to discover tests from the project root
+- Disables unittest to avoid conflicts
+
+Note: The .vscode/ folder is gitignored, so these settings won't be tracked. Each developer can customize them as needed.
 
 
 
