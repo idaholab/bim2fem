@@ -19,6 +19,20 @@ Convert Building Information Models (BIM) to Finite Element Models (FEM) for str
   </tr>
 </table>
 
+## Table of Contents
+
+- [What is bim2fem?](#what-is-bim2fem)
+  - [Key Features](#key-features)
+  - [Contents](#contents)
+- [Getting Started](#getting-started)
+  - [Interactive GUI](#interactive-gui-for-non-developers)
+  - [For Developers](#for-developers-api)
+- [Contributing](#contributing)
+- [Requirements](#requirements)
+- [Platform Support](#platform-support)
+- [License](#license)
+- [Support](#support)
+
 ## What is bim2fem?
 
 **bim2fem** is an open-source ([LGPL]) Python-based software that converts 3D architectural [BIM] models into [FEM] models ready for structural analysis. Support for transforming 3D building and piping models is implemented for the Industry Foundation Classes ([IFC]) standard. 
@@ -98,35 +112,9 @@ from bim2fem.bim2glb import convert_ifc_to_glb
 # Additional Details Coming Soon!
 ```
 
-## Development
+## Contributing
 
-### Development Setup
-
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest tests/
-
-# Run specific test file
-pytest tests/ifcplus/api/test_geometry.py
-```
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes and add tests
-4. Run tests to ensure everything works
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions.
 
 
 ## Requirements
