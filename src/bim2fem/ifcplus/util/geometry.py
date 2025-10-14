@@ -431,51 +431,6 @@ class TriangularMesh:
         plt.show()
 
 
-def get_bounding_box_of_element(
-    element: ifcopenshell.entity_instance,
-) -> tuple[list[float], list[float]]:
-
-    # Setup geometry settings
-    settings = ifcopenshell.geom.settings()
-    settings.set(settings.USE_WORLD_COORDS, True)
-
-    # Create shape
-    shape = ifcopenshell.geom.create_shape(settings, element)
-    geometry = shape.geometry  # This is a Triangulation object
-
-    # Extract vertices and reshape into Nx3 array
-    verts = np.array(geometry.verts).reshape(-1, 3)
-
-    # Compute bounding box
-    min_bounds = verts.min(axis=0)
-    max_bounds = verts.max(axis=0)
-
-    return min_bounds, max_bounds
-
-
-def get_bounding_box(
-    product: ifcopenshell.entity_instance,
-) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
-
-    settings = ifcopenshell.geom.settings()
-    settings.set(settings.USE_WORLD_COORDS, True)
-
-    shape = ifcopenshell.geom.create_shape(settings, product)
-    assert isinstance(shape, TriangulationElement)
-
-    geometry = shape.geometry
-
-    verts = np.array(geometry.verts).reshape(-1, 3)
-
-    min_bounds = tuple([float(val) for val in verts.min(axis=0)])
-    max_bounds = tuple([float(val) for val in verts.max(axis=0)])
-
-    assert len(min_bounds) == 3
-    assert len(max_bounds) == 3
-
-    return min_bounds, max_bounds
-
-
 @dataclass
 class BoundingBox:
     xmin: float
@@ -601,7 +556,7 @@ def calculate_angle_between_two_vectors(
         / np.linalg.norm(vector2)
     )
 
-    theta = np.arccos(cos_theta)
+    theta = float(np.arccos(cos_theta))
 
     return theta
 
@@ -660,57 +615,74 @@ class HorizontalCurve:
     @classmethod
     def from_3pt_polyline(
         cls,
-        p1: tuple[float, float, float],
-        p2: tuple[float, float, float],
-        p3: tuple[float, float, float],
+        first_point: tuple[float, float, float],
+        second_point: tuple[float, float, float],
+        third_point: tuple[float, float, float],
         radius_of_curvature: float,
     ):
 
-        # Get point of intersection of tangents
-        point_of_intersection = p2
+        point_of_intersection = second_point
 
-        # Get unit direction vectors of line segments
-        u1 = calculate_unit_direction_vector_between_two_points(p1=p1, p2=p2)
-        u2 = calculate_unit_direction_vector_between_two_points(p1=p2, p2=p3)
-
-        # Calculate the central angle
-        central_angle = calculate_angle_between_two_vectors(vector1=u2, vector2=u1)
-
-        # Calculate the unit direction vector of the axis of rotation
-        direction_of_axis_of_rotation = calculate_cross_product_of_two_vectors(
-            vector1=u1, vector2=u2
+        unit_vector_from_PC_to_PI = calculate_unit_direction_vector_between_two_points(
+            p1=first_point,
+            p2=point_of_intersection,
         )
 
-        # Calculate tangent length
+        unit_vector_from_PI_to_PT = calculate_unit_direction_vector_between_two_points(
+            p1=point_of_intersection,
+            p2=third_point,
+        )
+
+        central_angle = calculate_angle_between_two_vectors(
+            vector1=unit_vector_from_PI_to_PT,
+            vector2=unit_vector_from_PC_to_PI,
+        )
+
+        axis_of_rotation = calculate_cross_product_of_two_vectors(
+            vector1=unit_vector_from_PC_to_PI,
+            vector2=unit_vector_from_PI_to_PT,
+            unit_normalize=True,
+        )
+
         tangent_length = radius_of_curvature * np.tan(central_angle / 2)
 
-        # Calculate point of curvature
         point_of_curvature = (
-            np.array(point_of_intersection) - np.array(u1) * tangent_length
+            np.array(point_of_intersection)
+            - np.array(unit_vector_from_PC_to_PI) * tangent_length
         )
-        point_of_curvature = tuple(point_of_curvature.tolist())
 
-        # Calculate point of tangency
+        point_of_curvature = convert_3pt_ndarray_to_tuple_of_floats(
+            numpy_3pt_array=point_of_curvature
+        )
+
         point_of_tangency = (
-            np.array(point_of_intersection) + np.array(u2) * tangent_length
+            np.array(point_of_intersection)
+            + np.array(unit_vector_from_PI_to_PT) * tangent_length
         )
-        point_of_tangency = tuple(point_of_tangency.tolist())
 
-        # Calculate the point of center of curvature
-        cross_product_of_axis_and_u1 = calculate_cross_product_of_two_vectors(
-            vector1=direction_of_axis_of_rotation, vector2=u1
+        point_of_tangency = convert_3pt_ndarray_to_tuple_of_floats(
+            numpy_3pt_array=point_of_tangency
         )
+
+        unit_vector_from_PC_to_CC = calculate_cross_product_of_two_vectors(
+            vector1=axis_of_rotation,
+            vector2=unit_vector_from_PC_to_PI,
+        )
+
         center_of_curvature = (
             np.array(point_of_curvature)
-            + np.array(cross_product_of_axis_and_u1) * radius_of_curvature
+            + np.array(unit_vector_from_PC_to_CC) * radius_of_curvature
         )
-        center_of_curvature = tuple(center_of_curvature.tolist())
+
+        center_of_curvature = convert_3pt_ndarray_to_tuple_of_floats(
+            numpy_3pt_array=center_of_curvature
+        )
 
         return cls(
             point_of_intersection=point_of_intersection,
-            central_angle=central_angle,
-            radius_of_curvature=radius_of_curvature,
-            direction_of_axis_of_rotation=direction_of_axis_of_rotation,
+            central_angle=float(central_angle),
+            radius_of_curvature=float(radius_of_curvature),
+            direction_of_axis_of_rotation=axis_of_rotation,
             point_of_curvature=point_of_curvature,
             point_of_tangency=point_of_tangency,
             center_of_curvature=center_of_curvature,
@@ -724,45 +696,55 @@ class HorizontalCurve:
         point_of_tangency: tuple[float, float, float],
     ):
 
-        # Get unit direction vectors of line segments
-        u1 = calculate_unit_direction_vector_between_two_points(
-            p1=point_of_curvature, p2=point_of_intersection
-        )
-        u2 = calculate_unit_direction_vector_between_two_points(
-            p1=point_of_intersection, p2=point_of_tangency
+        unit_vector_from_PC_to_PI = calculate_unit_direction_vector_between_two_points(
+            p1=point_of_curvature,
+            p2=point_of_intersection,
         )
 
-        # Calculate the central angle
-        central_angle = calculate_angle_between_two_vectors(vector1=u2, vector2=u1)
-
-        # Calculate the unit direction vector of the axis of rotation
-        direction_of_axis_of_rotation = calculate_cross_product_of_two_vectors(
-            vector1=u1, vector2=u2
+        unit_vector_from_PI_to_PT = calculate_unit_direction_vector_between_two_points(
+            p1=point_of_intersection,
+            p2=point_of_tangency,
         )
 
-        # Calculate tangent length
+        central_angle_of_curvature = calculate_angle_between_two_vectors(
+            vector1=unit_vector_from_PI_to_PT,
+            vector2=unit_vector_from_PC_to_PI,
+        )
+
+        axis_of_rotation = calculate_cross_product_of_two_vectors(
+            vector1=unit_vector_from_PC_to_PI,
+            vector2=unit_vector_from_PI_to_PT,
+            unit_normalize=True,
+        )
+
         tangent_length = np.linalg.norm(
             np.array(point_of_intersection) - np.array(point_of_curvature)
         )
 
-        # Calculate radius of curvature
-        radius_of_curvature = float(tangent_length * 1 / np.tan(central_angle / 2))
-
-        # Calculate the point of center of curvature
-        cross_product_of_axis_and_u1 = calculate_cross_product_of_two_vectors(
-            vector1=direction_of_axis_of_rotation, vector2=u1
+        radius_of_curvature = float(
+            tangent_length * 1 / np.tan(central_angle_of_curvature / 2)
         )
+
+        unit_vector_from_PC_to_CC = calculate_cross_product_of_two_vectors(
+            vector1=axis_of_rotation,
+            vector2=unit_vector_from_PC_to_PI,
+            unit_normalize=True,
+        )
+
         center_of_curvature = (
             np.array(point_of_curvature)
-            + np.array(cross_product_of_axis_and_u1) * radius_of_curvature
+            + np.array(unit_vector_from_PC_to_CC) * radius_of_curvature
         )
-        center_of_curvature = tuple(center_of_curvature.tolist())
+
+        center_of_curvature = convert_3pt_ndarray_to_tuple_of_floats(
+            numpy_3pt_array=center_of_curvature
+        )
 
         return cls(
             point_of_intersection=point_of_intersection,
-            central_angle=central_angle,
-            radius_of_curvature=radius_of_curvature,
-            direction_of_axis_of_rotation=direction_of_axis_of_rotation,
+            central_angle=float(central_angle_of_curvature),
+            radius_of_curvature=float(radius_of_curvature),
+            direction_of_axis_of_rotation=axis_of_rotation,
             point_of_curvature=point_of_curvature,
             point_of_tangency=point_of_tangency,
             center_of_curvature=center_of_curvature,
@@ -777,60 +759,102 @@ class HorizontalCurve:
         radius_of_curvature: float,
     ):
 
-        # Long chord length
         long_chord_length = np.linalg.norm(
             np.array(point_of_tangency) - np.array(point_of_curvature),
         )
 
-        # Central Angle
         central_angle = 2 * np.arcsin(long_chord_length / 2 / radius_of_curvature)
 
-        # Unit Vector from PC to PT
-        vector_from_PC_to_PT = calculate_unit_direction_vector_between_two_points(
+        unit_vector_from_PC_to_PT = calculate_unit_direction_vector_between_two_points(
             p1=point_of_curvature,
             p2=point_of_tangency,
         )
 
-        # Unit Vector from PC to point on CC side
-        vector_from_PC_to_P3 = calculate_unit_direction_vector_between_two_points(
-            p1=point_of_curvature,
-            p2=point_on_center_of_curvature_side,
+        unit_vector_from_PC_to_point_on_CC_side = (
+            calculate_unit_direction_vector_between_two_points(
+                p1=point_of_curvature,
+                p2=point_on_center_of_curvature_side,
+            )
         )
 
-        # Axis of rotation
-        direction_of_axis_of_rotation = calculate_cross_product_of_two_vectors(
-            vector1=vector_from_PC_to_PT,
-            vector2=vector_from_PC_to_P3,
+        axis_of_rotation = calculate_cross_product_of_two_vectors(
+            vector1=unit_vector_from_PC_to_PT,
+            vector2=unit_vector_from_PC_to_point_on_CC_side,
+            unit_normalize=True,
         )
 
-        # Unit vector from center of curvature to point of intersection
-        vector_from_CC_to_PI = calculate_cross_product_of_two_vectors(
-            vector1=vector_from_PC_to_PT,
-            vector2=direction_of_axis_of_rotation,
+        unit_vector_from_from_CC_to_PI = calculate_cross_product_of_two_vectors(
+            vector1=unit_vector_from_PC_to_PT,
+            vector2=axis_of_rotation,
         )
 
-        # Middle ordinate distance
         middle_ordinate_distance = radius_of_curvature * (
             1.0 - np.cos(central_angle / 2)
         )
 
-        # External distance
         external_distance = radius_of_curvature * (1 / np.cos(central_angle / 2) - 1.0)
 
-        # Point of intersection
-        point_of_intersection = tuple(
-            (
-                np.array(point_of_curvature)
-                + long_chord_length / 2 * np.array(vector_from_PC_to_PT)
-                + (middle_ordinate_distance + external_distance)
-                * np.array(vector_from_CC_to_PI)
-            ).tolist()
+        point_of_intersection = (
+            np.array(point_of_curvature)
+            + long_chord_length / 2 * np.array(unit_vector_from_PC_to_PT)
+            + (middle_ordinate_distance + external_distance)
+            * np.array(unit_vector_from_from_CC_to_PI)
+        )
+
+        point_of_intersection = convert_3pt_ndarray_to_tuple_of_floats(
+            numpy_3pt_array=point_of_intersection,
         )
 
         return cls.from_PC_and_PT_and_PI(
             point_of_curvature=point_of_curvature,
             point_of_tangency=point_of_tangency,
             point_of_intersection=point_of_intersection,
+        )
+
+    @classmethod
+    def from_PC_and_CC_and_angle(
+        cls,
+        point_of_curvature: tuple[float, float, float],
+        point_of_center_of_curvature: tuple[float, float, float],
+        central_angle_of_curvature: float,
+    ):
+
+        radius_of_curvature = float(
+            np.linalg.norm(
+                np.array(point_of_center_of_curvature) - np.array(point_of_curvature)
+            )
+        )
+
+        vector_rotating = calculate_unit_direction_vector_between_two_points(
+            p1=point_of_center_of_curvature,
+            p2=point_of_curvature,
+        )
+
+        axis_of_rotation = calculate_cross_product_of_two_vectors(
+            vector1=point_of_curvature,
+            vector2=point_of_center_of_curvature,
+            unit_normalize=True,
+        )
+
+        rotated_vector = rotate_vector_about_axis(
+            vector=vector_rotating,
+            axis=axis_of_rotation,
+            angle=central_angle_of_curvature,
+        )
+
+        point_of_tangency = np.array(point_of_center_of_curvature) + np.array(
+            rotated_vector
+        )
+
+        point_of_tangency = convert_3pt_ndarray_to_tuple_of_floats(
+            numpy_3pt_array=point_of_tangency
+        )
+
+        return cls.from_PC_and_PT_and_CC(
+            point_of_curvature=point_of_curvature,
+            point_of_tangency=point_of_tangency,
+            point_on_center_of_curvature_side=point_of_center_of_curvature,
+            radius_of_curvature=radius_of_curvature,
         )
 
     def __repr__(self):
@@ -847,6 +871,40 @@ class HorizontalCurve:
                 f"center_of_curvature={self.center_of_curvature})",
             ]
         )
+
+
+def rotate_vector_about_axis(
+    vector: tuple[float, float, float],
+    axis: tuple[float, float, float],
+    angle: float,
+):
+    """
+    Rotate vector vector about axis axis by angle (in radians).
+
+    Args:
+        vector: array-like - vector to rotate
+        axis: array-like - axis of rotation (unit vector)
+        angle: float - rotation angle in radians
+
+    Returns:
+        numpy array - rotated vector v3
+    """
+    v = np.array(vector)
+    k = np.array(axis)  # axis unit vector
+
+    cos_angle = np.cos(angle)
+    sin_angle = np.sin(angle)
+
+    # Rodrigues' rotation formula
+    rotated_vector = (
+        v * cos_angle + np.cross(k, v) * sin_angle + k * np.dot(k, v) * (1 - cos_angle)
+    )
+
+    rotated_vector = convert_3pt_ndarray_to_tuple_of_floats(
+        numpy_3pt_array=rotated_vector
+    )
+
+    return rotated_vector
 
 
 def calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
@@ -1362,8 +1420,11 @@ def convert_3pt_ndarray_to_tuple_of_floats(
     numpy_3pt_array: np.ndarray,
 ) -> tuple[float, float, float]:
 
-    result = tuple(float(val) for val in numpy_3pt_array.tolist())
-    assert len(result) == 3
+    result = (
+        float(numpy_3pt_array[0]),
+        float(numpy_3pt_array[1]),
+        float(numpy_3pt_array[2]),
+    )
 
     return result
 

@@ -16,6 +16,8 @@ import bim2fem.ifcplus.api.geometry
 import ifcopenshell.util.representation
 import pytest
 from tests.conftest import OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
+import bim2fem.ifcplus.util.geometry
+import numpy as np
 
 
 class TestAddEquipment:
@@ -111,6 +113,143 @@ class TestAddEquipment:
             OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
             / "one_air_filtration_containment_housing.ifc"
         )
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_add_elbows(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        horizontal_curve_1 = (
+            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+                point_on_center_of_curvature_side=(2.0, 1.0, 0.0),
+                point_of_curvature=(1.0, 1.0, 0.0),
+                point_of_tangency=(2.0, 2.0, 0.0),
+                radius_of_curvature=1.0,
+            )
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_elbow(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            horizontal_curve=horizontal_curve_1,
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=None,
+            name="Elbow #1",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        horizontal_curve_2 = (
+            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_CC_and_angle(
+                point_of_center_of_curvature=(4.0, 1.0, 0.0),
+                point_of_curvature=(3.0, 1.0, 0.0),
+                central_angle_of_curvature=np.pi / 2,
+            )
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_elbow(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            horizontal_curve=horizontal_curve_2,
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=None,
+            name="Elbow #2",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        horizontal_curve_3 = (
+            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_PI(
+                point_of_curvature=(5.0, 1.0, 0.0),
+                point_of_intersection=(5.0, 2.0, 0.0),
+                point_of_tangency=(6.0, 2.0, 0.0),
+            )
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_elbow(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            horizontal_curve=horizontal_curve_3,
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=None,
+            name="Elbow #3",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        horizontal_curve_4 = (
+            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+                first_point=(7.0, 1.0, 0.0),
+                second_point=(7.0, 2.0, 0.0),
+                third_point=(8.0, 2.0, 0.0),
+                radius_of_curvature=1.0,
+            )
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_elbow(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            horizontal_curve=horizontal_curve_4,
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=None,
+            name="Elbow #4",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        horizontal_curve_5 = (
+            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_CC_and_angle(
+                point_of_center_of_curvature=(10.0, 1.0, 0.0),
+                point_of_curvature=(9.0, 1.0, 0.0),
+                central_angle_of_curvature=np.pi / 3,
+            )
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_elbow(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            horizontal_curve=horizontal_curve_5,
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=None,
+            name="Elbow #5",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "elbows.ifc")
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,

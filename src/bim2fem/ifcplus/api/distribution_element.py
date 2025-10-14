@@ -26,16 +26,18 @@ import ifcopenshell.api.material
 import numpy as np
 import bim2fem.ifcplus.api.system
 import ifcopenshell.util.representation
+import bim2fem.ifcplus.api.material
 
 
 ELBOW_RADIUS_TYPE = Literal["LONG", "SHORT"]
 
 
 def create_elbow(
+    ifc4_file: ifcopenshell.file,
     horizontal_curve: bim2fem.ifcplus.util.geometry.HorizontalCurve,
     nominal_diameter: float,
     thickness: float,
-    material: ifcopenshell.entity_instance,
+    material: ifcopenshell.entity_instance | None = None,
     elbow: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     spatial_element: ifcopenshell.entity_instance | None = None,
@@ -43,8 +45,6 @@ def create_elbow(
     place_object_relative_to_parent: bool = False,
     add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
-
-    ifc4_file = material.file
 
     if elbow is None:
         elbow = ifcopenshell.api.root.create_entity(
@@ -127,6 +127,18 @@ def create_elbow(
         repositioned_x_axis=object_x_axis_in_global_coordinates,
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
+
+    if material is None:
+        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+            ifc4_file=ifc4_file,
+            name="Galvanized Steel",
+            category="steel",
+            mass_density=7850.0,
+            young_modulus=200.0e9,
+            poisson_ratio=0.3,
+            thermal_expansion_coefficient=1.2e-6,
+            check_for_duplicate=True,
+        )
 
     ifcopenshell.api.material.assign_material(
         file=ifc4_file,

@@ -12,12 +12,13 @@ import numpy as np
 import ifcopenshell.util.placement
 import ifcopenshell.util.representation
 from bim2fem.ifcplus.api.distribution_element import ELBOW_RADIUS_TYPE
+import bim2fem.ifcplus.util.system
 
 
 def add_shape_representation_to_distribution_ports(
     ports: list[ifcopenshell.entity_instance],
     arrow_size: float = 0.1,
-):
+) -> None:
     ifc4_file = ports[0].file
 
     sink_arrow = None
@@ -71,7 +72,8 @@ def add_shape_representation_to_distribution_ports(
         representation_type = ifcopenshell.util.representation.guess_type(
             items=[csg_solid]
         )
-        assert isinstance(representation_type, str)
+        if representation_type is None:
+            return None
 
         shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
@@ -104,7 +106,8 @@ def filter_out_colinear_points_from_polyline(
         # Use list comprehension to create a new list without the specified indices
         return [item for idx, item in enumerate(lst) if idx not in indices_set]
 
-    assert len(polyline) >= 3
+    if len(polyline) < 3:
+        return polyline
 
     indices_of_points_to_remove = []
 
@@ -158,7 +161,8 @@ def create_piping_system_from_polyline(
 
     ifc4_file = material.file
 
-    assert len(polyline) >= 2
+    if len(polyline) < 2:
+        return []
 
     if len(polyline) == 2:
         pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
@@ -208,9 +212,9 @@ def create_piping_system_from_polyline(
 
         horizontal_curve = (
             bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
-                p1=polyline[index],
-                p2=polyline[index + 1],
-                p3=polyline[index + 2],
+                first_point=polyline[index],
+                second_point=polyline[index + 1],
+                third_point=polyline[index + 2],
                 radius_of_curvature=radius_of_curvature,
             )
         )
@@ -293,38 +297,19 @@ def connect_two_distribution_ports_via_piping_with_no_intelligence(
     """Connect two IfcDistributionPorts using a single path pipe branch formed via no
     intelligent method."""
 
-    source_port_local_placement_in_global_coordinates = (
-        ifcopenshell.util.placement.get_local_placement(
-            placement=source_port.ObjectPlacement
-        )
+    source_port_origin = bim2fem.ifcplus.util.system.get_port_location(
+        distribution_port=source_port,
     )
-    source_port_origin = tuple(
-        [
-            float(row[3])
-            for row in source_port_local_placement_in_global_coordinates[0:-1]
-        ]
-    )
-    source_port_z_axis = tuple(
-        [
-            float(row[2])
-            for row in source_port_local_placement_in_global_coordinates[0:-1]
-        ]
+    source_port_z_axis = bim2fem.ifcplus.util.system.get_port_z_axis(
+        distribution_port=source_port
     )
 
-    sink_port_local_placement_in_global_coordinates = (
-        ifcopenshell.util.placement.get_local_placement(
-            placement=sink_port.ObjectPlacement
-        )
+    sink_port_origin = bim2fem.ifcplus.util.system.get_port_location(
+        distribution_port=sink_port,
     )
-    sink_port_origin = tuple(
-        [float(row[3]) for row in sink_port_local_placement_in_global_coordinates[0:-1]]
+    sink_port_z_axis = bim2fem.ifcplus.util.system.get_port_z_axis(
+        distribution_port=sink_port
     )
-    sink_port_z_axis = tuple(
-        [float(row[2]) for row in sink_port_local_placement_in_global_coordinates[0:-1]]
-    )
-
-    assert len(source_port_origin) == 3
-    assert len(sink_port_origin) == 3
 
     outer_diameter_of_piping = nominal_diameter + thickness
 
