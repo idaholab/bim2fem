@@ -12,9 +12,9 @@ import ifcopenshell.api.geometry
 
 def edit_object_placement(
     product: ifcopenshell.entity_instance,
-    repositioned_origin: Iterable[float] = (0, 0, 0),
-    repositioned_z_axis: Iterable[float] = (0, 0, 1),
-    repositioned_x_axis: Iterable[float] = (1, 0, 0),
+    repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
     should_transform_children: bool = False,
     place_object_relative_to_parent: bool = False,
 ):

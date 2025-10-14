@@ -141,13 +141,10 @@ class TestAddEquipment:
             include_subtypes=False,
         )[0]
 
-        horizontal_curve_1 = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
-                point_on_center_of_curvature_side=(2.0, 1.0, 0.0),
-                point_of_curvature=(1.0, 1.0, 0.0),
-                point_of_tangency=(2.0, 2.0, 0.0),
-                radius_of_curvature=1.0,
-            )
+        bim2fem.ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=False,
         )
 
         material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
@@ -159,6 +156,15 @@ class TestAddEquipment:
             poisson_ratio=0.3,
             thermal_expansion_coefficient=1.2e-6,
             check_for_duplicate=True,
+        )
+
+        horizontal_curve_1 = (
+            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+                point_on_center_of_curvature_side=(2.0, 1.0, 0.0),
+                point_of_curvature=(1.0, 1.0, 0.0),
+                point_of_tangency=(2.0, 2.0, 0.0),
+                radius_of_curvature=1.0,
+            )
         )
 
         bim2fem.ifcplus.api.distribution_element.create_elbow(

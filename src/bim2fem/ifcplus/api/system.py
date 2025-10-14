@@ -10,8 +10,65 @@ import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.api.style
 import numpy as np
 import ifcopenshell.util.representation
-from bim2fem.ifcplus.api.distribution_element import ELBOW_RADIUS_TYPE
 import bim2fem.ifcplus.util.system
+import bim2fem.ifcplus.api.placement
+from typing import Literal
+
+FLOW_DIRECTION = Literal[
+    "SINK",
+    "SOURCE",
+    "SOURCEANDSINK",
+    "NOTDEFINED",
+]
+
+DISTRIBUTION_PORT_PREDEFINED_TYPE = Literal[
+    "CABLE",
+    "CABLECARRIER",
+    "DUCT",
+    "PIPE",
+    "WIRELESS",
+    "USERDEFINED",
+    "NOTDEFINED",
+]
+
+ELBOW_RADIUS_TYPE = Literal[
+    "LONG",
+    "SHORT",
+]
+
+
+def create_distribution_port(
+    ifc4_file: ifcopenshell.file,
+    port_origin_in_distribution_element_coordinates: tuple[float, float, float],
+    port_z_axis_in_distribution_element_coordinates: tuple[float, float, float],
+    port_x_axis_in_distribution_element_coordinates: tuple[float, float, float],
+    distribution_element: ifcopenshell.entity_instance,
+    flow_direction: FLOW_DIRECTION,
+    predefined_type: DISTRIBUTION_PORT_PREDEFINED_TYPE,
+    distribution_system: ifcopenshell.entity_instance | None = None,
+) -> ifcopenshell.entity_instance:
+
+    distribution_port = ifcopenshell.api.system.add_port(
+        file=ifc4_file,
+        element=distribution_element,
+    )
+
+    distribution_port.FlowDirection = flow_direction
+
+    distribution_port.PredefinedType = predefined_type
+
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        distribution_port.SystemType = distribution_system.PredefinedType
+
+    bim2fem.ifcplus.api.placement.edit_object_placement(
+        product=distribution_port,
+        repositioned_origin=port_origin_in_distribution_element_coordinates,
+        repositioned_z_axis=port_z_axis_in_distribution_element_coordinates,
+        repositioned_x_axis=port_x_axis_in_distribution_element_coordinates,
+        place_object_relative_to_parent=True,
+    )
+
+    return distribution_port
 
 
 def add_shape_representation_to_distribution_ports(

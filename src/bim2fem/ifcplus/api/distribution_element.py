@@ -28,9 +28,6 @@ import bim2fem.ifcplus.api.system
 import ifcopenshell.util.representation
 
 
-ELBOW_RADIUS_TYPE = Literal["LONG", "SHORT"]
-
-
 def create_elbow(
     ifc4_file: ifcopenshell.file,
     horizontal_curve: bim2fem.ifcplus.util.geometry.HorizontalCurve,
@@ -58,10 +55,6 @@ def create_elbow(
             file=ifc4_file,
             products=[elbow],
             relating_structure=spatial_element,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=elbow,
-            place_object_relative_to_parent=True,
         )
 
     if isinstance(distribution_system, ifcopenshell.entity_instance):
@@ -100,6 +93,7 @@ def create_elbow(
         representation_type=cast(str, representation_type),
         items=[revolved_area_solid],
     )
+
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=elbow,
@@ -132,65 +126,51 @@ def create_elbow(
         material=material,
     )
 
-    port1_origin_in_object_coordinates = (0.0, 0.0, 0.0)
-    port1_z_axis_in_object_coordinates = (0.0, 0.0, 1.0)
-    port1_x_axis_in_object_coordinates = (1.0, 0.0, 0.0)
-    port1 = ifcopenshell.api.system.add_port(file=ifc4_file, element=elbow)
-    port1.FlowDirection = "SINK"
-    port1.PredefinedType = "PIPE"
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        port1.SystemType = distribution_system.PredefinedType
-    bim2fem.ifcplus.api.placement.edit_object_placement(
-        product=port1,
-        place_object_relative_to_parent=False,
-    )
-    port1.ObjectPlacement.PlacementRelTo = elbow.ObjectPlacement
-    bim2fem.ifcplus.api.placement.edit_object_placement(
-        product=port1,
-        repositioned_origin=port1_origin_in_object_coordinates,
-        repositioned_z_axis=port1_z_axis_in_object_coordinates,
-        repositioned_x_axis=port1_x_axis_in_object_coordinates,
-        place_object_relative_to_parent=True,
+    sink_port_origin = (0.0, 0.0, 0.0)
+    sink_port_z_axis = (0.0, 0.0, 1.0)
+    sink_port_x_axis = (1.0, 0.0, 0.0)
+    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=sink_port_origin,
+        port_z_axis_in_distribution_element_coordinates=sink_port_z_axis,
+        port_x_axis_in_distribution_element_coordinates=sink_port_x_axis,
+        distribution_element=elbow,
+        flow_direction="SINK",
+        predefined_type="PIPE",
+        distribution_system=distribution_system,
     )
 
     radius_of_curvature = horizontal_curve.radius_of_curvature
     central_angle = horizontal_curve.central_angle
-    port2_origin_in_object_coordinates = (
+    source_port_origin_in_object_coordinates = (
         float(radius_of_curvature - radius_of_curvature * np.cos(central_angle)),
         0.0,
         float(radius_of_curvature * np.sin(central_angle)),
     )
-    port2_z_axis_in_object_coordinates = (
+    source_port_z_axis_in_object_coordinates = (
         float(np.sin(horizontal_curve.central_angle)),
         0.0,
         float(np.cos(horizontal_curve.central_angle)),
     )
-    port2_x_axis_in_object_coordinates = (
+    source_port_x_axis_in_object_coordinates = (
         float(np.cos(horizontal_curve.central_angle)),
         0.0,
         float(-1 * np.sin(horizontal_curve.central_angle)),
     )
-    port2 = ifcopenshell.api.system.add_port(file=ifc4_file, element=elbow)
-    port2.FlowDirection = "SOURCE"
-    port2.PredefinedType = "PIPE"
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        port2.SystemType = distribution_system.PredefinedType
-    bim2fem.ifcplus.api.placement.edit_object_placement(
-        product=port2,
-        place_object_relative_to_parent=False,
-    )
-    port2.ObjectPlacement.PlacementRelTo = elbow.ObjectPlacement
-    bim2fem.ifcplus.api.placement.edit_object_placement(
-        product=port2,
-        repositioned_origin=port2_origin_in_object_coordinates,
-        repositioned_z_axis=port2_z_axis_in_object_coordinates,
-        repositioned_x_axis=port2_x_axis_in_object_coordinates,
-        place_object_relative_to_parent=True,
+    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=source_port_origin_in_object_coordinates,
+        port_z_axis_in_distribution_element_coordinates=source_port_z_axis_in_object_coordinates,
+        port_x_axis_in_distribution_element_coordinates=source_port_x_axis_in_object_coordinates,
+        distribution_element=elbow,
+        flow_direction="SOURCE",
+        predefined_type="PIPE",
+        distribution_system=distribution_system,
     )
 
     if add_shape_representation_to_ports:
         bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[port1, port2],
+            ports=[sink_port, source_port],
             arrow_size=nominal_diameter * 0.10,
         )
 
