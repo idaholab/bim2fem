@@ -23,110 +23,7 @@ from typing import cast
 
 class TestAddEquipment:
 
-    def test_add_one_make_up_air_unit(
-        self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
-    ):
-
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
-
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
-
-        mau = bim2fem.ifcplus.api.distribution_element.create_make_up_air_unit(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
-            name="MAU",
-            spatial_element=site,
-            distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
-        )
-
-        bbox = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
-            product=mau,
-        )
-        bbox_dict = bbox.to_dict()
-        assert bbox_dict["min"] == (0.0, 0.0, 0.0)
-        assert bbox_dict["max"] == (4.0, 1.5, 1.5)
-
-        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "make_up_air_unit.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
-            file_path=output_path,
-            add_annotations=True,
-        )
-
-        logger = ifcopenshell.validate.json_logger()
-        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
-        pprint(logger.statements)
-
-        assert len(logger.statements) == 0
-
-    def test_add_air_filtration_containment_housing(
-        self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
-    ):
-
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
-
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
-
-        hepa = bim2fem.ifcplus.api.distribution_element.create_air_filtration_containment_housing(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
-            name="HEPA",
-            spatial_element=site,
-            distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
-        )
-
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=hepa,
-            repositioned_origin=(12.0, 0.0, 0.0),
-            repositioned_z_axis=(0.0, 0.0, 1.0),
-            repositioned_x_axis=(1.0, 0.0, 0.0),
-            place_object_relative_to_parent=True,
-        )
-
-        bbox = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
-            product=hepa,
-        )
-        bbox_dict = bbox.to_dict()
-        assert bbox_dict["min"] == (12.0, 0.0, 0.0)
-        assert bbox_dict["max"] == (20.0, 1.0, 2.0)
-
-        output_path = str(
-            OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
-            / "air_filtration_containment_housing.ifc"
-        )
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
-            file_path=output_path,
-            add_annotations=True,
-        )
-
-        logger = ifcopenshell.validate.json_logger()
-        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
-        pprint(logger.statements)
-
-        assert len(logger.statements) == 0
-
-    def test_add_elbows(
+    def test_create_elbows(
         self,
         ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
@@ -280,7 +177,7 @@ class TestAddEquipment:
 
         assert len(logger.statements) == 0
 
-    def test_add_pipe_segments(
+    def test_create_pipe_segments(
         self,
         ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
@@ -335,6 +232,259 @@ class TestAddEquipment:
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "pipe_segments.ifc")
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_create_make_up_air_unit(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        mau = bim2fem.ifcplus.api.distribution_element.create_make_up_air_unit(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="MAU",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        bbox = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
+            product=mau,
+        )
+        bbox_dict = bbox.to_dict()
+        assert bbox_dict["min"] == (0.0, 0.0, 0.0)
+        assert bbox_dict["max"] == (4.0, 1.5, 1.5)
+
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "make_up_air_unit.ifc")
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_create_air_filtration_containment_housing(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        hepa = bim2fem.ifcplus.api.distribution_element.create_air_filtration_containment_housing(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="HEPA",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        bbox = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
+            product=hepa,
+        )
+        bbox_dict = bbox.to_dict()
+        assert bbox_dict["min"] == (0.0, 0.0, 0.0)
+        assert bbox_dict["max"] == (8.0, 1.0, 2.0)
+
+        output_path = str(
+            OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
+            / "air_filtration_containment_housing.ifc"
+        )
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_create_motorized_valve(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        bim2fem.ifcplus.api.distribution_element.create_motorized_valve(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="V4",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "motorized_valve.ifc")
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_create_generic_air_filter(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        bim2fem.ifcplus.api.distribution_element.create_generic_air_filter(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="F2",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        output_path = str(
+            OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "generic_air_filter.ifc"
+        )
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_create_hprs_exhaust_fan(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        bim2fem.ifcplus.api.distribution_element.create_hprs_exhaust_fan(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="HPRS",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "hprs_exhaust_fan.ifc")
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
+    def test_create_stack(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        bim2fem.ifcplus.api.distribution_element.create_stack(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="HPRS",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "stack.ifc")
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
