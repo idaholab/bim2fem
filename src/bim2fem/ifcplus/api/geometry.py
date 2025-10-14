@@ -180,6 +180,36 @@ def add_cylindrical_extruded_area_solid(
     return extruded_area_solid
 
 
+def add_hollow_cylindrical_extruded_area_solid(
+    ifc4_file: ifcopenshell.file,
+    radius: float,
+    extrusion_depth: float,
+    wall_thickness: float,
+    repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
+) -> ifcopenshell.entity_instance:
+    """Add hollow cylindrical IfcExtrudedAreaSolid"""
+
+    profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
+        ifc4_file=ifc4_file,
+        profile_class="IfcCircleHollowProfileDef",
+        dimensions=[radius, wall_thickness],
+        check_for_duplicate=True,
+    )
+
+    extruded_area_solid = add_extruded_area_solid(
+        ifc4_file=ifc4_file,
+        profile=profile,
+        extrusion_depth=extrusion_depth,
+        repositioned_origin=repositioned_origin,
+        repositioned_z_axis=repositioned_z_axis,
+        repositioned_x_axis=repositioned_x_axis,
+    )
+
+    return extruded_area_solid
+
+
 def add_sphere(
     ifc4_file: ifcopenshell.file,
     radius: float,

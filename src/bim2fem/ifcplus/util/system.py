@@ -2,6 +2,7 @@
 
 
 import ifcopenshell.util.placement
+import bim2fem.ifcplus.util.geometry
 
 
 def get_port_location(
@@ -13,24 +14,30 @@ def get_port_location(
             placement=distribution_port.ObjectPlacement
         )
     )
-    port_origin = tuple(
-        [float(row[3]) for row in port_local_placement_in_global_coordinates[0:-1]]
-    )
-    assert len(port_origin) == 3
-    return port_origin
+    x_val = float(port_local_placement_in_global_coordinates[0][3])
+    y_val = float(port_local_placement_in_global_coordinates[1][3])
+    z_val = float(port_local_placement_in_global_coordinates[2][3])
+
+    return x_val, y_val, z_val
 
 
 def get_port_z_axis(
     distribution_port: ifcopenshell.entity_instance,
 ) -> tuple[float, float, float]:
-    """Get IfcDistributionPort Location in Global Coordinates"""
+    """Get IfcDistributionPort Z-Axis in Global Coordinates. The Z-axis points in the
+    direction of flow."""
+
     port_local_placement_in_global_coordinates = (
         ifcopenshell.util.placement.get_local_placement(
             placement=distribution_port.ObjectPlacement
         )
     )
-    port_z_axis = tuple(
-        [float(row[2]) for row in port_local_placement_in_global_coordinates[0:-1]]
+    val_1 = float(port_local_placement_in_global_coordinates[0][2])
+    val_2 = float(port_local_placement_in_global_coordinates[1][2])
+    val_3 = float(port_local_placement_in_global_coordinates[2][2])
+
+    port_z_axis = bim2fem.ifcplus.util.geometry.unit_normalize_vector(
+        vector=(val_1, val_2, val_3)
     )
-    assert len(port_z_axis) == 3
+
     return port_z_axis
