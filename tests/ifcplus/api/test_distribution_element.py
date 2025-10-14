@@ -54,9 +54,7 @@ class TestAddEquipment:
         assert bbox_dict["min"] == (0.0, 0.0, 0.0)
         assert bbox_dict["max"] == (4.0, 1.5, 1.5)
 
-        output_path = str(
-            OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "one_make_up_air_unit.ifc"
-        )
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "make_up_air_unit.ifc")
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
@@ -112,7 +110,7 @@ class TestAddEquipment:
 
         output_path = str(
             OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
-            / "one_air_filtration_containment_housing.ifc"
+            / "air_filtration_containment_housing.ifc"
         )
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,

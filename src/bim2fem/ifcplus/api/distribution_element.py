@@ -710,7 +710,6 @@ def create_motorized_valve(
     add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
 
-    # Create Element
     if element is None:
         element = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -719,7 +718,6 @@ def create_motorized_valve(
             predefined_type="MOTORIZED",
         )
 
-    # Assign spatial container
     if isinstance(spatial_element, ifcopenshell.entity_instance):
         ifcopenshell.api.spatial.assign_container(
             file=ifc4_file,
@@ -731,7 +729,6 @@ def create_motorized_valve(
             place_object_relative_to_parent=True,
         )
 
-    # Assign System
     if isinstance(distribution_system, ifcopenshell.entity_instance):
         ifcopenshell.api.system.assign_system(
             file=ifc4_file,
@@ -739,48 +736,60 @@ def create_motorized_valve(
             system=distribution_system,
         )
 
-    # Create Constituted Solid Geometry
-    operands = [
-        bim2fem.ifcplus.api.geometry.add_block(  # Block
-            ifc4_file=ifc4_file,
-            length=2 * outer_diameter,
-            width=2 / 5 * outer_diameter,
-            height=2 / 5 * outer_diameter,
-            repositioned_origin=(0.0, 0.0, outer_diameter),
-            repositioned_z_axis=(0.0, 0.0, 1.0),
-            repositioned_x_axis=(1.0, 0.0, 0.0),
-        ),
-        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(  # Cylinder
-            ifc4_file=ifc4_file,
-            radius=outer_diameter / 2.0,
-            extrusion_depth=2 / 5 * outer_diameter,
-            repositioned_origin=(1.5 * outer_diameter, 0.0, outer_diameter / 2.0),
-            repositioned_z_axis=(0.0, 1.0, 0.0),
-            repositioned_x_axis=(1.0, 0.0, 1.0),
-        ),
-        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(  # Cylinder
-            ifc4_file=ifc4_file,
-            radius=outer_diameter / 2.0 - thickness,
-            extrusion_depth=2 / 5 * outer_diameter,
-            repositioned_origin=(1.5 * outer_diameter, 0.0, outer_diameter / 2.0),
-            repositioned_z_axis=(0.0, 1.0, 0.0),
-            repositioned_x_axis=(1.0, 0.0, 1.0),
-        ),
-    ]
-
-    # Add and Assign Representation
-    representation_item = bim2fem.ifcplus.api.geometry.add_csg_solid(
-        operands=operands,
-        boolean_operators=["UNION", "DIFFERENCE"],
+    block = bim2fem.ifcplus.api.geometry.add_block(
+        ifc4_file=ifc4_file,
+        length=2 * outer_diameter,
+        width=2 / 5 * outer_diameter,
+        height=2 / 5 * outer_diameter,
+        repositioned_origin=(0.0, 0.0, outer_diameter),
+        repositioned_z_axis=(0.0, 0.0, 1.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
     )
+
+    cylinder_1 = bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+        ifc4_file=ifc4_file,
+        radius=outer_diameter / 2.0,
+        extrusion_depth=2 / 5 * outer_diameter,
+        repositioned_origin=(1.5 * outer_diameter, 0.0, outer_diameter / 2.0),
+        repositioned_z_axis=(0.0, 1.0, 0.0),
+        repositioned_x_axis=(1.0, 0.0, 1.0),
+    )
+
+    cylinder_2 = bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+        ifc4_file=ifc4_file,
+        radius=outer_diameter / 2.0 - thickness,
+        extrusion_depth=2 / 5 * outer_diameter,
+        repositioned_origin=(1.5 * outer_diameter, 0.0, outer_diameter / 2.0),
+        repositioned_z_axis=(0.0, 1.0, 0.0),
+        repositioned_x_axis=(1.0, 0.0, 1.0),
+    )
+
+    boolean_result_1 = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=block,
+        second_items=[cylinder_1],
+        operator="UNION",
+    )[-1]
+
+    boolean_result_2 = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=boolean_result_1,
+        second_items=[cylinder_2],
+        operator="DIFFERENCE",
+    )[-1]
+
+    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        boolean_result_or_primitive=boolean_result_2,
+    )
+
+    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
+
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type="CSG",
-        context_type="Model",
-        target_view="MODEL_VIEW",
-        items=[representation_item],
+        representation_type=cast(str, representation_type),
+        items=[csg_solid],
     )
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
@@ -788,7 +797,6 @@ def create_motorized_valve(
         representation=shape_model,
     )
 
-    # Edit Element Placement
     bim2fem.ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
@@ -797,7 +805,6 @@ def create_motorized_valve(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    # Add and Assign Type
     element_type = bim2fem.ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
@@ -812,7 +819,6 @@ def create_motorized_valve(
         relating_type=element_type,
     )
 
-    # Port 1
     port1_origin_in_object_coordinates = (
         1.5 * outer_diameter,
         0.0,
@@ -838,7 +844,6 @@ def create_motorized_valve(
         place_object_relative_to_parent=True,
     )
 
-    # Port 2
     port2_origin_in_object_coordinates = (
         1.5 * outer_diameter,
         2 / 5 * outer_diameter,
