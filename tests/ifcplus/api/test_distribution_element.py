@@ -276,6 +276,75 @@ class TestAddEquipment:
 
         assert len(logger.statements) == 0
 
+    def test_add_pipe_segments(
+        self,
+        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
+    ):
+
+        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcDistributionSystem",
+            include_subtypes=False,
+        )[0]
+
+        site = ifc_file_with_ventilation_distribution_system.by_type(
+            type="IfcSite",
+            include_subtypes=False,
+        )[0]
+
+        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="Galvanized Steel",
+            category="steel",
+            mass_density=7850.0,
+            young_modulus=200.0e9,
+            poisson_ratio=0.3,
+            thermal_expansion_coefficient=1.2e-6,
+            check_for_duplicate=True,
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            start_point=(1.0, 1.0, 0.0),
+            end_point=(1.0, 1.0 + 5.0, 0.0),
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=material,
+            name="Pipe #1",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            start_point=(1.0, 1.0 + 8.0, 0.0),
+            end_point=(1.0, 1.0 + 5.0 + 8.0, 0.0 + 5.0),
+            nominal_diameter=1.0,
+            thickness=0.10,
+            material=material,
+            name="Pipe #2",
+            spatial_element=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=False,
+            add_shape_representation_to_ports=False,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "pipe_segments.ifc")
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
+
+        assert len(logger.statements) == 0
+
 
 class TestConnectEquipment:
 

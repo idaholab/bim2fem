@@ -198,8 +198,9 @@ def create_elbow(
 
 
 def create_pipe_segment(
-    p1: tuple[float, float, float],
-    p2: tuple[float, float, float],
+    ifc4_file: ifcopenshell.file,
+    start_point: tuple[float, float, float],
+    end_point: tuple[float, float, float],
     nominal_diameter: float,
     thickness: float,
     material: ifcopenshell.entity_instance,
@@ -210,8 +211,6 @@ def create_pipe_segment(
     place_object_relative_to_parent: bool = False,
     add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
-
-    ifc4_file = material.file
 
     if pipe_segment is None:
         pipe_segment = ifcopenshell.api.root.create_entity(
@@ -239,7 +238,7 @@ def create_pipe_segment(
             system=distribution_system,
         )
 
-    object_z_axis_in_global_coordinates = np.array(p2) - np.array(p1)
+    object_z_axis_in_global_coordinates = np.array(end_point) - np.array(start_point)
     angle_between_local_and_global_z_axes = (
         bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
             vector1=tuple(object_z_axis_in_global_coordinates.tolist()),
@@ -298,7 +297,7 @@ def create_pipe_segment(
         representation=shape_model,
     )
 
-    object_origin_in_global_coordinates = p1
+    object_origin_in_global_coordinates = start_point
 
     bim2fem.ifcplus.api.placement.edit_object_placement(
         product=pipe_segment,

@@ -1527,3 +1527,48 @@ def line_parallel_to_triangle_plane(
     is_coplanar = is_parallel and (dist <= dist_tol)
 
     return is_parallel, is_coplanar, angle_to_plane_deg
+
+
+def filter_out_colinear_points_from_polyline(
+    polyline: list[tuple[float, float, float]],
+) -> list[tuple[float, float, float]]:
+    """Filter out colinear points from 3D polyline"""
+
+    def remove_items_by_indices(lst: list, indices: list) -> list:
+        indices_set = set(indices)
+        return [item for idx, item in enumerate(lst) if idx not in indices_set]
+
+    if len(polyline) < 3:
+        return polyline
+
+    indices_of_points_to_remove = []
+
+    for index in range(len(polyline)):
+
+        if index == len(polyline) - 2:
+            break
+
+        p1 = polyline[index]
+        p2 = polyline[index + 1]
+        p3 = polyline[index + 2]
+
+        v12 = calculate_unit_direction_vector_between_two_points(
+            p1=p1,
+            p2=p2,
+        )
+
+        v23 = calculate_unit_direction_vector_between_two_points(
+            p1=p2,
+            p2=p3,
+        )
+
+        angle = calculate_angle_between_two_vectors(vector1=v12, vector2=v23)
+
+        if angle == 0.0:
+            indices_of_points_to_remove.append(index + 1)
+
+        new_polyline = remove_items_by_indices(
+            lst=polyline, indices=indices_of_points_to_remove
+        )
+
+    return new_polyline

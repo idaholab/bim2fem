@@ -9,7 +9,6 @@ import ifcopenshell.api.geometry
 import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.api.style
 import numpy as np
-import ifcopenshell.util.placement
 import ifcopenshell.util.representation
 from bim2fem.ifcplus.api.distribution_element import ELBOW_RADIUS_TYPE
 import bim2fem.ifcplus.util.system
@@ -19,6 +18,10 @@ def add_shape_representation_to_distribution_ports(
     ports: list[ifcopenshell.entity_instance],
     arrow_size: float = 0.1,
 ) -> None:
+    """Add ShapeRepresentation to DistributionPorts as RectangularPyramids pointing
+    in the direction of flow.
+    """
+
     ifc4_file = ports[0].file
 
     sink_arrow = None
@@ -96,52 +99,6 @@ def add_shape_representation_to_distribution_ports(
             )
 
 
-def filter_out_colinear_points_from_polyline(
-    polyline: list[tuple[float, float, float]],
-) -> list[tuple[float, float, float]]:
-
-    def remove_items_by_indices(lst: list, indices: list) -> list:
-        indices_set = set(indices)
-        return [item for idx, item in enumerate(lst) if idx not in indices_set]
-
-    if len(polyline) < 3:
-        return polyline
-
-    indices_of_points_to_remove = []
-
-    for index in range(len(polyline)):
-
-        if index == len(polyline) - 2:
-            break
-
-        p1 = polyline[index]
-        p2 = polyline[index + 1]
-        p3 = polyline[index + 2]
-
-        v12 = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=p1,
-            p2=p2,
-        )
-
-        v23 = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=p2,
-            p2=p3,
-        )
-
-        angle = bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
-            vector1=v12, vector2=v23
-        )
-
-        if angle == 0.0:
-            indices_of_points_to_remove.append(index + 1)
-
-        new_polyine = remove_items_by_indices(
-            lst=polyline, indices=indices_of_points_to_remove
-        )
-
-    return new_polyine
-
-
 def create_piping_system_from_polyline(
     ifc4_file: ifcopenshell.file,
     polyline: list[tuple[float, float, float]],
@@ -163,8 +120,9 @@ def create_piping_system_from_polyline(
 
     if len(polyline) == 2:
         pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
-            p1=polyline[0],
-            p2=polyline[1],
+            ifc4_file=ifc4_file,
+            start_point=polyline[0],
+            end_point=polyline[1],
             nominal_diameter=nominal_diameter,
             thickness=thickness,
             material=material,
@@ -176,7 +134,9 @@ def create_piping_system_from_polyline(
         )
         return [pipe_segment]
 
-    polyline = filter_out_colinear_points_from_polyline(polyline=polyline)
+    polyline = bim2fem.ifcplus.util.geometry.filter_out_colinear_points_from_polyline(
+        polyline=polyline,
+    )
 
     if elbow_radius_type == "LONG":
         radius_of_curvature = 1.5 * nominal_diameter
@@ -192,8 +152,9 @@ def create_piping_system_from_polyline(
         if index + 2 == len(polyline):
             last_pipe_segment = (
                 bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
-                    p1=pipe_segment_start_point,
-                    p2=polyline[-1],
+                    ifc4_file=ifc4_file,
+                    start_point=pipe_segment_start_point,
+                    end_point=polyline[-1],
                     nominal_diameter=nominal_diameter,
                     thickness=thickness,
                     material=material,
@@ -219,8 +180,9 @@ def create_piping_system_from_polyline(
         pipe_segment_end_point = horizontal_curve.point_of_curvature
 
         pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
-            p1=pipe_segment_start_point,
-            p2=pipe_segment_end_point,
+            ifc4_file=ifc4_file,
+            start_point=pipe_segment_start_point,
+            end_point=pipe_segment_end_point,
             nominal_diameter=nominal_diameter,
             thickness=thickness,
             material=material,
