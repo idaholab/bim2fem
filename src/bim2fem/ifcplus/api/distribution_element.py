@@ -13,7 +13,7 @@ import bim2fem.ifcplus.api.element_type
 import ifcopenshell.api.type
 import numpy as np
 import ifcopenshell.util.representation
-from typing import Literal
+from typing import Literal, cast
 import ifcopenshell.api.system
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
@@ -26,7 +26,6 @@ import ifcopenshell.api.material
 import numpy as np
 import bim2fem.ifcplus.api.system
 import ifcopenshell.util.representation
-import bim2fem.ifcplus.api.material
 
 
 ELBOW_RADIUS_TYPE = Literal["LONG", "SHORT"]
@@ -37,7 +36,7 @@ def create_elbow(
     horizontal_curve: bim2fem.ifcplus.util.geometry.HorizontalCurve,
     nominal_diameter: float,
     thickness: float,
-    material: ifcopenshell.entity_instance | None = None,
+    material: ifcopenshell.entity_instance,
     elbow: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     spatial_element: ifcopenshell.entity_instance | None = None,
@@ -93,13 +92,12 @@ def create_elbow(
     representation_type = ifcopenshell.util.representation.guess_type(
         items=[revolved_area_solid]
     )
-    assert isinstance(representation_type, str)
 
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=representation_type,
+        representation_type=cast(str, representation_type),
         items=[revolved_area_solid],
     )
     ifcopenshell.api.geometry.assign_representation(
@@ -127,18 +125,6 @@ def create_elbow(
         repositioned_x_axis=object_x_axis_in_global_coordinates,
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
-
-    if material is None:
-        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
-            ifc4_file=ifc4_file,
-            name="Galvanized Steel",
-            category="steel",
-            mass_density=7850.0,
-            young_modulus=200.0e9,
-            poisson_ratio=0.3,
-            thermal_expansion_coefficient=1.2e-6,
-            check_for_duplicate=True,
-        )
 
     ifcopenshell.api.material.assign_material(
         file=ifc4_file,
@@ -298,13 +284,12 @@ def create_pipe_segment(
     representation_type = ifcopenshell.util.representation.guess_type(
         items=[extruded_area_solid]
     )
-    assert isinstance(representation_type, str)
 
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=representation_type,
+        representation_type=cast(str, representation_type),
         items=[extruded_area_solid],
     )
     ifcopenshell.api.geometry.assign_representation(
@@ -450,14 +435,15 @@ def create_make_up_air_unit(
         boolean_result_or_primitive=boolean_results[-1],
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-    assert isinstance(representation_type, str)
+    representation_type = ifcopenshell.util.representation.guess_type(
+        items=[csg_solid],
+    )
 
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=representation_type,
+        representation_type=cast(str, representation_type),
         items=[csg_solid],
     )
     ifcopenshell.api.geometry.assign_representation(
@@ -626,13 +612,12 @@ def create_air_filtration_containment_housing(
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-    assert isinstance(representation_type, str)
 
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=representation_type,
+        representation_type=cast(str, representation_type),
         items=[csg_solid],
     )
     ifcopenshell.api.geometry.assign_representation(

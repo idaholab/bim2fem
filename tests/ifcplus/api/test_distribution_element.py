@@ -18,6 +18,7 @@ import pytest
 from tests.conftest import OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
 import bim2fem.ifcplus.util.geometry
 import numpy as np
+from typing import cast
 
 
 class TestAddEquipment:
@@ -151,12 +152,23 @@ class TestAddEquipment:
             )
         )
 
+        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="Galvanized Steel",
+            category="steel",
+            mass_density=7850.0,
+            young_modulus=200.0e9,
+            poisson_ratio=0.3,
+            thermal_expansion_coefficient=1.2e-6,
+            check_for_duplicate=True,
+        )
+
         bim2fem.ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             horizontal_curve=horizontal_curve_1,
             nominal_diameter=1.0,
             thickness=0.10,
-            material=None,
+            material=material,
             name="Elbow #1",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -177,7 +189,7 @@ class TestAddEquipment:
             horizontal_curve=horizontal_curve_2,
             nominal_diameter=1.0,
             thickness=0.10,
-            material=None,
+            material=material,
             name="Elbow #2",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -198,7 +210,7 @@ class TestAddEquipment:
             horizontal_curve=horizontal_curve_3,
             nominal_diameter=1.0,
             thickness=0.10,
-            material=None,
+            material=material,
             name="Elbow #3",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -220,7 +232,7 @@ class TestAddEquipment:
             horizontal_curve=horizontal_curve_4,
             nominal_diameter=1.0,
             thickness=0.10,
-            material=None,
+            material=material,
             name="Elbow #4",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -241,7 +253,7 @@ class TestAddEquipment:
             horizontal_curve=horizontal_curve_5,
             nominal_diameter=1.0,
             thickness=0.10,
-            material=None,
+            material=material,
             name="Elbow #5",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -335,14 +347,13 @@ class TestConnectEquipment:
             )
         )
 
-        assert isinstance(steel_material, ifcopenshell.entity_instance)
-
         bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_piping_with_no_intelligence(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
             source_port=mau_source_port,
             sink_port=hepa_sink_port,
             nominal_diameter=0.20,
             thickness=0.20 * 0.10,
-            material=steel_material,
+            material=cast(ifcopenshell.entity_instance, steel_material),
             distribution_system=distribution_system,
             elbow_radius_type="SHORT",
             branch_name="Branch #1",
@@ -437,15 +448,13 @@ class TestConnectEquipment:
             )
         )
 
-        assert isinstance(steel_material, ifcopenshell.entity_instance)
-
         bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_piping_using_ant_colony(
             source_port=mau_source_port,
             sink_port=hepa_sink_port,
             obstacle=None,
             nominal_diameter=0.20,
             thickness=0.20 * 0.10,
-            material=steel_material,
+            material=cast(ifcopenshell.entity_instance, steel_material),
             distribution_system=distribution_system,
             elbow_radius_type="SHORT",
             branch_name="Branch #1",
@@ -540,12 +549,11 @@ class TestConnectEquipment:
         representation_type = ifcopenshell.util.representation.guess_type(
             items=[csg_solid]
         )
-        assert isinstance(representation_type, str)
         shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(str, representation_type),
             items=[csg_solid],
         )
         ifcopenshell.api.geometry.assign_representation(
@@ -596,15 +604,13 @@ class TestConnectEquipment:
             )
         )
 
-        assert isinstance(steel_material, ifcopenshell.entity_instance)
-
         bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_piping_using_ant_colony(
             source_port=mau_source_port,
             sink_port=hepa_sink_port,
             obstacle=obstacle,
             nominal_diameter=0.20,
             thickness=0.20 * 0.10,
-            material=steel_material,
+            material=cast(ifcopenshell.entity_instance, steel_material),
             distribution_system=distribution_system,
             elbow_radius_type="SHORT",
             branch_name="Branch #1",

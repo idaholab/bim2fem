@@ -101,9 +101,7 @@ def filter_out_colinear_points_from_polyline(
 ) -> list[tuple[float, float, float]]:
 
     def remove_items_by_indices(lst: list, indices: list) -> list:
-        # Convert indices to a set for faster lookup
         indices_set = set(indices)
-        # Use list comprehension to create a new list without the specified indices
         return [item for idx, item in enumerate(lst) if idx not in indices_set]
 
     if len(polyline) < 3:
@@ -145,6 +143,7 @@ def filter_out_colinear_points_from_polyline(
 
 
 def create_piping_system_from_polyline(
+    ifc4_file: ifcopenshell.file,
     polyline: list[tuple[float, float, float]],
     nominal_diameter: float,
     thickness: float,
@@ -158,8 +157,6 @@ def create_piping_system_from_polyline(
 ) -> list[ifcopenshell.entity_instance]:
     """Create a single path pipe branch composed of IfcPipeSegments and
     IfcPipeFittings (Elbows)."""
-
-    ifc4_file = material.file
 
     if len(polyline) < 2:
         return []
@@ -235,6 +232,7 @@ def create_piping_system_from_polyline(
         )
 
         elbow = bim2fem.ifcplus.api.distribution_element.create_elbow(
+            ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve,
             nominal_diameter=nominal_diameter,
             thickness=thickness,
@@ -283,6 +281,7 @@ def create_piping_system_from_polyline(
 
 
 def connect_two_distribution_ports_via_piping_with_no_intelligence(
+    ifc4_file: ifcopenshell.file,
     source_port: ifcopenshell.entity_instance,
     sink_port: ifcopenshell.entity_instance,
     nominal_diameter: float,
@@ -348,6 +347,7 @@ def connect_two_distribution_ports_via_piping_with_no_intelligence(
     )
 
     piping_elements = create_piping_system_from_polyline(
+        ifc4_file=ifc4_file,
         polyline=[
             source_port_origin,
             second_point,
