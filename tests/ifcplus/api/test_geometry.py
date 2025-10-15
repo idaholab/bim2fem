@@ -733,11 +733,11 @@ class TestAddTopologyRepresentation:
         )[0]
 
         edge = bim2fem.ifcplus.api.geometry.add_edge(
-            edge_start=bim2fem.ifcplus.api.geometry.add_vertex_point(
+            edge_start_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(0.0, 0.0, 1.0),
             ),
-            edge_end=bim2fem.ifcplus.api.geometry.add_vertex_point(
+            edge_end_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(4.0, 0.0, 1.0),
             ),
@@ -785,11 +785,11 @@ class TestAddTopologyRepresentation:
         )[0]
 
         edge_curve = bim2fem.ifcplus.api.geometry.add_curved_edge(
-            vertex_point_at_point_of_curvature=bim2fem.ifcplus.api.geometry.add_vertex_point(
+            point_of_curvature_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(0.0, 0.0, 0.0),
             ),
-            vertex_point_at_point_of_tangency=bim2fem.ifcplus.api.geometry.add_vertex_point(
+            point_of_tangency_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(5.0, 0.0, 5.0),
             ),
