@@ -3,22 +3,13 @@
 import ifcopenshell
 import ifcopenshell.validate
 import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.api.system
 import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.api.placement
 import bim2fem.ifcplus.api.distribution_element
-import ifcopenshell.util.system
 import bim2fem.ifcplus.api.material
-import ifcopenshell.api.root
-import ifcopenshell.api.spatial
-import ifcopenshell.api.geometry
-import bim2fem.ifcplus.api.geometry
-import ifcopenshell.util.representation
-import pytest
 from tests.conftest import OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
 import bim2fem.ifcplus.util.geometry
 import numpy as np
-from typing import cast
 
 
 class TestCreatePipingElements:

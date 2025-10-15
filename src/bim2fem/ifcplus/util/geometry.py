@@ -651,17 +651,9 @@ class HorizontalCurve:
             - np.array(unit_vector_from_PC_to_PI) * tangent_length
         )
 
-        point_of_curvature = convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=point_of_curvature
-        )
-
         point_of_tangency = (
             np.array(point_of_intersection)
             + np.array(unit_vector_from_PI_to_PT) * tangent_length
-        )
-
-        point_of_tangency = convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=point_of_tangency
         )
 
         unit_vector_from_PC_to_CC = calculate_cross_product_of_two_vectors(
@@ -674,18 +666,14 @@ class HorizontalCurve:
             + np.array(unit_vector_from_PC_to_CC) * radius_of_curvature
         )
 
-        center_of_curvature = convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=center_of_curvature
-        )
-
         return cls(
             point_of_intersection=point_of_intersection,
             central_angle=float(central_angle),
             radius_of_curvature=float(radius_of_curvature),
             direction_of_axis_of_rotation=axis_of_rotation,
-            point_of_curvature=point_of_curvature,
-            point_of_tangency=point_of_tangency,
-            center_of_curvature=center_of_curvature,
+            point_of_curvature=tuple(point_of_curvature.tolist()),
+            point_of_tangency=tuple(point_of_tangency.tolist()),
+            center_of_curvature=tuple(center_of_curvature.tolist()),
         )
 
     @classmethod
@@ -736,10 +724,6 @@ class HorizontalCurve:
             + np.array(unit_vector_from_PC_to_CC) * radius_of_curvature
         )
 
-        center_of_curvature = convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=center_of_curvature
-        )
-
         return cls(
             point_of_intersection=point_of_intersection,
             central_angle=float(central_angle_of_curvature),
@@ -747,7 +731,7 @@ class HorizontalCurve:
             direction_of_axis_of_rotation=axis_of_rotation,
             point_of_curvature=point_of_curvature,
             point_of_tangency=point_of_tangency,
-            center_of_curvature=center_of_curvature,
+            center_of_curvature=tuple(center_of_curvature.tolist()),
         )
 
     @classmethod
@@ -801,14 +785,10 @@ class HorizontalCurve:
             * np.array(unit_vector_from_from_CC_to_PI)
         )
 
-        point_of_intersection = convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=point_of_intersection,
-        )
-
         return cls.from_PC_and_PT_and_PI(
             point_of_curvature=point_of_curvature,
             point_of_tangency=point_of_tangency,
-            point_of_intersection=point_of_intersection,
+            point_of_intersection=tuple(point_of_intersection.tolist()),
         )
 
     @classmethod
@@ -846,13 +826,9 @@ class HorizontalCurve:
             rotated_vector
         )
 
-        point_of_tangency = convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=point_of_tangency
-        )
-
         return cls.from_PC_and_PT_and_CC(
             point_of_curvature=point_of_curvature,
-            point_of_tangency=point_of_tangency,
+            point_of_tangency=tuple(point_of_tangency.tolist()),
             point_on_center_of_curvature_side=point_of_center_of_curvature,
             radius_of_curvature=radius_of_curvature,
         )
@@ -900,11 +876,7 @@ def rotate_vector_about_axis(
         v * cos_angle + np.cross(k, v) * sin_angle + k * np.dot(k, v) * (1 - cos_angle)
     )
 
-    rotated_vector = convert_3pt_ndarray_to_tuple_of_floats(
-        numpy_3pt_array=rotated_vector
-    )
-
-    return rotated_vector
+    return tuple(rotated_vector.tolist())
 
 
 def calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(

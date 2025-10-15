@@ -154,7 +154,7 @@ class TestConnectEquipment:
             )
         )
 
-        bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_piping_with_no_intelligence(
+        bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_pipe_run(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             source_port=mau_source_port,
             sink_port=hepa_sink_port,

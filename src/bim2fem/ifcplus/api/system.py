@@ -298,7 +298,7 @@ def create_pipe_run_from_polyline(
     return piping_elements
 
 
-def connect_two_distribution_ports_via_piping_with_no_intelligence(
+def connect_two_distribution_ports_via_pipe_run(
     ifc4_file: ifcopenshell.file,
     source_port: ifcopenshell.entity_instance,
     sink_port: ifcopenshell.entity_instance,
@@ -311,7 +311,7 @@ def connect_two_distribution_ports_via_piping_with_no_intelligence(
     spatial_element: ifcopenshell.entity_instance | None = None,
     add_shape_representation_to_ports: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
-    """Connect two IfcDistributionPorts using a single path pipe branch formed via no
+    """Connect two IfcDistributionPorts using a pipe run formed via no
     intelligent method."""
 
     source_port_origin = bim2fem.ifcplus.util.system.get_port_location(
@@ -344,11 +344,13 @@ def connect_two_distribution_ports_via_piping_with_no_intelligence(
         ).tolist()
     )
 
-    (
-        delta_x_between_second_and_penultimate_point,
-        delta_y_between_second_and_penultimate_point,
-        _,
-    ) = tuple((np.array(penultimate_point) - np.array(second_point)).tolist())
+    delta_x_between_second_and_penultimate_point = (
+        np.array(penultimate_point) - np.array(second_point)
+    )[0]
+
+    delta_y_between_second_and_penultimate_point = (
+        np.array(penultimate_point) - np.array(second_point)
+    )[1]
 
     third_point = tuple(
         (

@@ -241,18 +241,6 @@ def create_pipe_segment(
         object_z_axis_in_global_coordinates,
     )
 
-    object_z_axis_in_global_coordinates = (
-        bim2fem.ifcplus.util.geometry.convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=object_z_axis_in_global_coordinates,
-        )
-    )
-
-    object_x_axis_in_global_coordinates = (
-        bim2fem.ifcplus.util.geometry.convert_3pt_ndarray_to_tuple_of_floats(
-            numpy_3pt_array=object_x_axis_in_global_coordinates,
-        )
-    )
-
     length = float(np.linalg.norm(object_z_axis_in_global_coordinates))
 
     outer_radius = nominal_diameter / 2 + thickness / 2
@@ -291,8 +279,8 @@ def create_pipe_segment(
     bim2fem.ifcplus.api.placement.edit_object_placement(
         product=pipe_segment,
         repositioned_origin=object_origin_in_global_coordinates,
-        repositioned_z_axis=object_z_axis_in_global_coordinates,
-        repositioned_x_axis=object_x_axis_in_global_coordinates,
+        repositioned_z_axis=tuple(object_z_axis_in_global_coordinates.tolist()),
+        repositioned_x_axis=tuple(object_x_axis_in_global_coordinates.tolist()),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
