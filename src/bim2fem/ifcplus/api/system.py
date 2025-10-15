@@ -156,7 +156,7 @@ def add_shape_representation_to_distribution_ports(
             )
 
 
-def create_piping_system_from_polyline(
+def create_pipe_run_from_polyline(
     ifc4_file: ifcopenshell.file,
     polyline: list[tuple[float, float, float]],
     nominal_diameter: float,
@@ -164,12 +164,12 @@ def create_piping_system_from_polyline(
     material: ifcopenshell.entity_instance,
     distribution_system: ifcopenshell.entity_instance,
     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
-    branch_name: str = "Unnamed Branch",
+    branch_name: str = "Pipe Run",
     spatial_element: ifcopenshell.entity_instance | None = None,
     place_objects_relative_to_parent: bool = False,
     add_shape_representation_to_ports: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
-    """Create a single path pipe branch composed of IfcPipeSegments and
+    """Create a single path pipe run composed of IfcPipeSegments and
     IfcPipeFittings (Elbows)."""
 
     if len(polyline) < 2:
@@ -365,7 +365,7 @@ def connect_two_distribution_ports_via_piping_with_no_intelligence(
         ).tolist()
     )
 
-    piping_elements = create_piping_system_from_polyline(
+    piping_elements = create_pipe_run_from_polyline(
         ifc4_file=ifc4_file,
         polyline=[
             source_port_origin,
