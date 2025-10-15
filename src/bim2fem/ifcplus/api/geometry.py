@@ -420,35 +420,32 @@ def add_vertex_point(
 
 
 def add_edge(
-    edge_start: ifcopenshell.entity_instance,
-    edge_end: ifcopenshell.entity_instance,
+    edge_start_as_vertex_point: ifcopenshell.entity_instance,
+    edge_end_as_vertex_point: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance:
     """Add an IfcEdge"""
 
-    assert edge_start.is_a("IfcVertexPoint")
-    assert edge_end.is_a("IfcVertexPoint")
+    ifc4_file = edge_start_as_vertex_point.file
 
-    ifc4_file = edge_start.file
-
-    edge = ifc4_file.createIfcEdge(edge_start, edge_end)
+    edge = ifc4_file.createIfcEdge(
+        edge_start_as_vertex_point,
+        edge_end_as_vertex_point,
+    )
 
     return edge
 
 
 def add_curved_edge(
-    vertex_point_at_point_of_curvature: ifcopenshell.entity_instance,
-    vertex_point_at_point_of_tangency: ifcopenshell.entity_instance,
+    point_of_curvature_as_vertex_point: ifcopenshell.entity_instance,
+    point_of_tangency_as_vertex_point: ifcopenshell.entity_instance,
     center_of_curvature: tuple[float, float, float],
 ) -> ifcopenshell.entity_instance:
     """Add an IfcEdgeCurve"""
 
-    assert vertex_point_at_point_of_curvature.is_a("IfcVertexPoint")
-    assert vertex_point_at_point_of_tangency.is_a("IfcVertexPoint")
+    ifc4_file = point_of_curvature_as_vertex_point.file
 
-    ifc4_file = vertex_point_at_point_of_curvature.file
-
-    point_of_curvature = vertex_point_at_point_of_curvature.VertexGeometry.Coordinates
-    point_of_tangency = vertex_point_at_point_of_tangency.VertexGeometry.Coordinates
+    point_of_curvature = point_of_curvature_as_vertex_point.VertexGeometry.Coordinates
+    point_of_tangency = point_of_tangency_as_vertex_point.VertexGeometry.Coordinates
 
     radius_of_curvature = float(
         np.linalg.norm(np.array(point_of_curvature) - np.array(center_of_curvature))
@@ -484,8 +481,8 @@ def add_curved_edge(
     same_sense = True
 
     edge_curve = ifc4_file.createIfcEdgeCurve(
-        vertex_point_at_point_of_curvature,
-        vertex_point_at_point_of_tangency,
+        point_of_curvature_as_vertex_point,
+        point_of_tangency_as_vertex_point,
         edge_geometry,
         same_sense,
     )
@@ -508,7 +505,7 @@ def add_face_bound(
             v2 = vertex_points_of_bound[0]
         else:
             v2 = vertex_points_of_bound[index + 1]
-        edge = add_edge(edge_start=v1, edge_end=v2)
+        edge = add_edge(edge_start_as_vertex_point=v1, edge_end_as_vertex_point=v2)
         oriented_edge = ifc4_file.create_entity(
             type="IfcOrientedEdge",
             EdgeElement=edge,

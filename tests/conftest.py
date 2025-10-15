@@ -28,6 +28,9 @@ OUTPUT_DIR_FOR_GEOMETRY.mkdir(exist_ok=True)
 OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT = OUTPUT_DIR / "distribution_element"
 OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT.mkdir(exist_ok=True)
 
+OUTPUT_DIR_FOR_SYSTEM = OUTPUT_DIR / "system"
+OUTPUT_DIR_FOR_SYSTEM.mkdir(exist_ok=True)
+
 
 @pytest.fixture
 def empty_ifc_file() -> ifcopenshell.file:

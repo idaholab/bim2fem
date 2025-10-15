@@ -105,8 +105,8 @@ def create_linear_structural_curve_member(
 
     # Add and assign representation
     representation_item = bim2fem.ifcplus.api.geometry.add_edge(
-        edge_start=vertex_points[0],
-        edge_end=vertex_points[1],
+        edge_start_as_vertex_point=vertex_points[0],
+        edge_end_as_vertex_point=vertex_points[1],
     )
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
@@ -218,8 +218,8 @@ def create_curved_structural_curve_member(
 
     # Add and assign representation
     representation_item = bim2fem.ifcplus.api.geometry.add_curved_edge(
-        vertex_point_at_point_of_curvature=vertex_points[0],
-        vertex_point_at_point_of_tangency=vertex_points[1],
+        point_of_curvature_as_vertex_point=vertex_points[0],
+        point_of_tangency_as_vertex_point=vertex_points[1],
         center_of_curvature=horizontal_curve.center_of_curvature,
     )
     shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
