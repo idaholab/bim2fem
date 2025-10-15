@@ -1,6 +1,5 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
-
 import ifcopenshell.api.system
 import ifcopenshell.util.system
 import bim2fem.ifcplus.api.distribution_element

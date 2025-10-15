@@ -13,7 +13,7 @@ import bim2fem.ifcplus.api.element_type
 import ifcopenshell.api.type
 import numpy as np
 import ifcopenshell.util.representation
-from typing import Literal, cast
+from typing import cast
 import ifcopenshell.api.system
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial

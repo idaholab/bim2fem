@@ -21,7 +21,7 @@ import numpy as np
 from typing import cast
 
 
-class TestAddEquipment:
+class TestCreatePipingElements:
 
     def test_create_elbows(
         self,
@@ -245,6 +245,9 @@ class TestAddEquipment:
         pprint(logger.statements)
 
         assert len(logger.statements) == 0
+
+
+class TestCreateEquipment:
 
     def test_create_make_up_air_unit(
         self,
