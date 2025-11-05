@@ -13,9 +13,9 @@ Convert Building Information Models (BIM) to Finite Element Models (FEM) for str
     <td align="center"><strong>IFC4 StructuralAnalysisView</strong></td>
   </tr>
   <tr>
-    <td><img src="src/bim2fem/images/Revit_original.png" alt="Original Revit model" width="300"/></td>
-    <td><img src="src/bim2fem/images/Revit_IFC4_ReferenceView.png" alt="IFC4 ReferenceView" width="300"/></td>
-    <td><img src="src/bim2fem/images/Revit_IFC4_StructuralAnalysisView.png" alt="IFC4 StructuralAnalysisView" width="300"/></td>
+    <td><img src="images/Revit_original.png" alt="Original Revit model" width="300"/></td>
+    <td><img src="images/Revit_IFC4_ReferenceView.png" alt="IFC4 ReferenceView" width="300"/></td>
+    <td><img src="images/Revit_IFC4_StructuralAnalysisView.png" alt="IFC4 StructuralAnalysisView" width="300"/></td>
   </tr>
 </table>
 
