@@ -11,8 +11,8 @@ import ifcopenshell.util.element
 import multiprocessing
 import subprocess
 import json
-import bim2fem.bim2glb.util
-import bim2fem.bim2glb.api
+import bim2glb.util
+import bim2glb.api
 
 IFCCONVERT_WINDOWS_FILE_PATH = os.path.abspath(
     os.path.join(
@@ -48,7 +48,7 @@ def convert_ifc_to_glb_using_ifcconvert_executable(
 ) -> str:
     """Convert IFC to GLB using IfcConvert Executable"""
 
-    current_os = bim2fem.bim2glb.util.get_os()
+    current_os = bim2glb.util.get_os()
     print(f"current_os: {current_os}")
     if current_os == "Linux":
         ifcconvert_file_path = IFCCONVERT_LINUX_FILE_PATH
@@ -89,37 +89,20 @@ def traverse_nodes_and_correct_local_transforms(
     node = gltf.nodes[node_index]
     assert node.extras
     node.extras["depth"] = depth
-    ancestors_from_parent_to_progenitor = bim2fem.bim2glb.util.get_ancestors_of_node(
+    ancestors_from_parent_to_progenitor = bim2glb.util.get_ancestors_of_node(
         gltf=gltf, index_of_child_node=node_index
     )
-    new_local_4x4_transform = bim2fem.bim2glb.util.get_node_matrix_array(node=node)
+    new_local_4x4_transform = bim2glb.util.get_node_matrix_array(node=node)
     for ancestor_node_index in ancestors_from_parent_to_progenitor[::-1]:
         ancestor_node = gltf.nodes[ancestor_node_index]
-        ancestor_local_4x4_transform = bim2fem.bim2glb.util.get_node_matrix_array(
+        ancestor_local_4x4_transform = bim2glb.util.get_node_matrix_array(
             node=ancestor_node
         )
         new_local_4x4_transform = np.dot(
-            bim2fem.bim2glb.util.inverse_matrix(ancestor_local_4x4_transform),
+            bim2glb.util.inverse_matrix(ancestor_local_4x4_transform),
             new_local_4x4_transform,
         )
-    bim2fem.bim2glb.api.set_node_matrix(node=node, matrix_array=new_local_4x4_transform)
-
-    # # Print Node information
-    # indent = "  " * depth * 4  # Indentation for visualizing hierarchy
-    # print(
-    #     " - ".join(
-    #         [
-    #             f"{indent}{node_index}",
-    #             f"{node.extras['Class']}{node.extras['Name']}",
-    #             "".join(
-    #                 [
-    #                     "ancestors_from_parent_to_progenitor: ",
-    #                     f"{ancestors_from_parent_to_progenitor}",
-    #                 ]
-    #             ),
-    #         ]
-    #     )
-    # )
+    bim2glb.api.set_node_matrix(node=node, matrix_array=new_local_4x4_transform)
 
     # Recursively traverse children (if any)
     if node.children:
@@ -214,7 +197,7 @@ def convert_ifc_to_glb(
     assert isinstance(ifc_file, ifcopenshell.file)
 
     # Get IFC Parent Mapping
-    family_info_by_ifc_guid = bim2fem.bim2glb.util.get_parent_mapping_of_ifc_entities(
+    family_info_by_ifc_guid = bim2glb.util.get_parent_mapping_of_ifc_entities(
         ifc_file=ifc_file
     )
 
@@ -251,7 +234,7 @@ def convert_ifc_to_glb(
     # Create Nodes for desireable IFC entities not yet in the Scene
     for ifc_guid in ifc_guids_of_desireable_entities_not_yet_in_the_scene:
         ifc_entity = ifc_file.by_guid(guid=ifc_guid)
-        index_of_node = bim2fem.bim2glb.api.create_node(
+        index_of_node = bim2glb.api.create_node(
             gltf=glb_file, name=ifc_entity.GlobalId
         )
         glb_file.scenes[0].nodes.append(index_of_node)
@@ -278,14 +261,14 @@ def convert_ifc_to_glb(
 
     # Show global coords via boxes
     if show_global_coordinate_system_axes:
-        bim2fem.bim2glb.api.create_shapes_representing_cartesian_coordinate_axes(
+        bim2glb.api.create_shapes_representing_cartesian_coordinate_axes(
             gltf=glb_file
         )
 
     # Store Metadata
     metadata_requested = any([store_metadata_in_glb_nodes, store_metadata_in_json])
     if metadata_requested:
-        metadata_for_all_nodes = bim2fem.bim2glb.util.get_ifc_metadata_for_all_nodes(
+        metadata_for_all_nodes = bim2glb.util.get_ifc_metadata_for_all_nodes(
             glb_file=glb_file, ifc_file=ifc_file, flatten_metadata=flatten_metadata
         )
         if store_metadata_in_glb_nodes:

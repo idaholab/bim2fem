@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 import json
 import ifcopenshell
 import bim2fem.ifcplus.api.project
-import bim2fem.bim2glb.convert_ifc_to_glb
+import bim2glb.convert_ifc_to_glb
 import bim2fem.core.convert_ifc_to_fem
 import bim2fem.core.recreate_fem_with_3d_body_shape_representation
 from bim2fem.core.adjust_element_connectivity_of_building_fem import (
@@ -243,7 +243,7 @@ def convert_to_fem_done(
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=recreated_ifc4_sav_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -309,7 +309,7 @@ def convert_to_glb():
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=input_ifc_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -455,7 +455,7 @@ def view_ifc():
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=input_ifc_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
