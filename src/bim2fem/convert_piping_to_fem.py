@@ -5,7 +5,7 @@ StructuralAnalysisView MVD"""
 
 
 import ifcopenshell
-import inlbim.api.file
+import ifcplus.api.project
 import ifcopenshell.util.selector
 from bim2fem.helpers.convert_pipe_segment import (
     convert_linear_pipe_segment_to_structural_curve_member,
@@ -13,12 +13,12 @@ from bim2fem.helpers.convert_pipe_segment import (
 from bim2fem.helpers.convert_pipe_fitting import (
     convert_pipe_fitting_to_structural_items,
 )
-from inlbim import REGION
+from ifcplus import REGION
 import ifcopenshell.util.element
-import inlbim.api.structural
+import ifcplus.api.structural
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import inlbim.api.geometry
+import ifcplus.api.placement
 
 
 def convert_piping_from_reference_view_to_structural_analysis_view(
@@ -32,7 +32,7 @@ def convert_piping_from_reference_view_to_structural_analysis_view(
     element_selection_query = "IfcPipeSegment, IfcPipeFitting"
 
     # Create empty IFC4 StructuralAnalysisView File
-    ifc4_destination_file = inlbim.api.file.create_ifc4_file(
+    ifc4_destination_file = ifcplus.api.project.create_ifc4_file(
         model_view_definition="StructuralAnalysisView",
         precision=1e-4,
     )
@@ -53,7 +53,7 @@ def convert_piping_from_reference_view_to_structural_analysis_view(
         products=[site],
         relating_object=project,
     )
-    inlbim.api.geometry.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
     )
@@ -108,7 +108,7 @@ def convert_piping_from_reference_view_to_structural_analysis_view(
     print(f"IfcPipeFittings: {len(pipe_fittings_from_source_file)}")
 
     # Add StructuralAnalysisModel
-    structural_analysis_model = inlbim.api.structural.add_structural_analysis_model(
+    structural_analysis_model = ifcplus.api.structural.add_structural_analysis_model(
         ifc4_file=ifc4_destination_file,
         name=None,
     )
@@ -194,7 +194,7 @@ def convert_piping_from_reference_view_to_structural_analysis_view(
         print(f"\t{key.GlobalId} {key.is_a()}: {result}")
 
     # Merge Nodes
-    inlbim.api.structural.merge_all_coincident_structural_point_connections(
+    ifcplus.api.structural.merge_all_coincident_structural_point_connections(
         ifc4sav_file=ifc4_destination_file
     )
 

@@ -2,13 +2,13 @@
 
 
 import ifcopenshell
-import bim2fem.ifcplus.util.geometry
-import bim2fem.ifcplus.util.structural
-import bim2fem.ifcplus.api.structural
+import ifcplus.util.geometry
+import ifcplus.util.structural
+import ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
-import bim2fem.ifcplus.util.material
-from bim2fem.ifcplus.util.geometry import convert_3pt_ndarray_to_tuple_of_floats
+import ifcplus.util.material
+from ifcplus.util.geometry import convert_3pt_ndarray_to_tuple_of_floats
 
 
 def snap_walls_to_perpendicular_walls(
@@ -20,13 +20,13 @@ def snap_walls_to_perpendicular_walls(
     print("\nSnap structural walls to other nearby perpendicular walls")
 
     # Get walls
-    walls = bim2fem.ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
+    walls = ifcplus.util.structural.get_structural_items_assigned_to_specified_element_class(
         ifc4_sav_file=ifc4_sav_file,
         ifc_element_class="IfcWall",
     )
     print(f"\tlen(walls): {len(walls)}")
 
-    # numeric_scale = bim2fem.ifcplus.util.file.get_numeric_scale_of_project(
+    # numeric_scale = ifcplus.util.file.get_numeric_scale_of_project(
     #     ifc4_file=ifc4_sav_file
     # )
 
@@ -38,14 +38,14 @@ def snap_walls_to_perpendicular_walls(
             should_skip_usage=True,
         )
         assert material_layer_set
-        thickness = bim2fem.ifcplus.util.material.sum_material_layer_thicknesses(
+        thickness = ifcplus.util.material.sum_material_layer_thicknesses(
             material_layer_set=material_layer_set
         )
         thicknesses_for_walls[wall] = thickness
 
     original_coordinates_of_walls = {}
     for wall in walls:
-        coordinates_of_wall = bim2fem.ifcplus.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
+        coordinates_of_wall = ifcplus.util.structural.get_coordinates_of_points_on_outer_bound_of_structural_surface_member(
             triangular_structural_surface_member=wall
         )
         original_coordinates_of_walls[wall] = coordinates_of_wall
@@ -65,7 +65,7 @@ def snap_walls_to_perpendicular_walls(
             ]
 
             walls_are_perpendicular, _ = (
-                bim2fem.ifcplus.util.geometry.planes_are_right_angled(
+                ifcplus.util.geometry.planes_are_right_angled(
                     a1=original_coordinates_of_points_of_wall_1[0],
                     b1=original_coordinates_of_points_of_wall_1[1],
                     c1=original_coordinates_of_points_of_wall_1[2],
@@ -89,13 +89,13 @@ def snap_walls_to_perpendicular_walls(
                 ]
             )
 
-            a_min, a_max = bim2fem.ifcplus.util.geometry.aabb_from_points(
+            a_min, a_max = ifcplus.util.geometry.aabb_from_points(
                 points=original_coordinates_of_points_of_wall_1
             )
-            b_min, b_max = bim2fem.ifcplus.util.geometry.aabb_from_points(
+            b_min, b_max = ifcplus.util.geometry.aabb_from_points(
                 points=original_coordinates_of_points_of_wall_2
             )
-            overlap, _ = bim2fem.ifcplus.util.geometry.aabb_overlap_3d(
+            overlap, _ = ifcplus.util.geometry.aabb_overlap_3d(
                 a_min=a_min,
                 a_max=a_max,
                 b_min=b_min,
@@ -107,7 +107,7 @@ def snap_walls_to_perpendicular_walls(
             if not walls_are_close_to_each_other:
                 continue
 
-            p0, dir = bim2fem.ifcplus.util.geometry.plane_intersection_line(
+            p0, dir = ifcplus.util.geometry.plane_intersection_line(
                 a1=original_coordinates_of_points_of_wall_1[0],
                 b1=original_coordinates_of_points_of_wall_1[1],
                 c1=original_coordinates_of_points_of_wall_1[2],
@@ -121,20 +121,20 @@ def snap_walls_to_perpendicular_walls(
             # p1 = tuple(float(val) for val in p1.tolist())
             # assert len(p1) == 3
 
-            nodes_of_wall_1 = bim2fem.ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
+            nodes_of_wall_1 = ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
                 triangular_structural_surface_member=wall_1
             )
-            nodes_of_wall_2 = bim2fem.ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
+            nodes_of_wall_2 = ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
                 triangular_structural_surface_member=wall_2
             )
 
             for wall_node in nodes_of_wall_1 + nodes_of_wall_2:
 
-                coordinates_of_wall_node = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                coordinates_of_wall_node = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
                     structural_point_connection=wall_node
                 )
 
-                projected_coordinates_of_wall_node = bim2fem.ifcplus.util.geometry.calculate_coordinates_of_point_projected_onto_line(
+                projected_coordinates_of_wall_node = ifcplus.util.geometry.calculate_coordinates_of_point_projected_onto_line(
                     point=coordinates_of_wall_node,
                     start_point_of_line=convert_3pt_ndarray_to_tuple_of_floats(p0),
                     end_point_of_line=convert_3pt_ndarray_to_tuple_of_floats(p1),
@@ -161,7 +161,7 @@ def snap_walls_to_perpendicular_walls(
                     coordinates_of_wall_node
                 )
 
-                bim2fem.ifcplus.api.structural.translate_structural_point_connection(
+                ifcplus.api.structural.translate_structural_point_connection(
                     structural_point_connection=wall_node,
                     translation=convert_3pt_ndarray_to_tuple_of_floats(translation),
                 )

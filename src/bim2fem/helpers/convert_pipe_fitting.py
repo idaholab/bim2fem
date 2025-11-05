@@ -3,28 +3,28 @@
 from re import T
 import ifcopenshell
 import ifcopenshell.util.element
-import inlbim.util.geometry
-import inlbim.util.material
-import inlbim.api.material
-from inlbim import REGION
-import inlbim.util.profile
+import ifcplus.util.geometry
+import ifcplus.util.material
+import ifcplus.api.material
+from ifcplus import REGION
+import ifcplus.util.profile
 import ifcopenshell.api.root
-import inlbim.api.profile
-import inlbim.api.structural
+import ifcplus.api.profile
+import ifcplus.api.structural
 import ifcopenshell.util.representation
 import ifcopenshell.util.placement
 import numpy as np
-import inlbim.util.representation
-from inlbim.util.geometry import TriangularMesh
+import ifcplus.util.representation
+from ifcplus.util.geometry import TriangularMesh
 import bim2fem.helpers.classify_beam_shape
 import ifcopenshell.util.unit
-import inlbim.api.element_type
+import ifcplus.api.element_type
 import ifcopenshell.api.type
 import ifcopenshell.api.spatial
-import inlbim.util.file
+import ifcplus.util.project
 import ifcopenshell.api.project
 import ifcopenshell.util.system
-import inlbim.util.structural
+import ifcplus.util.structural
 import math
 
 
@@ -83,7 +83,7 @@ def convert_pipe_fitting_to_structural_items(
         }
     )
     standard_material_name = (
-        inlbim.util.material.get_best_matching_standard_material_from_element_metadata(
+        ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
             element=pipe_fitting_from_source_file,
             region=region,
             other_material_names=material_names_from_destination_file,
@@ -113,15 +113,15 @@ def convert_pipe_fitting_to_structural_items(
             guid=connected_from[0].GlobalId
         )
         first_pipe_as_analytical_element = (
-            inlbim.util.structural.get_structural_items_of_assigned_product(
+            ifcplus.util.structural.get_structural_items_of_assigned_product(
                 assigned_product=first_pipe_as_architectural_element
             )
         )[0]
-        first_pipe_endpoint_coordinates = inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+        first_pipe_endpoint_coordinates = ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=first_pipe_as_analytical_element
         )
         first_pipe_vector = (
-            inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+            ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
                 p1=first_pipe_endpoint_coordinates[0],
                 p2=first_pipe_endpoint_coordinates[1],
             )
@@ -131,21 +131,21 @@ def convert_pipe_fitting_to_structural_items(
             guid=connected_to[0].GlobalId
         )
         second_pipe_as_analytical_element = (
-            inlbim.util.structural.get_structural_items_of_assigned_product(
+            ifcplus.util.structural.get_structural_items_of_assigned_product(
                 assigned_product=second_pipe_as_architectural_element
             )
         )[0]
-        second_pipe_endpoint_coordinates = inlbim.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+        second_pipe_endpoint_coordinates = ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=second_pipe_as_analytical_element
         )
         second_pipe_vector = (
-            inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+            ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
                 p1=second_pipe_endpoint_coordinates[0],
                 p2=second_pipe_endpoint_coordinates[1],
             )
         )
 
-        angle = inlbim.util.geometry.calculate_angle_between_two_vectors(
+        angle = ifcplus.util.geometry.calculate_angle_between_two_vectors(
             vector1=first_pipe_vector,
             vector2=second_pipe_vector,
         )
@@ -169,7 +169,7 @@ def convert_pipe_fitting_to_structural_items(
                 outgoing_segment=second_pipe_endpoint_coordinates[0:2],
             )
 
-            connecting_segment_of_inf_lines = inlbim.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
+            connecting_segment_of_inf_lines = ifcplus.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
                 coordinates_of_start_of_line_1=incoming_segment[0],
                 coordinates_of_end_of_line_1=incoming_segment[1],
                 coordinates_of_start_of_line_2=outgoing_segment[0],
@@ -193,19 +193,19 @@ def convert_pipe_fitting_to_structural_items(
             radius_of_curvature_assuming_short_elbow = 1.0 * nominal_diameter
 
             horizontal_curve_assuming_long_elbow = (
-                inlbim.util.geometry.HorizontalCurve.from_3pt_polyline(
-                    p1=incoming_segment[1],
-                    p2=connecting_segment_of_inf_lines[0],
-                    p3=outgoing_segment[0],
+                ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+                    first_point=incoming_segment[1],
+                    second_point=connecting_segment_of_inf_lines[0],
+                    third_point=outgoing_segment[0],
                     radius_of_curvature=radius_of_curvature_assuming_long_elbow,
                 )
             )
 
             horizontal_curve_assuming_short_elbow = (
-                inlbim.util.geometry.HorizontalCurve.from_3pt_polyline(
-                    p1=incoming_segment[1],
-                    p2=connecting_segment_of_inf_lines[0],
-                    p3=outgoing_segment[0],
+                ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+                    first_point=incoming_segment[1],
+                    second_point=connecting_segment_of_inf_lines[0],
+                    third_point=outgoing_segment[0],
                     radius_of_curvature=radius_of_curvature_assuming_short_elbow,
                 )
             )
@@ -251,7 +251,7 @@ def convert_pipe_fitting_to_structural_items(
             )
 
             # Create the standard material
-            material = inlbim.api.material.add_material_from_standard_library(
+            material = ifcplus.api.material.add_material_from_standard_library(
                 ifc4_file=ifc4_destination_file,
                 region=region,
                 material_name=standard_material_name,
@@ -260,19 +260,19 @@ def convert_pipe_fitting_to_structural_items(
             assert isinstance(material, ifcopenshell.entity_instance)
 
             incoming_segment_vector = (
-                inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+                ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
                     p1=incoming_segment[0],
                     p2=incoming_segment[1],
                 )
             )
             outgoing_segment_vector = (
-                inlbim.util.geometry.calculate_unit_direction_vector_between_two_points(
+                ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
                     p1=outgoing_segment[0],
                     p2=outgoing_segment[1],
                 )
             )
             local_z_axis_in_global_coordinates = (
-                inlbim.util.geometry.calculate_cross_product_of_two_vectors(
+                ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                     vector1=incoming_segment_vector, vector2=outgoing_segment_vector
                 )
             )
@@ -284,7 +284,7 @@ def convert_pipe_fitting_to_structural_items(
 
             # Create StructuralItem
             structural_curve_member = (
-                inlbim.api.structural.create_curved_structural_curve_member(
+                ifcplus.api.structural.create_curved_structural_curve_member(
                     horizontal_curve,
                     orientation_point=orientation_point,
                     profile_def=profile_def,
