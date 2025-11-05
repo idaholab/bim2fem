@@ -14,9 +14,9 @@ import json
 import ifcopenshell
 import ifcplus.api.project
 import bim2glb.convert_ifc_to_glb
-import bim2fem.core.convert_ifc_to_fem
-import bim2fem.core.recreate_fem_with_3d_body_shape_representation
-from bim2fem.core.adjust_element_connectivity_of_building_fem import (
+import bim2fem.convert_ifc_to_fem
+import bim2fem.recreate_fem_with_3d_body_shape_representation
+from bim2fem.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 from flask import (
@@ -87,9 +87,9 @@ def index():
             return redirect(location=url_for(endpoint="convert_to_glb"))
         elif selected_job == "Convert IFC to Finite Element Model":
             # return redirect(location=url_for(endpoint="convert_to_fem"))
-            return "This feature is currently broken"
+            return "This feature is currently unavailable"
         elif selected_job == "Adjust Element Connectivity of Finite Element Model":
-            return "This feature is currently broken"
+            return "This feature is currently unavailable"
         else:
             return "Unknown Job"
 
@@ -137,7 +137,7 @@ def convert_to_fem():
         ifc_source_file = ifcopenshell.open(input_ifc_file_path)
         assert isinstance(ifc_source_file, ifcopenshell.file)
         assert region == "Europe" or region == "UnitedStates"
-        ifc4_sav_file = bim2fem.core.convert_ifc_to_fem.convert_ifc_to_fem(
+        ifc4_sav_file = bim2fem.convert_ifc_to_fem.convert_ifc_to_fem(
             ifc4_source_file=ifc_source_file,
             element_selection_query=element_selection_query,
             element_deselection_query=element_deselection_query,
@@ -209,7 +209,7 @@ def convert_to_fem_done(
             return "IFC file could not be opened by IfcOpenShell"
 
         # Recreate the IFC4 SAV file with Body Shape Representations
-        recreated_ifc4_sav_file = bim2fem.core.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
+        recreated_ifc4_sav_file = bim2fem.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
             ifc4_sav_file=ifc4_sav_file,
             view_option="Wireframe_3D",
         )
