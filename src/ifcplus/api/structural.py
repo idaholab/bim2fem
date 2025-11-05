@@ -5,18 +5,18 @@ import ifcopenshell.api.geometry
 import ifcopenshell.api.root
 import ifcopenshell.api.material
 import ifcopenshell.api.structural
-import bim2fem.ifcplus.api.geometry
-import bim2fem.ifcplus.util.geometry
-import bim2fem.ifcplus.util.structural
-import bim2fem.ifcplus.util.file
+import ifcplus.api.geometry
+import ifcplus.util.geometry
+import ifcplus.util.structural
+import ifcplus.util.project
 import ifcopenshell.api.project
-import bim2fem.ifcplus.api.material
-import bim2fem.ifcplus.api.product
+import ifcplus.api.material
+import ifcplus.api.product
 import math
 import numpy as np
-import bim2fem.ifcplus.api.structural
+import ifcplus.api.structural
 import ifcopenshell.util.element
-from bim2fem.ifcplus.util.geometry import HorizontalCurve
+from ifcplus.util.geometry import HorizontalCurve
 
 
 def add_structural_analysis_model(
@@ -98,17 +98,17 @@ def create_linear_structural_curve_member(
     vertex_points = []
     for point in [start_point, end_point]:
         vertex_points.append(
-            bim2fem.ifcplus.api.geometry.add_vertex_point(
+            ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file, point_coordinates=point
             )
         )
 
     # Add and assign representation
-    representation_item = bim2fem.ifcplus.api.geometry.add_edge(
+    representation_item = ifcplus.api.geometry.add_edge(
         edge_start_as_vertex_point=vertex_points[0],
         edge_end_as_vertex_point=vertex_points[1],
     )
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -124,7 +124,7 @@ def create_linear_structural_curve_member(
     )
 
     # Add and Assign MaterialProfileSetUsage
-    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+    material_profile_set = ifcplus.api.material.add_material_profile_set_with_single_material_profile(
         material=material,
         profile=profile_def,
         check_for_duplicate=True,
@@ -154,7 +154,7 @@ def create_linear_structural_curve_member(
 
     # Assign to corresponding IfcProduct
     if corresponding_product:
-        bim2fem.ifcplus.api.product.assign_product(
+        ifcplus.api.product.assign_product(
             file=ifc4_file,
             objects=[structural_curve_member],
             product=corresponding_product,
@@ -211,18 +211,18 @@ def create_curved_structural_curve_member(
         horizontal_curve.point_of_tangency,
     ]:
         vertex_points.append(
-            bim2fem.ifcplus.api.geometry.add_vertex_point(
+            ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file, point_coordinates=point
             )
         )
 
     # Add and assign representation
-    representation_item = bim2fem.ifcplus.api.geometry.add_curved_edge(
+    representation_item = ifcplus.api.geometry.add_curved_edge(
         point_of_curvature_as_vertex_point=vertex_points[0],
         point_of_tangency_as_vertex_point=vertex_points[1],
         center_of_curvature=horizontal_curve.center_of_curvature,
     )
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -238,7 +238,7 @@ def create_curved_structural_curve_member(
     )
 
     # Add and Assign MaterialProfileSetUsage
-    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+    material_profile_set = ifcplus.api.material.add_material_profile_set_with_single_material_profile(
         material=material,
         profile=profile_def,
         check_for_duplicate=True,
@@ -268,7 +268,7 @@ def create_curved_structural_curve_member(
 
     # Assign to corresponding IfcProduct
     if corresponding_product:
-        bim2fem.ifcplus.api.product.assign_product(
+        ifcplus.api.product.assign_product(
             file=ifc4_file,
             objects=[structural_curve_member],
             product=corresponding_product,
@@ -321,7 +321,7 @@ def create_npt_structural_surface_member(
     vertex_points_of_outer_profile = []
     for point in outer_profile:
         vertex_points_of_outer_profile.append(
-            bim2fem.ifcplus.api.geometry.add_vertex_point(
+            ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=point,
             )
@@ -333,7 +333,7 @@ def create_npt_structural_surface_member(
         vertex_points_of_inner_profile = []
         for point in inner_profile:
             vertex_points_of_inner_profile.append(
-                bim2fem.ifcplus.api.geometry.add_vertex_point(
+                ifcplus.api.geometry.add_vertex_point(
                     ifc4_file=ifc4_file,
                     point_coordinates=point,
                 )
@@ -341,11 +341,11 @@ def create_npt_structural_surface_member(
         vertex_points_of_inner_profiles.append(vertex_points_of_inner_profile)
 
     # Add and assign representation
-    representation_item = bim2fem.ifcplus.api.geometry.add_face_surface(
+    representation_item = ifcplus.api.geometry.add_face_surface(
         vertex_points_of_outer_bound=vertex_points_of_outer_profile,
         vertex_points_of_inner_bounds=vertex_points_of_inner_profiles,
     )
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -361,7 +361,7 @@ def create_npt_structural_surface_member(
     )
 
     # Add and Assign MaterialLayerSetUsage
-    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
+    material_layer_set = ifcplus.api.material.add_material_layer_set(
         materials=[material],
         thicknesses=[thickness],
         name=None,
@@ -405,7 +405,7 @@ def create_npt_structural_surface_member(
 
     # Assign to corresponding IfcProduct
     if corresponding_product:
-        bim2fem.ifcplus.api.product.assign_product(
+        ifcplus.api.product.assign_product(
             file=ifc4_file,
             objects=[structural_surface_member],
             product=corresponding_product,
@@ -445,7 +445,7 @@ def create_structural_point_connection(
     )
 
     # Add and assign representation
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -468,7 +468,7 @@ def merge_all_coincident_structural_point_connections(
 ):
 
     # Get Model Precision
-    model_precision = bim2fem.ifcplus.util.file.get_precision_of_project(
+    model_precision = ifcplus.util.project.get_precision_of_project(
         ifc4_file=ifc4sav_file
     )
 
@@ -491,7 +491,7 @@ def merge_all_coincident_structural_point_connections(
     y_vals = set()
     z_vals = set()
     for node in all_nodes:
-        coordinates_of_node = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+        coordinates_of_node = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
             structural_point_connection=node,
         )
         x_vals.add(coordinates_of_node[0])
@@ -509,7 +509,7 @@ def merge_all_coincident_structural_point_connections(
 
     # Sort the nodes into groups
     for node in all_nodes:
-        coordinates_of_node = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+        coordinates_of_node = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
             structural_point_connection=node,
         )
         x_val = coordinates_of_node[0]
@@ -536,7 +536,7 @@ def merge_all_coincident_structural_point_connections(
         for trial_node in trial_nodes:
             trial_node_is_unique = True
             for merged_node in merged_nodes:
-                nodes_are_coincident = bim2fem.ifcplus.util.structural.two_structural_point_connections_are_coincident(
+                nodes_are_coincident = ifcplus.util.structural.two_structural_point_connections_are_coincident(
                     structural_point_connection_1=merged_node,
                     structural_point_connection_2=trial_node,
                     tolerance=model_precision,
@@ -576,12 +576,12 @@ def merge_two_structural_point_connections_together(
 
     # Replace VertexPoint
     replacing_vertex_point = (
-        bim2fem.ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
+        ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replacing_structural_point_connection,
         )
     )
     replaced_vertex_point = (
-        bim2fem.ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
+        ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replaced_structural_point_connection,
         )
     )
@@ -658,13 +658,13 @@ def translate_structural_point_connection(
 ):
 
     vertex_point = (
-        bim2fem.ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
+        ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=structural_point_connection
         )
     )
 
     old_coordinates = (
-        bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+        ifcplus.util.structural.get_coordinates_of_structural_point_connection(
             structural_point_connection=structural_point_connection
         )
     )
@@ -715,25 +715,25 @@ def divide_structural_curve_member(
 
     # Get various parameters
     original_start_point, original_end_point, original_orientation_point = (
-        bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+        ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=structural_curve_member
         )
     )
     length_of_original_member = float(
         np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
     )
-    direction_vector = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+    direction_vector = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=original_start_point,
         p2=original_end_point,
     )
-    local_orientation_axis_in_global_coordinates = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+    local_orientation_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=original_start_point,
         p2=original_orientation_point,
     )
 
     # Get assigned product
     assigned_product = (
-        bim2fem.ifcplus.util.structural.get_assigned_product_of_structural_item(
+        ifcplus.util.structural.get_assigned_product_of_structural_item(
             structural_item=structural_curve_member
         )
     )
@@ -747,7 +747,7 @@ def divide_structural_curve_member(
     profile_def = material_profile_set.MaterialProfiles[0].Profile
     material = material_profile_set.MaterialProfiles[0].Material
 
-    structural_analysis_model = bim2fem.ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
+    structural_analysis_model = ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
         structural_item=structural_curve_member
     )
     assert structural_analysis_model
@@ -788,7 +788,7 @@ def divide_structural_curve_member(
                 ).tolist()
             )
             assert len(translation) == 3
-            second_node_of_structural_curve_member = bim2fem.ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
+            second_node_of_structural_curve_member = ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
                 linear_structural_curve_member=structural_curve_member
             )[
                 1
@@ -800,7 +800,7 @@ def divide_structural_curve_member(
             new_structural_curve_members.append(structural_curve_member)
         else:
             new_structural_curve_member = (
-                bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
+                ifcplus.api.structural.create_linear_structural_curve_member(
                     start_point=new_start_point,
                     end_point=new_end_point,
                     orientation_point=new_orientation_point,
@@ -822,13 +822,13 @@ def calculate_orientation_point_from_endpoints(
     p2: tuple[float, float, float],
 ) -> tuple[float, float, float]:
 
-    local_x_axis = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+    local_x_axis = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=p1,
         p2=p2,
     )
     global_x_axis = (1.0, 0.0, 1.0)
     angle = np.round(
-        bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
+        ifcplus.util.geometry.calculate_angle_between_two_vectors(
             vector1=local_x_axis,
             vector2=global_x_axis,
         ),
@@ -837,158 +837,9 @@ def calculate_orientation_point_from_endpoints(
     if angle == 0.0 or angle == np.pi:
         p3 = (0.0, 0.0, 1.0)
     else:
-        p3 = bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+        p3 = ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
             vector1=local_x_axis,
             vector2=global_x_axis,
         )
 
     return p3
-
-
-# def create_piping_system_composed_of_structural_items_with_polyline(
-#     polyline: list[tuple[float, float, float]],
-#     nominal_diameter: float,
-#     thickness: float,
-#     material: ifcopenshell.entity_instance,
-#     distribution_system: ifcopenshell.entity_instance,
-#     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
-#     branch_name: str = "Unnamed Branch",
-#     spatial_element: ifcopenshell.entity_instance | None = None,
-#     place_objects_relative_to_parent: bool = False,
-#     add_shape_representation_to_ports: bool = False,
-# ) -> list[ifcopenshell.entity_instance]:
-
-#     ifc4_file = material.file
-
-#     assert len(polyline) >= 2
-
-#     if len(polyline) == 2:
-#         p1 = polyline[0]
-#         p2 = polyline[1]
-
-#         pipe_segment = inlbim.api.structural.create_3pt_structural_curve_member(
-#             p1=polyline[0],
-#             p2=polyline[1],
-#             nominal_diameter=nominal_diameter,
-#             thickness=thickness,
-#             material=material,
-#             name=f"Pipe #1 of {branch_name}",
-#             spatial_element=spatial_element,
-#             distribution_system=distribution_system,
-#             place_object_relative_to_parent=place_objects_relative_to_parent,
-#             add_shape_representation_to_ports=add_shape_representation_to_ports,
-#         )
-
-#         pipe_segment = inlbim.api.system.create_pipe_segment(
-#             p1=polyline[0],
-#             p2=polyline[1],
-#             nominal_diameter=nominal_diameter,
-#             thickness=thickness,
-#             material=material,
-#             name=f"Pipe #1 of {branch_name}",
-#             spatial_element=spatial_element,
-#             distribution_system=distribution_system,
-#             place_object_relative_to_parent=place_objects_relative_to_parent,
-#             add_shape_representation_to_ports=add_shape_representation_to_ports,
-#         )
-#         return [pipe_segment]
-
-#     polyline = filter_out_colinear_points_from_polyline(polyline=polyline)
-
-#     if elbow_radius_type == "LONG":
-#         radius_of_curvature = 1.5 * nominal_diameter
-#     else:
-#         radius_of_curvature = 1.0 * nominal_diameter
-
-#     piping_elements = []
-
-#     pipe_segment_start_point = polyline[0]
-
-#     for index in range(len(polyline)):
-
-#         if index + 2 == len(polyline):
-#             last_pipe_segment = inlbim.api.system.create_pipe_segment(
-#                 p1=pipe_segment_start_point,
-#                 p2=polyline[-1],
-#                 nominal_diameter=nominal_diameter,
-#                 thickness=thickness,
-#                 material=material,
-#                 name=f"Pipe #{[index + 1]} of {branch_name}",
-#                 spatial_element=spatial_element,
-#                 distribution_system=distribution_system,
-#                 place_object_relative_to_parent=place_objects_relative_to_parent,
-#                 add_shape_representation_to_ports=add_shape_representation_to_ports,
-#             )
-#             piping_elements += [last_pipe_segment]
-#             break
-
-#         horizontal_curve = inlbim.util.geometry.HorizontalCurve.from_3pt_polyline(
-#             p1=polyline[index],
-#             p2=polyline[index + 1],
-#             p3=polyline[index + 2],
-#             radius_of_curvature=radius_of_curvature,
-#         )
-
-#         pipe_segment_end_point = horizontal_curve.point_of_curvature
-
-#         # Create Element
-#         pipe_segment = inlbim.api.system.create_pipe_segment(
-#             p1=pipe_segment_start_point,
-#             p2=pipe_segment_end_point,
-#             nominal_diameter=nominal_diameter,
-#             thickness=thickness,
-#             material=material,
-#             name=f"Pipe #{[index + 1]} of {branch_name}",
-#             spatial_element=spatial_element,
-#             distribution_system=distribution_system,
-#             place_object_relative_to_parent=place_objects_relative_to_parent,
-#             add_shape_representation_to_ports=add_shape_representation_to_ports,
-#         )
-
-#         # Create Element
-#         elbow = inlbim.api.system.create_elbow(
-#             horizontal_curve=horizontal_curve,
-#             nominal_diameter=nominal_diameter,
-#             thickness=thickness,
-#             material=material,
-#             name=f"Elbow #{[index + 1]} of {branch_name}",
-#             spatial_element=spatial_element,
-#             distribution_system=distribution_system,
-#             place_object_relative_to_parent=place_objects_relative_to_parent,
-#             add_shape_representation_to_ports=add_shape_representation_to_ports,
-#         )
-
-#         piping_elements += [pipe_segment, elbow]
-
-#         pipe_segment_start_point = horizontal_curve.point_of_tangency
-
-#     for index_for_an_elbow in range(len(piping_elements))[1::2]:
-#         pipe_segment_1 = piping_elements[index_for_an_elbow - 1]
-#         elbow = piping_elements[index_for_an_elbow]
-#         pipe_segment_2 = piping_elements[index_for_an_elbow + 1]
-#         ifcopenshell.api.system.connect_port(
-#             file=ifc4_file,
-#             port1=ifcopenshell.util.system.get_ports(
-#                 element=pipe_segment_1,
-#                 flow_direction="SOURCE",
-#             )[0],
-#             port2=ifcopenshell.util.system.get_ports(
-#                 element=elbow,
-#                 flow_direction="SINK",
-#             )[0],
-#             direction="SOURCE",
-#         )
-#         ifcopenshell.api.system.connect_port(
-#             file=ifc4_file,
-#             port1=ifcopenshell.util.system.get_ports(
-#                 element=elbow,
-#                 flow_direction="SOURCE",
-#             )[0],
-#             port2=ifcopenshell.util.system.get_ports(
-#                 element=pipe_segment_2,
-#                 flow_direction="SINK",
-#             )[0],
-#             direction="SOURCE",
-#         )
-
-#     return piping_elements

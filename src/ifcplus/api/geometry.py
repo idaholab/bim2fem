@@ -5,7 +5,7 @@ import ifcopenshell.api.context
 import ifcopenshell.util.representation
 from typing import Literal
 import numpy as np
-import bim2fem.ifcplus.api.profile
+import ifcplus.api.profile
 import ifcopenshell
 import ifcopenshell.api.context
 import ifcopenshell.util.representation
@@ -14,7 +14,7 @@ from ifcopenshell.util.representation import (
     CONTEXT_TYPE,
     TARGET_VIEW,
 )
-import bim2fem.ifcplus.util.geometry
+import ifcplus.util.geometry
 
 
 FACE_BOUND_CLASS = Literal["IfcFaceOuterBound", "IfcFaceBound"]
@@ -100,10 +100,10 @@ def add_block(
     """Adds an IfcBlock"""
 
     repositioned_z_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
     )
     repositioned_x_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
     )
 
     block = ifc4_file.createIfcBlock(
@@ -131,10 +131,10 @@ def add_rectangular_pyramid(
 ) -> ifcopenshell.entity_instance:
 
     repositioned_z_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
     )
     repositioned_x_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
     )
 
     rect_pyramid = ifc4_file.createIfcRectangularPyramid(
@@ -161,7 +161,7 @@ def add_cylindrical_extruded_area_solid(
 ) -> ifcopenshell.entity_instance:
     """Add cylindrical IfcExtrudedAreaSolid"""
 
-    profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
+    profile = ifcplus.api.profile.add_parameterized_profile(
         ifc4_file=ifc4_file,
         profile_class="IfcCircleProfileDef",
         dimensions=[radius],
@@ -191,7 +191,7 @@ def add_hollow_cylindrical_extruded_area_solid(
 ) -> ifcopenshell.entity_instance:
     """Add hollow cylindrical IfcExtrudedAreaSolid"""
 
-    profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
+    profile = ifcplus.api.profile.add_parameterized_profile(
         ifc4_file=ifc4_file,
         profile_class="IfcCircleHollowProfileDef",
         dimensions=[radius, wall_thickness],
@@ -220,10 +220,10 @@ def add_sphere(
     """Add an IfcSphere"""
 
     repositioned_z_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
     )
     repositioned_x_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
     )
 
     sphere = ifc4_file.createIfcSphere(
@@ -270,10 +270,10 @@ def add_extruded_area_solid_tapered(
     """Add an IfcExtrudedAreaSolidTapered"""
 
     repositioned_z_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
     )
     repositioned_x_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
     )
 
     extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolidTapered(
@@ -303,10 +303,10 @@ def add_extruded_area_solid(
     """Add an IfcExtrudedAreaSolid"""
 
     repositioned_z_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
     )
     repositioned_x_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
     )
 
     extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolid(
@@ -343,16 +343,16 @@ def add_revolved_area_solid(
     object_z_axis = (0.0, 0.0, 1.0)
 
     direction_of_axis_of_rotation = (
-        bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+        ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
             vector1=object_z_axis, vector2=center_of_curvature_in_object_xyz_coordinates
         )
     )
 
     repositioned_z_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
     )
     repositioned_x_axis_normalized = (
-        bim2fem.ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
     )
 
     revolved_area_solid = ifc4_file.createIfcRevolvedAreaSolid(
@@ -452,7 +452,7 @@ def add_curved_edge(
     )
 
     horizontal_curve = (
-        bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+        ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
             point_of_curvature=point_of_curvature,
             point_on_center_of_curvature_side=center_of_curvature,
             point_of_tangency=point_of_tangency,
@@ -462,7 +462,7 @@ def add_curved_edge(
 
     z_axis = horizontal_curve.direction_of_axis_of_rotation
 
-    x_axis = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+    x_axis = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=horizontal_curve.point_of_curvature,
         p2=horizontal_curve.point_of_tangency,
     )

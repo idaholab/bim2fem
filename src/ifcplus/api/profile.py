@@ -2,15 +2,15 @@
 
 import ifcopenshell
 from typing import Literal
-import bim2fem.ifcplus.util.file
+import ifcplus.util.project
 import ifcopenshell.api.attribute
 import ifcopenshell.api.profile
 import numpy as np
 import pickle
 import os
 import ifcopenshell.api.pset
-import bim2fem.ifcplus.util.unit
-from bim2fem.ifcplus import REGION
+import ifcplus.util.unit
+from ifcplus import REGION
 
 PARAMETERIZED_PROFILE_CLASSES = Literal[
     "IfcRectangleProfileDef",
@@ -50,7 +50,7 @@ def add_parameterized_profile(
     calculate_mechanical_properties: bool = False,
 ) -> ifcopenshell.entity_instance:
 
-    precision = bim2fem.ifcplus.util.file.get_precision_of_project(ifc4_file=ifc4_file)
+    precision = ifcplus.util.project.get_precision_of_project(ifc4_file=ifc4_file)
 
     dimensions = extend_list_to_length(
         lst=dimensions, target_length=TARGET_LENGTHS[profile_class]
@@ -405,7 +405,7 @@ def add_profile_from_standard_library(
         ydim = matching_section_data_dictionary["Depth"]
         iyy = matching_section_data_dictionary["MomentOfInertiaY"]
         xdim = iyy * 12 / ydim**3
-        xdim = bim2fem.ifcplus.util.unit.convert_unit_of_value(
+        xdim = ifcplus.util.unit.convert_unit_of_value(
             value=xdim, conversion_factor=1
         )
         dimensions = [

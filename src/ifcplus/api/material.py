@@ -4,8 +4,8 @@ import ifcopenshell.api.pset
 import ifcopenshell.api.material
 import pickle
 import os
-import bim2fem.ifcplus.api.style
-from bim2fem.ifcplus import REGION, RGB_STEEL, RGB_CONCRETE
+import ifcplus.api.style
+from ifcplus import REGION, RGB_STEEL, RGB_CONCRETE
 
 
 def add_material_with_structural_properties(
@@ -136,7 +136,7 @@ def add_material_from_standard_library(
                 "UltimateStress": matching_material_data_dictionary["UltimateStress"],
             },
         )
-        bim2fem.ifcplus.api.style.assign_color_to_material(
+        ifcplus.api.style.assign_color_to_material(
             material=material_from_library,
             rgb_triplet=RGB_STEEL,
         )
@@ -156,7 +156,7 @@ def add_material_from_standard_library(
                 ],
             },
         )
-        bim2fem.ifcplus.api.style.assign_color_to_material(
+        ifcplus.api.style.assign_color_to_material(
             material=material_from_library,
             rgb_triplet=RGB_CONCRETE,
         )

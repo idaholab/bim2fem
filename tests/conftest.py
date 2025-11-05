@@ -10,8 +10,8 @@ import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
 import ifcopenshell.api.spatial
 import ifcopenshell.api.system
-import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.api.placement
+import ifcplus.api.project
+import ifcplus.api.placement
 from pathlib import Path
 
 TEST_DIR = Path(__file__).parent
@@ -36,7 +36,7 @@ OUTPUT_DIR_FOR_SYSTEM.mkdir(exist_ok=True)
 def empty_ifc_file() -> ifcopenshell.file:
     """Create a minimal valid IFC file"""
 
-    ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
+    ifc4_file = ifcplus.api.project.create_ifc4_file(
         model_view_definition="ReferenceView_V1.2",
         precision=1e-4,
     )
@@ -53,7 +53,7 @@ def empty_ifc_file() -> ifcopenshell.file:
         products=[site],
         relating_object=project,
     )
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
     )
@@ -65,7 +65,7 @@ def empty_ifc_file() -> ifcopenshell.file:
 def ifc_file_with_one_element() -> ifcopenshell.file:
     """Create a minimal valid IFC file with one element"""
 
-    ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
+    ifc4_file = ifcplus.api.project.create_ifc4_file(
         model_view_definition="ReferenceView_V1.2",
         precision=1e-4,
     )
@@ -82,7 +82,7 @@ def ifc_file_with_one_element() -> ifcopenshell.file:
         products=[site],
         relating_object=project,
     )
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
     )
@@ -98,7 +98,7 @@ def ifc_file_with_one_element() -> ifcopenshell.file:
         products=[element],
         relating_structure=site,
     )
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         place_object_relative_to_parent=True,
     )
@@ -110,7 +110,7 @@ def ifc_file_with_one_element() -> ifcopenshell.file:
 def ifc_file_with_ventilation_distribution_system() -> ifcopenshell.file:
     """Create a minimal valid IFC file with a ventilation IfcDisbributionSystem"""
 
-    ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
+    ifc4_file = ifcplus.api.project.create_ifc4_file(
         model_view_definition="ReferenceView_V1.2",
         precision=1e-4,
     )
@@ -127,7 +127,7 @@ def ifc_file_with_ventilation_distribution_system() -> ifcopenshell.file:
         products=[site],
         relating_object=project,
     )
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
     )

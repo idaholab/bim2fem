@@ -2,12 +2,12 @@
 
 import ifcopenshell
 import ifcopenshell.validate
-import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.api.system
-import bim2fem.ifcplus.api.placement
-import bim2fem.ifcplus.api.distribution_element
+import ifcplus.api.project
+import ifcplus.api.system
+import ifcplus.api.placement
+import ifcplus.api.distribution_element
 import ifcopenshell.util.system
-import bim2fem.ifcplus.api.material
+import ifcplus.api.material
 from tests.conftest import OUTPUT_DIR_FOR_SYSTEM
 
 
@@ -29,7 +29,7 @@ class TestCreatePipingSystem:
         )[0]
 
         galvanized_steel = (
-            bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+            ifcplus.api.material.add_material_with_structural_properties(
                 ifc4_file=ifc_file_with_ventilation_distribution_system,
                 name="Galvanized Steel",
                 category="steel",
@@ -50,7 +50,7 @@ class TestCreatePipingSystem:
             (20.0, 15.0, 10.0),
         ]
 
-        bim2fem.ifcplus.api.system.create_pipe_run_from_polyline(
+        ifcplus.api.system.create_pipe_run_from_polyline(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             polyline=pipe_run_polyline,
             nominal_diameter=0.5,
@@ -65,7 +65,7 @@ class TestCreatePipingSystem:
         )
 
         output_path = str(OUTPUT_DIR_FOR_SYSTEM / "pipe_run.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -97,7 +97,7 @@ class TestConnectEquipment:
             include_subtypes=False,
         )[0]
 
-        mau = bim2fem.ifcplus.api.distribution_element.create_make_up_air_unit(
+        mau = ifcplus.api.distribution_element.create_make_up_air_unit(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="MAU",
             spatial_element=site,
@@ -106,7 +106,7 @@ class TestConnectEquipment:
             add_shape_representation_to_ports=False,
         )
 
-        bim2fem.ifcplus.api.placement.edit_object_placement(
+        ifcplus.api.placement.edit_object_placement(
             product=mau,
             repositioned_origin=(4.0, 2.0, 0.0),
             repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -114,7 +114,7 @@ class TestConnectEquipment:
             place_object_relative_to_parent=True,
         )
 
-        hepa = bim2fem.ifcplus.api.distribution_element.create_air_filtration_containment_housing(
+        hepa = ifcplus.api.distribution_element.create_air_filtration_containment_housing(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="HEPA",
             spatial_element=site,
@@ -123,7 +123,7 @@ class TestConnectEquipment:
             add_shape_representation_to_ports=False,
         )
 
-        bim2fem.ifcplus.api.placement.edit_object_placement(
+        ifcplus.api.placement.edit_object_placement(
             product=hepa,
             repositioned_origin=(4.0 + 10.0, 2.0 + 5.0, 0.0 + 6.0),
             repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -142,7 +142,7 @@ class TestConnectEquipment:
         )[0]
 
         galvanized_steel = (
-            bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+            ifcplus.api.material.add_material_with_structural_properties(
                 ifc4_file=ifc_file_with_ventilation_distribution_system,
                 name="Galvanized Steel",
                 category="steel",
@@ -154,7 +154,7 @@ class TestConnectEquipment:
             )
         )
 
-        bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_pipe_run(
+        ifcplus.api.system.connect_two_distribution_ports_via_pipe_run(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             source_port=mau_source_port,
             sink_port=hepa_sink_port,
@@ -169,7 +169,7 @@ class TestConnectEquipment:
         )
 
         output_path = str(OUTPUT_DIR_FOR_SYSTEM / "mau_connected_to_hepa.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,

@@ -10,10 +10,10 @@ import ifcplus.api.element_type
 import ifcopenshell.api.project
 import ifcopenshell
 import ifcopenshell.api.geometry
-import ifcplus.inlbim.api.placement
+import ifcplus.api.placement
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
-import inlbim.inlbim.api.geometry
+import ifcplus.api.geometry
 import ifcplus.api.profile
 
 BUILT_ELEMENT_FRAME_MEMBER = Literal["IfcBeam", "IfcColumn", "IfcMember"]
@@ -79,12 +79,12 @@ def create_3pt_beam_or_column_or_member(
     length = float(np.linalg.norm(z_axis))
 
     # Add and assign representation
-    representation_item = ifcplus.api.representation.add_extruded_area_solid(
+    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         profile=profile_def,
         extrusion_depth=length,
     )
-    shape_model = ifcplus.api.representation.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -103,8 +103,8 @@ def create_3pt_beam_or_column_or_member(
     ifcplus.api.placement.edit_object_placement(
         product=beam_or_column_or_member,
         repositioned_origin=p1,
-        repositioned_z_axis=z_axis,
-        repositioned_x_axis=x_axis,
+        repositioned_z_axis=tuple(z_axis.tolist()),
+        repositioned_x_axis=tuple(x_axis.tolist()),
         place_object_relative_to_parent=should_transform_relative_to_parent,
     )
 
@@ -179,7 +179,7 @@ def create_opening_element(
     )
 
     # Add and Assign Representation
-    representation_item = ifcplus.api.representation.add_extruded_area_solid(
+    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         profile=profile,
         extrusion_depth=depth,
@@ -187,7 +187,7 @@ def create_opening_element(
         repositioned_x_axis=x_axis_relative_to_voided_element,
         repositioned_z_axis=z_axis_relative_to_voided_element,
     )
-    shape_model = ifcplus.api.representation.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -263,7 +263,7 @@ def create_2pt_wall(
     length = float(np.linalg.norm(x_axis))
 
     # Add and assign representation
-    representation_item = ifcplus.api.representation.add_extruded_area_solid(
+    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         profile=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
             file=ifc4_file,
@@ -279,7 +279,7 @@ def create_2pt_wall(
         ),
         extrusion_depth=height,
     )
-    shape_model = ifcplus.api.representation.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -298,7 +298,7 @@ def create_2pt_wall(
     ifcplus.api.placement.edit_object_placement(
         product=wall,
         repositioned_origin=(p1[0], p1[1], elevation),
-        repositioned_z_axis=z_axis,
+        repositioned_z_axis=tuple(z_axis.tolist()),
         repositioned_x_axis=x_axis,
         place_object_relative_to_parent=should_transform_relative_to_parent,
     )
@@ -394,7 +394,7 @@ def create_npt_slab(
     thickness = sum(thicknesses)
 
     # Add and assign representation
-    representation_item = ifcplus.api.representation.add_extruded_area_solid(
+    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         profile=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
             file=ifc4_file,
@@ -405,7 +405,7 @@ def create_npt_slab(
         repositioned_origin=(0.0, 0.0, -thickness / 2),
         extrusion_depth=thickness,
     )
-    shape_model = ifcplus.api.representation.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",

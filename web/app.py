@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 import json
 import ifcopenshell
-import bim2fem.ifcplus.api.project
+import ifcplus.api.project
 import bim2glb.convert_ifc_to_glb
 import bim2fem.core.convert_ifc_to_fem
 import bim2fem.core.recreate_fem_with_3d_body_shape_representation
@@ -164,7 +164,7 @@ def convert_to_fem():
             PATH_TO_OUTPUT_DIRECTORY,
             output_ifc_filename,
         )
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_sav_file,
             file_path=output_ifc_file_path,
             add_annotations=False,
@@ -227,7 +227,7 @@ def convert_to_fem_done(
         )
 
         # Write the Recreated IFC4 SAV file to disk
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=recreated_ifc4_sav_file,
             file_path=recreated_ifc4_sav_file_path,
             add_annotations=False,

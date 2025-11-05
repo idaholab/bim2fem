@@ -4,11 +4,11 @@ import ifcopenshell
 import ifcopenshell.api.geometry
 import ifcopenshell.validate
 import ifcopenshell.util.representation
-import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.api.geometry
-import bim2fem.ifcplus.api.placement
+import ifcplus.api.project
+import ifcplus.api.geometry
+import ifcplus.api.placement
 import numpy as np
-import bim2fem.ifcplus.api.profile
+import ifcplus.api.profile
 from tests.conftest import OUTPUT_DIR_FOR_GEOMETRY
 
 
@@ -24,14 +24,14 @@ class TestAddCsgSolid:
             include_subtypes=False,
         )[0]
 
-        block = bim2fem.ifcplus.api.geometry.add_block(
+        block = ifcplus.api.geometry.add_block(
             ifc4_file=ifc_file_with_one_element,
             length=1.0,
             width=2.0,
             height=3.0,
         )
 
-        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        csg_solid = ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=block,
         )
 
@@ -40,7 +40,7 @@ class TestAddCsgSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -54,7 +54,7 @@ class TestAddCsgSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_block.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -78,14 +78,14 @@ class TestAddCsgSolid:
             include_subtypes=False,
         )[0]
 
-        block_1 = bim2fem.ifcplus.api.geometry.add_block(
+        block_1 = ifcplus.api.geometry.add_block(
             ifc4_file=ifc_file_with_one_element,
             length=0.5,
             width=1.0,
             height=4.0,
         )
 
-        block_2 = bim2fem.ifcplus.api.geometry.add_block(
+        block_2 = ifcplus.api.geometry.add_block(
             ifc4_file=ifc_file_with_one_element,
             length=3.5,
             width=1.0,
@@ -93,7 +93,7 @@ class TestAddCsgSolid:
             repositioned_origin=(0.5, 0.0, 3.5),
         )
 
-        block_3 = bim2fem.ifcplus.api.geometry.add_block(
+        block_3 = ifcplus.api.geometry.add_block(
             ifc4_file=ifc_file_with_one_element,
             length=0.5,
             width=1.0,
@@ -108,7 +108,7 @@ class TestAddCsgSolid:
             operator="UNION",
         )
 
-        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        csg_solid = ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=boolean_results[-1],
         )
 
@@ -117,7 +117,7 @@ class TestAddCsgSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -130,14 +130,14 @@ class TestAddCsgSolid:
             representation=shape_model,
         )
 
-        bim2fem.ifcplus.api.placement.edit_object_placement(
+        ifcplus.api.placement.edit_object_placement(
             product=element,
             repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "three_blocks.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -161,14 +161,14 @@ class TestAddCsgSolid:
             include_subtypes=False,
         )[0]
 
-        rectangular_pyramid = bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
+        rectangular_pyramid = ifcplus.api.geometry.add_rectangular_pyramid(
             ifc4_file=ifc_file_with_one_element,
             length=1.0,
             width=2.0,
             height=3.0,
         )
 
-        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        csg_solid = ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=rectangular_pyramid,
         )
 
@@ -177,7 +177,7 @@ class TestAddCsgSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -191,7 +191,7 @@ class TestAddCsgSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_rectangular_pyramid.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -215,14 +215,14 @@ class TestAddCsgSolid:
             include_subtypes=False,
         )[0]
 
-        block = bim2fem.ifcplus.api.geometry.add_block(
+        block = ifcplus.api.geometry.add_block(
             ifc4_file=ifc_file_with_one_element,
             length=1.0,
             width=1.0,
             height=4.0,
         )
 
-        rect_pyramid = bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
+        rect_pyramid = ifcplus.api.geometry.add_rectangular_pyramid(
             ifc4_file=ifc_file_with_one_element,
             length=1.0,
             width=1.0,
@@ -237,7 +237,7 @@ class TestAddCsgSolid:
             operator="UNION",
         )
 
-        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        csg_solid = ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=boolean_results[-1],
         )
 
@@ -246,7 +246,7 @@ class TestAddCsgSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -260,7 +260,7 @@ class TestAddCsgSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "obelisk.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -284,7 +284,7 @@ class TestAddCsgSolid:
             include_subtypes=False,
         )[0]
 
-        cylinder = bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+        cylinder = ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
             ifc4_file=ifc_file_with_one_element,
             radius=0.5,
             extrusion_depth=4.0,
@@ -296,7 +296,7 @@ class TestAddCsgSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -310,7 +310,7 @@ class TestAddCsgSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_right_circular_cylinder.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -334,13 +334,13 @@ class TestAddCsgSolid:
             include_subtypes=False,
         )[0]
 
-        sphere = bim2fem.ifcplus.api.geometry.add_sphere(
+        sphere = ifcplus.api.geometry.add_sphere(
             ifc4_file=ifc_file_with_one_element,
             radius=0.5,
             repositioned_origin=(0.5, 0.5, 0.5),
         )
 
-        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        csg_solid = ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=sphere,
         )
 
@@ -349,7 +349,7 @@ class TestAddCsgSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -363,7 +363,7 @@ class TestAddCsgSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_sphere.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -395,9 +395,9 @@ class TestAddSweptAreaSolid:
         thickness = 0.2
         length = 5.0
 
-        l_shape_extrusion = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
+        l_shape_extrusion = ifcplus.api.geometry.add_extruded_area_solid(
             ifc4_file=ifc_file_with_one_element,
-            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+            profile=ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc_file_with_one_element,
                 profile_class="IfcLShapeProfileDef",
                 dimensions=[depth, width, thickness, None, None, None],
@@ -412,7 +412,7 @@ class TestAddSweptAreaSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -426,7 +426,7 @@ class TestAddSweptAreaSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "l_shape_extrusion.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -456,15 +456,15 @@ class TestAddSweptAreaSolid:
         length = 5.0
 
         l_shape_extrusion = (
-            bim2fem.ifcplus.api.geometry.add_extruded_area_solid_tapered(
+            ifcplus.api.geometry.add_extruded_area_solid_tapered(
                 ifc4_file=ifc_file_with_one_element,
-                profile_start=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+                profile_start=ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc_file_with_one_element,
                     profile_class="IfcLShapeProfileDef",
                     dimensions=[depth, width, thickness, None, None, None],
                     check_for_duplicate=True,
                 ),
-                profile_end=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+                profile_end=ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc_file_with_one_element,
                     profile_class="IfcLShapeProfileDef",
                     dimensions=[
@@ -487,7 +487,7 @@ class TestAddSweptAreaSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -501,7 +501,7 @@ class TestAddSweptAreaSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "l_shape_extrusion_tapered.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -529,9 +529,9 @@ class TestAddSweptAreaSolid:
         width = 1.0
         thickness = 0.2
 
-        l_shape_extrusion = bim2fem.ifcplus.api.geometry.add_revolved_area_solid(
+        l_shape_extrusion = ifcplus.api.geometry.add_revolved_area_solid(
             ifc4_file=ifc_file_with_one_element,
-            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+            profile=ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc_file_with_one_element,
                 profile_class="IfcLShapeProfileDef",
                 dimensions=[depth, width, thickness, None, None, None],
@@ -547,7 +547,7 @@ class TestAddSweptAreaSolid:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -561,7 +561,7 @@ class TestAddSweptAreaSolid:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "l_shape_extrusion_revolved.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -588,7 +588,7 @@ class TestAddBoundingBox:
             include_subtypes=False,
         )[0]
 
-        bounding_box = bim2fem.ifcplus.api.geometry.add_bounding_box(
+        bounding_box = ifcplus.api.geometry.add_bounding_box(
             ifc4_file=ifc_file_with_one_element,
             length=4.0,
             width=2.0,
@@ -601,7 +601,7 @@ class TestAddBoundingBox:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Box",
@@ -614,14 +614,14 @@ class TestAddBoundingBox:
             representation=shape_model,
         )
 
-        bim2fem.ifcplus.api.placement.edit_object_placement(
+        ifcplus.api.placement.edit_object_placement(
             product=element,
             repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_bounding_box.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -674,7 +674,7 @@ class TestAddFacetedBrep:
             [6, 4, 7],
         ]
 
-        faceted_brep = bim2fem.ifcplus.api.geometry.add_faceted_brep(
+        faceted_brep = ifcplus.api.geometry.add_faceted_brep(
             ifc4_file=ifc_file_with_one_element,
             points=points,
             triangles=triangles,
@@ -685,7 +685,7 @@ class TestAddFacetedBrep:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -698,14 +698,14 @@ class TestAddFacetedBrep:
             representation=shape_model,
         )
 
-        bim2fem.ifcplus.api.placement.edit_object_placement(
+        ifcplus.api.placement.edit_object_placement(
             product=element,
             repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_faceted_brep.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -732,12 +732,12 @@ class TestAddTopologyRepresentation:
             include_subtypes=False,
         )[0]
 
-        edge = bim2fem.ifcplus.api.geometry.add_edge(
-            edge_start_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
+        edge = ifcplus.api.geometry.add_edge(
+            edge_start_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(0.0, 0.0, 1.0),
             ),
-            edge_end_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
+            edge_end_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(4.0, 0.0, 1.0),
             ),
@@ -746,7 +746,7 @@ class TestAddTopologyRepresentation:
         representation_type = ifcopenshell.util.representation.guess_type(items=[edge])
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -760,7 +760,7 @@ class TestAddTopologyRepresentation:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_edge.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -784,12 +784,12 @@ class TestAddTopologyRepresentation:
             include_subtypes=False,
         )[0]
 
-        edge_curve = bim2fem.ifcplus.api.geometry.add_curved_edge(
-            point_of_curvature_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
+        edge_curve = ifcplus.api.geometry.add_curved_edge(
+            point_of_curvature_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(0.0, 0.0, 0.0),
             ),
-            point_of_tangency_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
+            point_of_tangency_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=(5.0, 0.0, 5.0),
             ),
@@ -801,7 +801,7 @@ class TestAddTopologyRepresentation:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -815,7 +815,7 @@ class TestAddTopologyRepresentation:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_edge_curve.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -847,14 +847,14 @@ class TestAddTopologyRepresentation:
         ]
 
         vertex_points_of_outer_bound = [
-            bim2fem.ifcplus.api.geometry.add_vertex_point(
+            ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=point_of_outer_bound,
             )
             for point_of_outer_bound in points_of_outer_bound
         ]
 
-        face_surface = bim2fem.ifcplus.api.geometry.add_face_surface(
+        face_surface = ifcplus.api.geometry.add_face_surface(
             vertex_points_of_outer_bound=vertex_points_of_outer_bound,
             vertex_points_of_inner_bounds=[],
         )
@@ -864,7 +864,7 @@ class TestAddTopologyRepresentation:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -878,7 +878,7 @@ class TestAddTopologyRepresentation:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_face_surface.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,
@@ -923,7 +923,7 @@ class TestAddTopologyRepresentation:
         ]
 
         vertex_points_of_outer_bound = [
-            bim2fem.ifcplus.api.geometry.add_vertex_point(
+            ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc_file_with_one_element,
                 point_coordinates=point_of_outer_bound,
             )
@@ -934,7 +934,7 @@ class TestAddTopologyRepresentation:
         for points_of_inner_bound in points_of_inner_bounds:
             vertex_points_of_inner_bounds.append(
                 [
-                    bim2fem.ifcplus.api.geometry.add_vertex_point(
+                    ifcplus.api.geometry.add_vertex_point(
                         ifc4_file=ifc_file_with_one_element,
                         point_coordinates=point_of_inner_bound,
                     )
@@ -942,7 +942,7 @@ class TestAddTopologyRepresentation:
                 ]
             )
 
-        face_surface = bim2fem.ifcplus.api.geometry.add_face_surface(
+        face_surface = ifcplus.api.geometry.add_face_surface(
             vertex_points_of_outer_bound=vertex_points_of_outer_bound,
             vertex_points_of_inner_bounds=vertex_points_of_inner_bounds,
         )
@@ -952,7 +952,7 @@ class TestAddTopologyRepresentation:
         )
         assert isinstance(representation_type, str)
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -966,7 +966,7 @@ class TestAddTopologyRepresentation:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_face_surface_with_voids.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_one_element,
             file_path=output_path,
             add_annotations=True,

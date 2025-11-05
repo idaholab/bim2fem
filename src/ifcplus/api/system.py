@@ -2,15 +2,15 @@
 
 import ifcopenshell.api.system
 import ifcopenshell.util.system
-import bim2fem.ifcplus.api.distribution_element
-import bim2fem.ifcplus.api.geometry
+import ifcplus.api.distribution_element
+import ifcplus.api.geometry
 import ifcopenshell.api.geometry
-import bim2fem.ifcplus.util.geometry
-import bim2fem.ifcplus.api.style
+import ifcplus.util.geometry
+import ifcplus.api.style
 import numpy as np
 import ifcopenshell.util.representation
-import bim2fem.ifcplus.util.system
-import bim2fem.ifcplus.api.placement
+import ifcplus.util.system
+import ifcplus.api.placement
 from typing import Literal
 
 FLOW_DIRECTION = Literal[
@@ -59,7 +59,7 @@ def create_distribution_port(
     if isinstance(distribution_system, ifcopenshell.entity_instance):
         distribution_port.SystemType = distribution_system.PredefinedType
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=distribution_port,
         repositioned_origin=port_origin_in_distribution_element_coordinates,
         repositioned_z_axis=port_z_axis_in_distribution_element_coordinates,
@@ -87,8 +87,8 @@ def add_shape_representation_to_distribution_ports(
     for port in ports:
         if port.FlowDirection == "SINK":
             if sink_arrow is None:
-                sink_arrow = bim2fem.ifcplus.api.geometry.add_csg_solid(
-                    boolean_result_or_primitive=bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
+                sink_arrow = ifcplus.api.geometry.add_csg_solid(
+                    boolean_result_or_primitive=ifcplus.api.geometry.add_rectangular_pyramid(
                         ifc4_file=ifc4_file,
                         length=arrow_size,
                         width=arrow_size,
@@ -101,8 +101,8 @@ def add_shape_representation_to_distribution_ports(
 
         elif port.FlowDirection == "SOURCE":
             if source_arrow is None:
-                source_arrow = bim2fem.ifcplus.api.geometry.add_csg_solid(
-                    boolean_result_or_primitive=bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
+                source_arrow = ifcplus.api.geometry.add_csg_solid(
+                    boolean_result_or_primitive=ifcplus.api.geometry.add_rectangular_pyramid(
                         ifc4_file=ifc4_file,
                         length=arrow_size,
                         width=arrow_size,
@@ -119,8 +119,8 @@ def add_shape_representation_to_distribution_ports(
 
         else:
             if ambiguous_arrow is None:
-                ambiguous_arrow = bim2fem.ifcplus.api.geometry.add_csg_solid(
-                    boolean_result_or_primitive=bim2fem.ifcplus.api.geometry.add_sphere(
+                ambiguous_arrow = ifcplus.api.geometry.add_csg_solid(
+                    boolean_result_or_primitive=ifcplus.api.geometry.add_sphere(
                         ifc4_file=ifc4_file,
                         radius=arrow_size,
                     ),
@@ -134,7 +134,7 @@ def add_shape_representation_to_distribution_ports(
         if representation_type is None:
             return None
 
-        shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+        shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -148,7 +148,7 @@ def add_shape_representation_to_distribution_ports(
         )
 
         if color:
-            bim2fem.ifcplus.api.style.assign_color_to_element(
+            ifcplus.api.style.assign_color_to_element(
                 element=port,
                 rgb_triplet=color,
                 transparency=0.0,
@@ -175,7 +175,7 @@ def create_pipe_run_from_polyline(
         return []
 
     if len(polyline) == 2:
-        pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+        pipe_segment = ifcplus.api.distribution_element.create_pipe_segment(
             ifc4_file=ifc4_file,
             start_point=polyline[0],
             end_point=polyline[1],
@@ -190,7 +190,7 @@ def create_pipe_run_from_polyline(
         )
         return [pipe_segment]
 
-    polyline = bim2fem.ifcplus.util.geometry.filter_out_colinear_points_from_polyline(
+    polyline = ifcplus.util.geometry.filter_out_colinear_points_from_polyline(
         polyline=polyline,
     )
 
@@ -207,7 +207,7 @@ def create_pipe_run_from_polyline(
 
         if index + 2 == len(polyline):
             last_pipe_segment = (
-                bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+                ifcplus.api.distribution_element.create_pipe_segment(
                     ifc4_file=ifc4_file,
                     start_point=pipe_segment_start_point,
                     end_point=polyline[-1],
@@ -225,7 +225,7 @@ def create_pipe_run_from_polyline(
             break
 
         horizontal_curve = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+            ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
                 first_point=polyline[index],
                 second_point=polyline[index + 1],
                 third_point=polyline[index + 2],
@@ -235,7 +235,7 @@ def create_pipe_run_from_polyline(
 
         pipe_segment_end_point = horizontal_curve.point_of_curvature
 
-        pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+        pipe_segment = ifcplus.api.distribution_element.create_pipe_segment(
             ifc4_file=ifc4_file,
             start_point=pipe_segment_start_point,
             end_point=pipe_segment_end_point,
@@ -249,7 +249,7 @@ def create_pipe_run_from_polyline(
             add_shape_representation_to_ports=add_shape_representation_to_ports,
         )
 
-        elbow = bim2fem.ifcplus.api.distribution_element.create_elbow(
+        elbow = ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve,
             nominal_diameter=nominal_diameter,
@@ -314,17 +314,17 @@ def connect_two_distribution_ports_via_pipe_run(
     """Connect two IfcDistributionPorts using a pipe run formed via no
     intelligent method."""
 
-    source_port_origin = bim2fem.ifcplus.util.system.get_port_location(
+    source_port_origin = ifcplus.util.system.get_port_location(
         distribution_port=source_port,
     )
-    source_port_z_axis = bim2fem.ifcplus.util.system.get_port_z_axis(
+    source_port_z_axis = ifcplus.util.system.get_port_z_axis(
         distribution_port=source_port
     )
 
-    sink_port_origin = bim2fem.ifcplus.util.system.get_port_location(
+    sink_port_origin = ifcplus.util.system.get_port_location(
         distribution_port=sink_port,
     )
-    sink_port_z_axis = bim2fem.ifcplus.util.system.get_port_z_axis(
+    sink_port_z_axis = ifcplus.util.system.get_port_z_axis(
         distribution_port=sink_port
     )
 

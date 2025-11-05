@@ -3,7 +3,6 @@
 import ifcopenshell
 import ifcopenshell.api.geometry
 import ifcopenshell.util.placement
-from typing import Iterable
 import numpy as np
 import ifcopenshell.util.element
 import ifcopenshell

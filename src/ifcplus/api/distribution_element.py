@@ -2,14 +2,14 @@
 
 import ifcopenshell
 import ifcopenshell.api.root
-import bim2fem.ifcplus.api.geometry
+import ifcplus.api.geometry
 import ifcopenshell.api.geometry
 import ifcopenshell.api.spatial
-import bim2fem.ifcplus.api.placement
+import ifcplus.api.placement
 import ifcopenshell.api.system
-import bim2fem.ifcplus.api.system
+import ifcplus.api.system
 import ifcopenshell.util.type
-import bim2fem.ifcplus.api.element_type
+import ifcplus.api.element_type
 import ifcopenshell.api.type
 import numpy as np
 import ifcopenshell.util.representation
@@ -17,20 +17,20 @@ from typing import cast
 import ifcopenshell.api.system
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
-import bim2fem.ifcplus.api.placement
-import bim2fem.ifcplus.api.geometry
-import bim2fem.ifcplus.api.profile
+import ifcplus.api.placement
+import ifcplus.api.geometry
+import ifcplus.api.profile
 import ifcopenshell.api.geometry
-import bim2fem.ifcplus.util.geometry
+import ifcplus.util.geometry
 import ifcopenshell.api.material
 import numpy as np
-import bim2fem.ifcplus.api.system
+import ifcplus.api.system
 import ifcopenshell.util.representation
 
 
 def create_elbow(
     ifc4_file: ifcopenshell.file,
-    horizontal_curve: bim2fem.ifcplus.util.geometry.HorizontalCurve,
+    horizontal_curve: ifcplus.util.geometry.HorizontalCurve,
     nominal_diameter: float,
     thickness: float,
     material: ifcopenshell.entity_instance,
@@ -67,9 +67,9 @@ def create_elbow(
 
     outer_radius = nominal_diameter / 2 + thickness / 2
 
-    revolved_area_solid = bim2fem.ifcplus.api.geometry.add_revolved_area_solid(
+    revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
         ifc4_file=ifc4_file,
-        profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+        profile=ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcCircleHollowProfileDef",
             dimensions=[outer_radius, thickness],
@@ -87,7 +87,7 @@ def create_elbow(
         items=[revolved_area_solid]
     )
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -101,19 +101,19 @@ def create_elbow(
         representation=shape_model,
     )
 
-    object_z_axis_in_global_coordinates = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+    object_z_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=horizontal_curve.point_of_curvature,
         p2=horizontal_curve.point_of_intersection,
     )
 
-    object_x_axis_in_global_coordinates = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+    object_x_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=horizontal_curve.point_of_curvature,
         p2=horizontal_curve.center_of_curvature,
     )
 
     object_origin_in_global_coordinates = horizontal_curve.point_of_curvature
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=elbow,
         repositioned_origin=object_origin_in_global_coordinates,
         repositioned_z_axis=object_z_axis_in_global_coordinates,
@@ -127,7 +127,7 @@ def create_elbow(
         material=material,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(0.0, 0.0, 0.0),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
@@ -155,7 +155,7 @@ def create_elbow(
         0.0,
         float(-1 * np.sin(horizontal_curve.central_angle)),
     )
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=source_port_origin_in_object_coordinates,
         port_z_axis_in_distribution_element_coordinates=source_port_z_axis_in_object_coordinates,
@@ -167,7 +167,7 @@ def create_elbow(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=nominal_diameter * 0.10,
         )
@@ -215,7 +215,7 @@ def create_pipe_segment(
 
     object_z_axis_in_global_coordinates = np.array(end_point) - np.array(start_point)
     angle_between_local_and_global_z_axes = (
-        bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
+        ifcplus.util.geometry.calculate_angle_between_two_vectors(
             vector1=tuple(object_z_axis_in_global_coordinates.tolist()),
             vector2=(0.0, 0.0, 1.0),
         )
@@ -245,9 +245,9 @@ def create_pipe_segment(
 
     outer_radius = nominal_diameter / 2 + thickness / 2
 
-    extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
+    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+        profile=ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcCircleHollowProfileDef",
             dimensions=[outer_radius, thickness],
@@ -261,7 +261,7 @@ def create_pipe_segment(
         items=[extruded_area_solid]
     )
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -276,7 +276,7 @@ def create_pipe_segment(
 
     object_origin_in_global_coordinates = start_point
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=pipe_segment,
         repositioned_origin=object_origin_in_global_coordinates,
         repositioned_z_axis=tuple(object_z_axis_in_global_coordinates.tolist()),
@@ -290,7 +290,7 @@ def create_pipe_segment(
         material=material,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(0.0, 0.0, 0.0),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
@@ -301,7 +301,7 @@ def create_pipe_segment(
         distribution_system=distribution_system,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(0.0, 0.0, length),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
@@ -313,7 +313,7 @@ def create_pipe_segment(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=nominal_diameter * 0.10,
         )
@@ -357,7 +357,7 @@ def create_make_up_air_unit(
             system=distribution_system,
         )
 
-    block_1 = bim2fem.ifcplus.api.geometry.add_block(
+    block_1 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=length,
         width=width,
@@ -367,7 +367,7 @@ def create_make_up_air_unit(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    block_2 = bim2fem.ifcplus.api.geometry.add_block(
+    block_2 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=height,
         width=width,
@@ -384,7 +384,7 @@ def create_make_up_air_unit(
         operator="DIFFERENCE",
     )
 
-    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+    csg_solid = ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=boolean_results[-1],
     )
 
@@ -392,7 +392,7 @@ def create_make_up_air_unit(
         items=[csg_solid],
     )
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -406,7 +406,7 @@ def create_make_up_air_unit(
         representation=shape_model,
     )
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -414,7 +414,7 @@ def create_make_up_air_unit(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = bim2fem.ifcplus.api.element_type.add_element_type(
+    element_type = ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
             0
@@ -429,7 +429,7 @@ def create_make_up_air_unit(
         relating_type=element_type,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             length,
@@ -445,7 +445,7 @@ def create_make_up_air_unit(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[source_port],
             arrow_size=0.10 * height,
         )
@@ -489,7 +489,7 @@ def create_air_filtration_containment_housing(
             system=distribution_system,
         )
 
-    block_1 = bim2fem.ifcplus.api.geometry.add_block(
+    block_1 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=length - 4 / 25 * length,
         width=width,
@@ -499,7 +499,7 @@ def create_air_filtration_containment_housing(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    rect_pyramid_1 = bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
+    rect_pyramid_1 = ifcplus.api.geometry.add_rectangular_pyramid(
         ifc4_file=ifc4_file,
         length=height,
         width=width,
@@ -509,7 +509,7 @@ def create_air_filtration_containment_housing(
         repositioned_x_axis=(0.0, 0.0, -1.0),
     )
 
-    rect_pyramid_2 = bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
+    rect_pyramid_2 = ifcplus.api.geometry.add_rectangular_pyramid(
         ifc4_file=ifc4_file,
         length=height,
         width=width,
@@ -519,7 +519,7 @@ def create_air_filtration_containment_housing(
         repositioned_x_axis=(0.0, 0.0, 1.0),
     )
 
-    block_2 = bim2fem.ifcplus.api.geometry.add_block(
+    block_2 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=2 / 25 * length,
         width=width,
@@ -529,7 +529,7 @@ def create_air_filtration_containment_housing(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    block_3 = bim2fem.ifcplus.api.geometry.add_block(
+    block_3 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=2 / 25 * length,
         width=width,
@@ -553,13 +553,13 @@ def create_air_filtration_containment_housing(
         operator="DIFFERENCE",
     )[-1]
 
-    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+    csg_solid = ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=boolean_result_2,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -573,7 +573,7 @@ def create_air_filtration_containment_housing(
         representation=shape_model,
     )
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -581,7 +581,7 @@ def create_air_filtration_containment_housing(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = bim2fem.ifcplus.api.element_type.add_element_type(
+    element_type = ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
             0
@@ -596,7 +596,7 @@ def create_air_filtration_containment_housing(
         relating_type=element_type,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0,
@@ -611,7 +611,7 @@ def create_air_filtration_containment_housing(
         distribution_system=distribution_system,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             length,
@@ -627,7 +627,7 @@ def create_air_filtration_containment_housing(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=0.1 * height,
         )
@@ -670,7 +670,7 @@ def create_motorized_valve(
             system=distribution_system,
         )
 
-    block = bim2fem.ifcplus.api.geometry.add_block(
+    block = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=2 * outer_diameter,
         width=2 / 5 * outer_diameter,
@@ -680,7 +680,7 @@ def create_motorized_valve(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    cylinder_1 = bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+    cylinder_1 = ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
         ifc4_file=ifc4_file,
         radius=outer_diameter / 2.0,
         extrusion_depth=2 / 5 * outer_diameter,
@@ -689,7 +689,7 @@ def create_motorized_valve(
         repositioned_x_axis=(1.0, 0.0, 1.0),
     )
 
-    cylinder_2 = bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+    cylinder_2 = ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
         ifc4_file=ifc4_file,
         radius=outer_diameter / 2.0 - thickness,
         extrusion_depth=2 / 5 * outer_diameter,
@@ -712,13 +712,13 @@ def create_motorized_valve(
         operator="DIFFERENCE",
     )[-1]
 
-    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+    csg_solid = ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=boolean_result_2,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -732,7 +732,7 @@ def create_motorized_valve(
         representation=shape_model,
     )
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -740,7 +740,7 @@ def create_motorized_valve(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = bim2fem.ifcplus.api.element_type.add_element_type(
+    element_type = ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
             0
@@ -755,7 +755,7 @@ def create_motorized_valve(
         relating_type=element_type,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             1.5 * outer_diameter,
@@ -770,7 +770,7 @@ def create_motorized_valve(
         distribution_system=distribution_system,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             1.5 * outer_diameter,
@@ -786,7 +786,7 @@ def create_motorized_valve(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=0.10 * outer_diameter,
         )
@@ -832,7 +832,7 @@ def create_generic_air_filter(
 
     thickness = 1 / 12 * length
 
-    block_1 = bim2fem.ifcplus.api.geometry.add_block(
+    block_1 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=length,
         width=width,
@@ -842,7 +842,7 @@ def create_generic_air_filter(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    block_2 = bim2fem.ifcplus.api.geometry.add_block(
+    block_2 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=length - thickness * 2,
         width=width,
@@ -852,7 +852,7 @@ def create_generic_air_filter(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    block_3 = bim2fem.ifcplus.api.geometry.add_block(
+    block_3 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=length - thickness * 2,
         width=width / 4.0,
@@ -876,13 +876,13 @@ def create_generic_air_filter(
         operator="UNION",
     )[-1]
 
-    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+    csg_solid = ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=boolean_result_2,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -896,7 +896,7 @@ def create_generic_air_filter(
         representation=shape_model,
     )
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -904,7 +904,7 @@ def create_generic_air_filter(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = bim2fem.ifcplus.api.element_type.add_element_type(
+    element_type = ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
             0
@@ -919,7 +919,7 @@ def create_generic_air_filter(
         relating_type=element_type,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0 + length / 2.0,
@@ -934,7 +934,7 @@ def create_generic_air_filter(
         distribution_system=distribution_system,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0 + length / 2,
@@ -950,7 +950,7 @@ def create_generic_air_filter(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=0.4 * thickness,
         )
@@ -994,7 +994,7 @@ def create_hprs_exhaust_fan(
             system=distribution_system,
         )
 
-    block = bim2fem.ifcplus.api.geometry.add_block(
+    block = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=5 / 5 * length,
         width=width,
@@ -1004,7 +1004,7 @@ def create_hprs_exhaust_fan(
         repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    cylinder = bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+    cylinder = ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
         ifc4_file=ifc4_file,
         radius=width / 2.0,
         extrusion_depth=1 / 5 * length,
@@ -1014,7 +1014,7 @@ def create_hprs_exhaust_fan(
     )
 
     hollow_cylinder = (
-        bim2fem.ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
             radius=1 / 10 * length * 0.9,
             wall_thickness=1 / 10 * 1 / 10 * length * 0.9,
@@ -1036,13 +1036,13 @@ def create_hprs_exhaust_fan(
         operator="UNION",
     )[-1]
 
-    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+    csg_solid = ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=boolean_result,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -1056,7 +1056,7 @@ def create_hprs_exhaust_fan(
         representation=shape_model,
     )
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -1064,7 +1064,7 @@ def create_hprs_exhaust_fan(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = bim2fem.ifcplus.api.element_type.add_element_type(
+    element_type = ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
             0
@@ -1079,7 +1079,7 @@ def create_hprs_exhaust_fan(
         relating_type=element_type,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0,
@@ -1094,7 +1094,7 @@ def create_hprs_exhaust_fan(
         distribution_system=distribution_system,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             1 / 10 * length,
@@ -1110,7 +1110,7 @@ def create_hprs_exhaust_fan(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=0.1 * height,
         )
@@ -1154,7 +1154,7 @@ def create_stack(
         )
 
     hollow_cylinder_1 = (
-        bim2fem.ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
             radius=base_diameter / 2.0,
             wall_thickness=0.10 * base_diameter,
@@ -1166,7 +1166,7 @@ def create_stack(
     )
 
     hollow_cylinder_2 = (
-        bim2fem.ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
             radius=base_diameter / 2.0,
             wall_thickness=0.10 * base_diameter,
@@ -1188,13 +1188,13 @@ def create_stack(
         operator="UNION",
     )[-1]
 
-    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+    csg_solid = ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=boolean_result,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
 
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -1208,7 +1208,7 @@ def create_stack(
         representation=shape_model,
     )
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    ifcplus.api.placement.edit_object_placement(
         product=element,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -1216,7 +1216,7 @@ def create_stack(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = bim2fem.ifcplus.api.element_type.add_element_type(
+    element_type = ifcplus.api.element_type.add_element_type(
         ifc4_file=ifc4_file,
         ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
             0
@@ -1231,7 +1231,7 @@ def create_stack(
         relating_type=element_type,
     )
 
-    sink_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    sink_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             base_diameter * 2.0,
@@ -1246,7 +1246,7 @@ def create_stack(
         distribution_system=distribution_system,
     )
 
-    source_port = bim2fem.ifcplus.api.system.create_distribution_port(
+    source_port = ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             base_diameter / 2.0,
@@ -1262,7 +1262,7 @@ def create_stack(
     )
 
     if add_shape_representation_to_ports:
-        bim2fem.ifcplus.api.system.add_shape_representation_to_distribution_ports(
+        ifcplus.api.system.add_shape_representation_to_distribution_ports(
             ports=[sink_port, source_port],
             arrow_size=0.1 * base_diameter,
         )

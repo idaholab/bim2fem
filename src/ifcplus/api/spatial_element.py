@@ -6,9 +6,9 @@ from typing import Iterable
 import ifcplus.api.profile
 import ifcopenshell
 import ifcopenshell.api.geometry
-import ifcplus.inlbim.api.placement
+import ifcplus.api.placement
 import ifcplus.api.profile
-import inlbim.inlbim.api.geometry
+import ifcplus.api.geometry
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
 
@@ -18,9 +18,9 @@ def create_arbitrary_solid_space_with_or_without_voids(
     outer_profile: list[tuple[float, float]],
     inner_profiles: list[list[tuple[float, float]]],
     height: float,
-    origin: Iterable[float] = (0, 0, 0),
-    z_axis: Iterable[float] = (0, 0, 1),
-    x_axis: Iterable[float] = (1, 0, 0),
+    origin: tuple[float, float, float] = (0., 0., 0.),
+    z_axis: tuple[float, float, float] = (0., 0., 1.),
+    x_axis: tuple[float, float, float] = (1., 0., 0.),
     space: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     structure_contained_in: ifcopenshell.entity_instance | None = None,
@@ -99,7 +99,7 @@ def create_rectangular_solid_space(
     height: float,
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
     repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
-    repositioned_x_axis: Iterable[float] = (1, 0, 0),
+    repositioned_x_axis: tuple[float, float, float] = (1., 0., 0.),
     space: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     spatial_element: ifcopenshell.entity_instance | None = None,

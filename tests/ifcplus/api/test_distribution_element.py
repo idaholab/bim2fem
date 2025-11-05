@@ -2,13 +2,13 @@
 
 import ifcopenshell
 import ifcopenshell.validate
-import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.util.geometry
-import bim2fem.ifcplus.api.placement
-import bim2fem.ifcplus.api.distribution_element
-import bim2fem.ifcplus.api.material
+import ifcplus.api.project
+import ifcplus.util.geometry
+import ifcplus.api.placement
+import ifcplus.api.distribution_element
+import ifcplus.api.material
 from tests.conftest import OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
-import bim2fem.ifcplus.util.geometry
+import ifcplus.util.geometry
 import numpy as np
 
 
@@ -29,13 +29,13 @@ class TestCreatePipingElements:
             include_subtypes=False,
         )[0]
 
-        bim2fem.ifcplus.api.placement.edit_object_placement(
+        ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=False,
         )
 
-        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+        material = ifcplus.api.material.add_material_with_structural_properties(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="Galvanized Steel",
             category="steel",
@@ -47,7 +47,7 @@ class TestCreatePipingElements:
         )
 
         horizontal_curve_1 = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+            ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
                 point_on_center_of_curvature_side=(2.0, 1.0, 0.0),
                 point_of_curvature=(1.0, 1.0, 0.0),
                 point_of_tangency=(2.0, 2.0, 0.0),
@@ -55,7 +55,7 @@ class TestCreatePipingElements:
             )
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_elbow(
+        ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             horizontal_curve=horizontal_curve_1,
             nominal_diameter=1.0,
@@ -69,14 +69,14 @@ class TestCreatePipingElements:
         )
 
         horizontal_curve_2 = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_CC_and_angle(
+            ifcplus.util.geometry.HorizontalCurve.from_PC_and_CC_and_angle(
                 point_of_center_of_curvature=(4.0, 1.0, 0.0),
                 point_of_curvature=(3.0, 1.0, 0.0),
                 central_angle_of_curvature=np.pi / 2,
             )
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_elbow(
+        ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             horizontal_curve=horizontal_curve_2,
             nominal_diameter=1.0,
@@ -90,14 +90,14 @@ class TestCreatePipingElements:
         )
 
         horizontal_curve_3 = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_PI(
+            ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_PI(
                 point_of_curvature=(5.0, 1.0, 0.0),
                 point_of_intersection=(5.0, 2.0, 0.0),
                 point_of_tangency=(6.0, 2.0, 0.0),
             )
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_elbow(
+        ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             horizontal_curve=horizontal_curve_3,
             nominal_diameter=1.0,
@@ -111,7 +111,7 @@ class TestCreatePipingElements:
         )
 
         horizontal_curve_4 = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+            ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
                 first_point=(7.0, 1.0, 0.0),
                 second_point=(7.0, 2.0, 0.0),
                 third_point=(8.0, 2.0, 0.0),
@@ -119,7 +119,7 @@ class TestCreatePipingElements:
             )
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_elbow(
+        ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             horizontal_curve=horizontal_curve_4,
             nominal_diameter=1.0,
@@ -133,14 +133,14 @@ class TestCreatePipingElements:
         )
 
         horizontal_curve_5 = (
-            bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_CC_and_angle(
+            ifcplus.util.geometry.HorizontalCurve.from_PC_and_CC_and_angle(
                 point_of_center_of_curvature=(10.0, 1.0, 0.0),
                 point_of_curvature=(9.0, 1.0, 0.0),
                 central_angle_of_curvature=np.pi / 3,
             )
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_elbow(
+        ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             horizontal_curve=horizontal_curve_5,
             nominal_diameter=1.0,
@@ -154,7 +154,7 @@ class TestCreatePipingElements:
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "elbows.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -183,7 +183,7 @@ class TestCreatePipingElements:
             include_subtypes=False,
         )[0]
 
-        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+        material = ifcplus.api.material.add_material_with_structural_properties(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="Galvanized Steel",
             category="steel",
@@ -194,7 +194,7 @@ class TestCreatePipingElements:
             check_for_duplicate=True,
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+        ifcplus.api.distribution_element.create_pipe_segment(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             start_point=(1.0, 1.0, 0.0),
             end_point=(1.0, 1.0 + 5.0, 0.0),
@@ -208,7 +208,7 @@ class TestCreatePipingElements:
             add_shape_representation_to_ports=False,
         )
 
-        bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
+        ifcplus.api.distribution_element.create_pipe_segment(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             start_point=(1.0, 1.0 + 8.0, 0.0),
             end_point=(1.0, 1.0 + 5.0 + 8.0, 0.0 + 5.0),
@@ -223,7 +223,7 @@ class TestCreatePipingElements:
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "pipe_segments.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -255,7 +255,7 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        mau = bim2fem.ifcplus.api.distribution_element.create_make_up_air_unit(
+        mau = ifcplus.api.distribution_element.create_make_up_air_unit(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="MAU",
             spatial_element=site,
@@ -264,7 +264,7 @@ class TestCreateEquipment:
             add_shape_representation_to_ports=False,
         )
 
-        bbox = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
+        bbox = ifcplus.util.geometry.BoundingBox.from_ifc_product(
             product=mau,
         )
         bbox_dict = bbox.to_dict()
@@ -272,7 +272,7 @@ class TestCreateEquipment:
         assert bbox_dict["max"] == (4.0, 1.5, 1.5)
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "make_up_air_unit.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -301,7 +301,7 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        hepa = bim2fem.ifcplus.api.distribution_element.create_air_filtration_containment_housing(
+        hepa = ifcplus.api.distribution_element.create_air_filtration_containment_housing(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="HEPA",
             spatial_element=site,
@@ -310,7 +310,7 @@ class TestCreateEquipment:
             add_shape_representation_to_ports=False,
         )
 
-        bbox = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
+        bbox = ifcplus.util.geometry.BoundingBox.from_ifc_product(
             product=hepa,
         )
         bbox_dict = bbox.to_dict()
@@ -321,7 +321,7 @@ class TestCreateEquipment:
             OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
             / "air_filtration_containment_housing.ifc"
         )
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -350,7 +350,7 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        bim2fem.ifcplus.api.distribution_element.create_motorized_valve(
+        ifcplus.api.distribution_element.create_motorized_valve(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="V4",
             spatial_element=site,
@@ -360,7 +360,7 @@ class TestCreateEquipment:
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "motorized_valve.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -389,7 +389,7 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        bim2fem.ifcplus.api.distribution_element.create_generic_air_filter(
+        ifcplus.api.distribution_element.create_generic_air_filter(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="F2",
             spatial_element=site,
@@ -401,7 +401,7 @@ class TestCreateEquipment:
         output_path = str(
             OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "generic_air_filter.ifc"
         )
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -430,7 +430,7 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        bim2fem.ifcplus.api.distribution_element.create_hprs_exhaust_fan(
+        ifcplus.api.distribution_element.create_hprs_exhaust_fan(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="HPRS",
             spatial_element=site,
@@ -440,7 +440,7 @@ class TestCreateEquipment:
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "hprs_exhaust_fan.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,
@@ -469,7 +469,7 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        bim2fem.ifcplus.api.distribution_element.create_stack(
+        ifcplus.api.distribution_element.create_stack(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             name="HPRS",
             spatial_element=site,
@@ -479,7 +479,7 @@ class TestCreateEquipment:
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "stack.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc_file_with_ventilation_distribution_system,
             file_path=output_path,
             add_annotations=True,

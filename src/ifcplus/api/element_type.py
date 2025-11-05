@@ -4,7 +4,7 @@ import ifcopenshell
 import ifcopenshell.api.material
 import ifcopenshell.api.root
 import ifcopenshell.util.element
-import bim2fem.ifcplus.api.material
+import ifcplus.api.material
 from typing import Literal
 
 
@@ -50,7 +50,7 @@ def add_prismatic_homogenous_linear_elment_type(
         name=name if name else f"{material.Name} {profile.ProfileName}",
     )
 
-    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+    material_profile_set = ifcplus.api.material.add_material_profile_set_with_single_material_profile(
         material=material,
         profile=profile,
         name=beam_or_column_or_element_type.Name,
@@ -114,7 +114,7 @@ def add_slab_or_wall_or_plate_element_type(
         ),
     )
 
-    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
+    material_layer_set = ifcplus.api.material.add_material_layer_set(
         materials=materials,
         thicknesses=thicknesses,
         name=wall_or_slab_type.Name,
