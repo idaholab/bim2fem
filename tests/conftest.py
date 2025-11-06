@@ -31,6 +31,9 @@ OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT.mkdir(exist_ok=True)
 OUTPUT_DIR_FOR_SYSTEM = OUTPUT_DIR / "system"
 OUTPUT_DIR_FOR_SYSTEM.mkdir(exist_ok=True)
 
+OUTPUT_DIR_FOR_NUCLEAR = OUTPUT_DIR / "nuclear"
+OUTPUT_DIR_FOR_NUCLEAR.mkdir(exist_ok=True)
+
 
 @pytest.fixture
 def empty_ifc_file() -> ifcopenshell.file:
