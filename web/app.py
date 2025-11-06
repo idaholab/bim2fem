@@ -12,11 +12,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 import json
 import ifcopenshell
-import bim2fem.ifcplus.api.project
-import bim2fem.bim2glb.convert_ifc_to_glb
-import bim2fem.core.convert_ifc_to_fem
-import bim2fem.core.recreate_fem_with_3d_body_shape_representation
-from bim2fem.core.adjust_element_connectivity_of_building_fem import (
+import ifcplus.api.project
+import bim2glb.convert_ifc_to_glb
+import bim2fem.convert_ifc_to_fem
+import bim2fem.recreate_fem_with_3d_body_shape_representation
+from bim2fem.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 from flask import (
@@ -87,9 +87,9 @@ def index():
             return redirect(location=url_for(endpoint="convert_to_glb"))
         elif selected_job == "Convert IFC to Finite Element Model":
             # return redirect(location=url_for(endpoint="convert_to_fem"))
-            return "This feature is currently broken"
+            return "This feature is currently unavailable"
         elif selected_job == "Adjust Element Connectivity of Finite Element Model":
-            return "This feature is currently broken"
+            return "This feature is currently unavailable"
         else:
             return "Unknown Job"
 
@@ -137,7 +137,7 @@ def convert_to_fem():
         ifc_source_file = ifcopenshell.open(input_ifc_file_path)
         assert isinstance(ifc_source_file, ifcopenshell.file)
         assert region == "Europe" or region == "UnitedStates"
-        ifc4_sav_file = bim2fem.core.convert_ifc_to_fem.convert_ifc_to_fem(
+        ifc4_sav_file = bim2fem.convert_ifc_to_fem.convert_ifc_to_fem(
             ifc4_source_file=ifc_source_file,
             element_selection_query=element_selection_query,
             element_deselection_query=element_deselection_query,
@@ -164,7 +164,7 @@ def convert_to_fem():
             PATH_TO_OUTPUT_DIRECTORY,
             output_ifc_filename,
         )
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_sav_file,
             file_path=output_ifc_file_path,
             add_annotations=False,
@@ -209,7 +209,7 @@ def convert_to_fem_done(
             return "IFC file could not be opened by IfcOpenShell"
 
         # Recreate the IFC4 SAV file with Body Shape Representations
-        recreated_ifc4_sav_file = bim2fem.core.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
+        recreated_ifc4_sav_file = bim2fem.recreate_fem_with_3d_body_shape_representation.recreate_ifc4_sav_with_3d_body_shape_representation(
             ifc4_sav_file=ifc4_sav_file,
             view_option="Wireframe_3D",
         )
@@ -227,7 +227,7 @@ def convert_to_fem_done(
         )
 
         # Write the Recreated IFC4 SAV file to disk
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+        ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=recreated_ifc4_sav_file,
             file_path=recreated_ifc4_sav_file_path,
             add_annotations=False,
@@ -243,7 +243,7 @@ def convert_to_fem_done(
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=recreated_ifc4_sav_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -309,7 +309,7 @@ def convert_to_glb():
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=input_ifc_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,
@@ -455,7 +455,7 @@ def view_ifc():
         )
 
         # Convert the IFC to GLB
-        output_glb_file_path = bim2fem.bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
+        output_glb_file_path = bim2glb.convert_ifc_to_glb.convert_ifc_to_glb(
             ifc_input_filename=input_ifc_file_path,
             glb_output_filename=output_glb_file_path,
             show_global_coordinate_system_axes=False,

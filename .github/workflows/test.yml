@@ -30,7 +30,7 @@ jobs:
     
     - name: Make IfcConvert executable
       run: |
-        chmod +x src/bim2fem/bim2glb/ifc_convert/linux/IfcConvert
+        chmod +x src/bim2glb/ifc_convert/linux/IfcConvert
     
     - name: Run tests
       run: |

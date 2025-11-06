@@ -389,22 +389,21 @@ If you're using VS Code, you can use our recommended settings for better Python 
 3. Add the following configuration:
 ```json
 {
+    "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.analysis.extraPaths": [
-        "./src"
-    ],
     "python.testing.pytestArgs": [
-        "."
+        "tests",  // or wherever your tests are
+        "-v",
+        "--tb=short"
     ],
-    "python.testing.unittestEnabled": false
+    "python.testing.autoTestDiscoverOnSaveEnabled": true    
 }
 ```
 
 This configuration:
 
 - Enables pytest as the test framework
-- Adds the src/ directory to Python paths (fixes import warnings)
-- Configures pytest to discover tests from the project root
+- Automates pytest configuration in VS Code
 - Disables unittest to avoid conflicts
 
 Note: The .vscode/ folder is gitignored, so these settings won't be tracked. Each developer can customize them as needed.
