@@ -7,25 +7,15 @@ import ifcplus.api.geometry
 import ifcopenshell.api.geometry
 import ifcopenshell.api.spatial
 import ifcplus.api.placement
-import ifcopenshell.api.system
-import ifcplus.api.system
-import ifcopenshell.util.type
-import ifcplus.api.element_type
-import ifcopenshell.api.type
-import numpy as np
 import ifcopenshell.util.representation
 from typing import cast
-import ifcopenshell.api.system
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
 import ifcplus.api.placement
 import ifcplus.api.geometry
-import ifcplus.api.profile
 import ifcopenshell.api.geometry
-import ifcplus.util.geometry
 import ifcopenshell.api.material
 import numpy as np
-import ifcplus.api.system
 import ifcopenshell.util.representation
 from typing import cast
 
