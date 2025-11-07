@@ -3,5 +3,5 @@
 
 # Dev-only tools
 pytest==8.4.2
-# black
+black
 # flake8
