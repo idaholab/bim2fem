@@ -99,11 +99,11 @@ def add_block(
 ) -> ifcopenshell.entity_instance:
     """Adds an IfcBlock"""
 
-    repositioned_z_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
     )
-    repositioned_x_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
     )
 
     block = ifc4_file.createIfcBlock(
@@ -130,11 +130,11 @@ def add_rectangular_pyramid(
     repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
 ) -> ifcopenshell.entity_instance:
 
-    repositioned_z_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
     )
-    repositioned_x_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
     )
 
     rect_pyramid = ifc4_file.createIfcRectangularPyramid(
@@ -219,11 +219,11 @@ def add_sphere(
 ) -> ifcopenshell.entity_instance:
     """Add an IfcSphere"""
 
-    repositioned_z_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
     )
-    repositioned_x_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
     )
 
     sphere = ifc4_file.createIfcSphere(
@@ -269,11 +269,11 @@ def add_extruded_area_solid_tapered(
 ) -> ifcopenshell.entity_instance:
     """Add an IfcExtrudedAreaSolidTapered"""
 
-    repositioned_z_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
     )
-    repositioned_x_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
     )
 
     extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolidTapered(
@@ -302,11 +302,11 @@ def add_extruded_area_solid(
 ) -> ifcopenshell.entity_instance:
     """Add an IfcExtrudedAreaSolid"""
 
-    repositioned_z_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
     )
-    repositioned_x_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
     )
 
     extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolid(
@@ -348,11 +348,11 @@ def add_revolved_area_solid(
         )
     )
 
-    repositioned_z_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_z_axis)
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
     )
-    repositioned_x_axis_normalized = (
-        ifcplus.util.geometry.unit_normalize_vector(vector=repositioned_x_axis)
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
     )
 
     revolved_area_solid = ifc4_file.createIfcRevolvedAreaSolid(
@@ -451,13 +451,11 @@ def add_curved_edge(
         np.linalg.norm(np.array(point_of_curvature) - np.array(center_of_curvature))
     )
 
-    horizontal_curve = (
-        ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
-            point_of_curvature=point_of_curvature,
-            point_on_center_of_curvature_side=center_of_curvature,
-            point_of_tangency=point_of_tangency,
-            radius_of_curvature=radius_of_curvature,
-        )
+    horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+        point_of_curvature=point_of_curvature,
+        point_on_center_of_curvature_side=center_of_curvature,
+        point_of_tangency=point_of_tangency,
+        radius_of_curvature=radius_of_curvature,
     )
 
     z_axis = horizontal_curve.direction_of_axis_of_rotation

@@ -20,7 +20,7 @@ import ifcopenshell.util.representation
 from typing import cast
 
 
-def create_nuclear_containment_structure(
+def create_reactor_containment_structure(
     ifc4_file: ifcopenshell.file,
     material: ifcopenshell.entity_instance,
     slab_outer_radius: float = 25.0,
@@ -41,7 +41,7 @@ def create_nuclear_containment_structure(
             ifc_class="IfcElementAssembly",
             name=name,
         )
-        element.ObjectType = "NUCLEAR_CONTAINMENT_STRUCTURE"
+        element.ObjectType = "REACTOR_CONTAINMENT_STRUCTURE"
     if isinstance(parent, ifcopenshell.entity_instance):
         ifcopenshell.api.spatial.assign_container(
             file=ifc4_file,
@@ -212,6 +212,62 @@ def create_nuclear_containment_structure(
         file=ifc4_file,
         products=[dome],
         material=material,
+    )
+
+    return element
+
+
+def create_reactor_box(
+    ifc4_file: ifcopenshell.file,
+    length: float = 20.0,
+    width: float = 20.0,
+    height: float = 15.0,
+    element: ifcopenshell.entity_instance | None = None,
+    name: str | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
+    place_object_relative_to_parent: bool = False,
+) -> ifcopenshell.entity_instance:
+
+    if element is None:
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcEnergyConversionDevice",
+            name=name,
+        )
+
+    element_representation = ifcplus.api.geometry.add_block(
+        ifc4_file=ifc4_file,
+        length=length,
+        width=width,
+        height=height,
+    )
+    element_representation_type = ifcopenshell.util.representation.guess_type(
+        items=[element_representation]
+    )
+    element_shape_model = ifcplus.api.geometry.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcShapeRepresentation",
+        representation_identifier="Body",
+        representation_type=cast(str, element_representation_type),
+        items=[element_representation],
+    )
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=element,
+        representation=element_shape_model,
+    )
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=parent,
+        )
+    ifcplus.api.placement.edit_object_placement(
+        product=element,
+        repositioned_origin=(0.0, 0.0, 0.0),
+        repositioned_z_axis=(0.0, 0.0, 1.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
+        place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
     return element

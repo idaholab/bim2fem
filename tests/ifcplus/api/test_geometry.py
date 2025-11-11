@@ -10,6 +10,9 @@ import ifcplus.api.placement
 import numpy as np
 import ifcplus.api.profile
 from tests.conftest import OUTPUT_DIR_FOR_GEOMETRY
+import ifcopenshell.api.root
+import ifcopenshell.api.aggregate
+import ifcopenshell.api.spatial
 
 
 class TestAddCsgSolid:
@@ -455,31 +458,29 @@ class TestAddSweptAreaSolid:
         thickness = 0.2
         length = 5.0
 
-        l_shape_extrusion = (
-            ifcplus.api.geometry.add_extruded_area_solid_tapered(
+        l_shape_extrusion = ifcplus.api.geometry.add_extruded_area_solid_tapered(
+            ifc4_file=ifc_file_with_one_element,
+            profile_start=ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc_file_with_one_element,
-                profile_start=ifcplus.api.profile.add_parameterized_profile(
-                    ifc4_file=ifc_file_with_one_element,
-                    profile_class="IfcLShapeProfileDef",
-                    dimensions=[depth, width, thickness, None, None, None],
-                    check_for_duplicate=True,
-                ),
-                profile_end=ifcplus.api.profile.add_parameterized_profile(
-                    ifc4_file=ifc_file_with_one_element,
-                    profile_class="IfcLShapeProfileDef",
-                    dimensions=[
-                        depth * 0.25,
-                        width * 0.25,
-                        thickness * 0.25,
-                        None,
-                        None,
-                        None,
-                    ],
-                    check_for_duplicate=True,
-                ),
-                extrusion_depth=length,
-                repositioned_origin=(0.0, 0.0, 0.0),
-            )
+                profile_class="IfcLShapeProfileDef",
+                dimensions=[depth, width, thickness, None, None, None],
+                check_for_duplicate=True,
+            ),
+            profile_end=ifcplus.api.profile.add_parameterized_profile(
+                ifc4_file=ifc_file_with_one_element,
+                profile_class="IfcLShapeProfileDef",
+                dimensions=[
+                    depth * 0.25,
+                    width * 0.25,
+                    thickness * 0.25,
+                    None,
+                    None,
+                    None,
+                ],
+                check_for_duplicate=True,
+            ),
+            extrusion_depth=length,
+            repositioned_origin=(0.0, 0.0, 0.0),
         )
 
         representation_type = ifcopenshell.util.representation.guess_type(
@@ -978,4 +979,70 @@ class TestAddTopologyRepresentation:
 
         pprint(logger.statements)
 
+        assert len(logger.statements) == 0
+
+
+class TestAddWall:
+
+    def test_add_straight_walls(
+        self,
+    ):
+
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(
+            type="IfcProject",
+            include_subtypes=False,
+        )[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            place_object_relative_to_parent=True,
+        )
+
+        straight_wall_1 = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcWall",
+            name="Wall-01",
+            predefined_type=None,
+        )
+
+        # Representation, Material, Type
+
+        # Spatail Stuff
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[straight_wall_1],
+            relating_structure=site,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=straight_wall_1,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "straight_walls.ifc")
+        ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        from pprint import pprint
+
+        pprint(logger.statements)
         assert len(logger.statements) == 0
