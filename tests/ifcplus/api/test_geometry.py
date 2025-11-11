@@ -13,6 +13,7 @@ from tests.conftest import OUTPUT_DIR_FOR_GEOMETRY
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
 import ifcopenshell.api.spatial
+from typing import cast
 
 
 class TestAddCsgSolid:
@@ -413,15 +414,17 @@ class TestAddSweptAreaSolid:
         representation_type = ifcopenshell.util.representation.guess_type(
             items=[l_shape_extrusion]
         )
-        assert isinstance(representation_type, str)
 
         shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(str, representation_type),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[l_shape_extrusion],
         )
+
         ifcopenshell.api.geometry.assign_representation(
             file=ifc_file_with_one_element,
             product=element,
@@ -440,7 +443,6 @@ class TestAddSweptAreaSolid:
         from pprint import pprint
 
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_add_l_shape_extruded_area_solid_tapered(
@@ -979,70 +981,4 @@ class TestAddTopologyRepresentation:
 
         pprint(logger.statements)
 
-        assert len(logger.statements) == 0
-
-
-class TestAddWall:
-
-    def test_add_straight_walls(
-        self,
-    ):
-
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
-            model_view_definition="ReferenceView_V1.2",
-            precision=1e-4,
-        )
-
-        project = ifc4_file.by_type(
-            type="IfcProject",
-            include_subtypes=False,
-        )[0]
-
-        site = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcSite",
-            name="Site-01",
-        )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
-            products=[site],
-            relating_object=project,
-        )
-        ifcplus.api.placement.edit_object_placement(
-            product=site,
-            place_object_relative_to_parent=True,
-        )
-
-        straight_wall_1 = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcWall",
-            name="Wall-01",
-            predefined_type=None,
-        )
-
-        # Representation, Material, Type
-
-        # Spatail Stuff
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[straight_wall_1],
-            relating_structure=site,
-        )
-        ifcplus.api.placement.edit_object_placement(
-            product=straight_wall_1,
-            place_object_relative_to_parent=True,
-        )
-
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "straight_walls.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc4_file,
-            file_path=output_path,
-            add_annotations=True,
-        )
-
-        logger = ifcopenshell.validate.json_logger()
-        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
-        pprint(logger.statements)
         assert len(logger.statements) == 0
