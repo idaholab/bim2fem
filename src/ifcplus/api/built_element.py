@@ -36,6 +36,7 @@ import ifcplus.api.profile
 import ifcplus.api.material
 import ifcopenshell.util.representation
 from typing import cast
+import ifcplus.util.geometry
 
 BUILT_ELEMENT_FRAME_MEMBER = Literal["IfcBeam", "IfcColumn", "IfcMember"]
 
@@ -189,9 +190,6 @@ def create_opening_element(
         ifc4_file=ifc4_file,
         profile=profile,
         extrusion_depth=depth,
-        # repositioned_origin=origin_relative_to_voided_element,
-        # repositioned_x_axis=x_axis_relative_to_voided_element,
-        # repositioned_z_axis=z_axis_relative_to_voided_element,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(
@@ -357,6 +355,129 @@ def create_2pt_wall(
     )
 
     return wall
+
+
+# def create_curved_wall(
+#     point_of_curvature_2d: tuple[float, float],
+#     point_on_center_of_curvature_side_2d: tuple[float, float],
+#     point_of_tangency_2d: tuple[float, float],
+#     elevation: float,
+#     height: float,
+#     materials: list[ifcopenshell.entity_instance],
+#     thicknesses: list[float],
+#     wall: ifcopenshell.entity_instance | None = None,
+#     name: str | None = None,
+#     parent: ifcopenshell.entity_instance | None = None,
+#     place_object_relative_to_parent: bool = False,
+# ):
+#     """Add straight IfcWall with IfcMaterialLayerSetUsage based on two points in
+#     XY space."""
+
+#     ifc4_file = materials[0].file
+
+#     material_layer_set = ifcplus.api.material.add_material_layer_set(
+#         materials=materials,
+#         thicknesses=thicknesses,
+#         name=None,
+#         check_for_duplicate=True,
+#     )
+
+#     wall_type = ifcplus.api.element_type.add_element_type_for_material_layer_set(
+#         ifc_class="IfcWallType",
+#         material_layer_set=material_layer_set,
+#         name=material_layer_set.LayerSetName,
+#         check_for_duplicate=True,
+#     )
+
+#     if wall is None:
+#         wall = ifcopenshell.api.root.create_entity(
+#             file=ifc4_file,
+#             ifc_class="IfcWall",
+#             name=name,
+#             predefined_type="NOTDEFINED",
+#         )
+
+#     ifcopenshell.api.type.assign_type(
+#         file=ifc4_file,
+#         related_objects=[wall],
+#         relating_type=wall_type,
+#     )
+
+#     total_thickness = 0.0
+#     for material_layer in material_layer_set.MaterialLayers:
+#         total_thickness += material_layer.LayerThickness
+
+#     rel_associates_material = ifcopenshell.api.material.assign_material(
+#         file=ifc4_file,
+#         products=[wall],
+#         type="IfcMaterialLayerSetUsage",
+#         material=None,  # inferred from assigned IfcElementType
+#     )
+#     material_layer_set_usage = cast(
+#         ifcopenshell.entity_instance, rel_associates_material
+#     ).RelatingMaterial
+#     material_layer_set_usage.OffsetFromReferenceLine = -total_thickness / 2
+
+#     point_of_curvature_3d = (start_point_2d[0], start_point_2d[1], elevation)
+#     end_point_3d = (end_point_2d[0], end_point_2d[1], elevation)
+#     vector_from_start_point_to_end_point = np.array(end_point_3d) - np.array(
+#         start_point_3d
+#     )
+#     length = float(np.linalg.norm(vector_from_start_point_to_end_point))
+
+#     representation_item = ifcplus.api.geometry.add_extruded_area_solid(
+#         ifc4_file=ifc4_file,
+#         profile=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
+#             file=ifc4_file,
+#             outer_profile=[
+#                 (0.0, 0.0 - total_thickness / 2),
+#                 (0.0 + length, 0.0 - total_thickness / 2),
+#                 (0.0 + length, 0.0 + total_thickness - total_thickness / 2),
+#                 (0.0 + length - length, 0.0 + total_thickness - total_thickness / 2),
+#                 (0.0, 0.0 - total_thickness / 2),
+#             ],
+#             inner_profiles=[],
+#             name=None,
+#         ),
+#         extrusion_depth=height,
+#     )
+
+#     representation_type = ifcopenshell.util.representation.guess_type(
+#         items=[representation_item]
+#     )
+
+#     shape_model = ifcplus.api.geometry.add_shape_model(
+#         ifc4_file=ifc4_file,
+#         shape_model_class="IfcShapeRepresentation",
+#         representation_identifier="Body",
+#         representation_type=cast(str, representation_type),  # SweptSolid
+#         context_type="Model",
+#         target_view="MODEL_VIEW",
+#         items=[representation_item],
+#     )
+
+#     ifcopenshell.api.geometry.assign_representation(
+#         file=ifc4_file,
+#         product=wall,
+#         representation=shape_model,
+#     )
+
+#     if isinstance(parent, ifcopenshell.entity_instance):
+#         ifcopenshell.api.spatial.assign_container(
+#             file=ifc4_file,
+#             products=[wall],
+#             relating_structure=parent,
+#         )
+
+#     ifcplus.api.placement.edit_object_placement(
+#         product=wall,
+#         repositioned_origin=start_point_3d,
+#         repositioned_x_axis=tuple(vector_from_start_point_to_end_point.tolist()),
+#         repositioned_z_axis=(0.0, 0.0, 1.0),
+#         place_object_relative_to_parent=place_object_relative_to_parent,
+#     )
+
+#     return wall
 
 
 def create_npt_slab(
