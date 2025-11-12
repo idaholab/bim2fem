@@ -6,7 +6,7 @@ import ifcopenshell.api.root
 import ifcopenshell.util.element
 import ifcplus.api.material
 from typing import Literal
-
+import ifcopenshell.api.project
 
 LINEAR_ELEMENT_TYPE_CLASS = Literal[
     "IfcBeamType",
@@ -50,11 +50,13 @@ def add_prismatic_homogenous_linear_elment_type(
         name=name if name else f"{material.Name} {profile.ProfileName}",
     )
 
-    material_profile_set = ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-        material=material,
-        profile=profile,
-        name=beam_or_column_or_element_type.Name,
-        check_for_duplicate=check_for_duplicate,
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile,
+            name=beam_or_column_or_element_type.Name,
+            check_for_duplicate=check_for_duplicate,
+        )
     )
 
     ifcopenshell.api.material.assign_material(
@@ -149,5 +151,50 @@ def add_element_type(
     )
 
     assert element_type.is_a("IfcElementType")
+
+    return element_type
+
+
+def add_element_type_for_material_layer_set(
+    ifc_class: str,
+    material_layer_set: ifcopenshell.entity_instance,
+    name: str | None = None,
+    check_for_duplicate: bool = False,
+) -> ifcopenshell.entity_instance:
+    """Add an IfcElementType based on an IfcMaterialLayerSet. This function also
+    automates material assignment and project declaration for the type."""
+
+    ifc4_file = material_layer_set.file
+
+    if check_for_duplicate:
+        for old_type in ifc4_file.by_type(type="IfcWallType", include_subtypes=False):
+            old_material_layer_set = ifcopenshell.util.element.get_material(
+                element=old_type,
+                should_skip_usage=True,
+            )
+            if not isinstance(old_material_layer_set, ifcopenshell.entity_instance):
+                continue
+            if material_layer_set == old_material_layer_set:
+                return old_type
+
+    element_type = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class=ifc_class,
+        name=name,
+    )
+
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[element_type],
+        material=material_layer_set,
+    )
+
+    project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+    ifcopenshell.api.project.assign_declaration(
+        file=ifc4_file,
+        definitions=[element_type],
+        relating_context=project,
+    )
 
     return element_type

@@ -34,6 +34,9 @@ OUTPUT_DIR_FOR_SYSTEM.mkdir(exist_ok=True)
 OUTPUT_DIR_FOR_NUCLEAR = OUTPUT_DIR / "nuclear"
 OUTPUT_DIR_FOR_NUCLEAR.mkdir(exist_ok=True)
 
+OUTPUT_DIR_FOR_BUILT_ELEMENT = OUTPUT_DIR / "built_element"
+OUTPUT_DIR_FOR_BUILT_ELEMENT.mkdir(exist_ok=True)
+
 
 @pytest.fixture
 def empty_ifc_file() -> ifcopenshell.file:

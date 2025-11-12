@@ -405,9 +405,7 @@ def add_profile_from_standard_library(
         ydim = matching_section_data_dictionary["Depth"]
         iyy = matching_section_data_dictionary["MomentOfInertiaY"]
         xdim = iyy * 12 / ydim**3
-        xdim = ifcplus.util.unit.convert_unit_of_value(
-            value=xdim, conversion_factor=1
-        )
+        xdim = ifcplus.util.unit.convert_unit_of_value(value=xdim, conversion_factor=1)
         dimensions = [
             xdim,
             ydim,
@@ -872,26 +870,43 @@ def add_arbitrary_profile_with_or_without_voids(
             name="SK01 Hole Profile")
     """
 
-    outer_ifc_points = file.create_entity("IfcCartesianPointList2D", outer_profile)
-    outer_curve = file.create_entity("IfcIndexedPolyCurve", outer_ifc_points)
+    outer_ifc_points = file.create_entity(
+        "IfcCartesianPointList2D",
+        outer_profile,
+    )
+
+    outer_curve = file.create_entity(
+        "IfcIndexedPolyCurve",
+        outer_ifc_points,
+    )
 
     profile_has_voids = len(inner_profiles) > 0
 
     if profile_has_voids:
-
         inner_curves = []
         for inner_profile in inner_profiles:
             inner_ifc_points = file.create_entity(
-                "IfcCartesianPointList2D", inner_profile
+                "IfcCartesianPointList2D",
+                inner_profile,
             )
-            inner_curve = file.create_entity("IfcIndexedPolyCurve", inner_ifc_points)
+            inner_curve = file.create_entity(
+                "IfcIndexedPolyCurve",
+                inner_ifc_points,
+            )
             inner_curves.append(inner_curve)
 
         return file.create_entity(
-            "IfcArbitraryProfileDefWithVoids", "AREA", name, outer_curve, inner_curves
+            "IfcArbitraryProfileDefWithVoids",
+            "AREA",
+            name,
+            outer_curve,
+            inner_curves,
         )
 
     else:
         return file.create_entity(
-            "IfcArbitraryClosedProfileDef", "AREA", name, outer_curve
+            "IfcArbitraryClosedProfileDef",
+            "AREA",
+            name,
+            outer_curve,
         )

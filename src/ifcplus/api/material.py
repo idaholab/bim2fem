@@ -5,7 +5,9 @@ import ifcopenshell.api.material
 import pickle
 import os
 import ifcplus.api.style
+import ifcplus.util.project
 from ifcplus import REGION, RGB_STEEL, RGB_CONCRETE
+import numpy as np
 
 
 def add_material_with_structural_properties(
@@ -215,6 +217,14 @@ def add_material_layer_set(
 
     ifc4_file = materials[0].file
 
+    numeric_scale = ifcplus.util.project.get_numeric_scale_of_project(
+        ifc4_file=ifc4_file,
+    )
+
+    thicknesses = [
+        float(np.round(thickness, numeric_scale)) for thickness in thicknesses
+    ]
+
     if check_for_duplicate:
         for old_material_layer_set in ifc4_file.by_type(
             type="IfcMaterialLayerSet", include_subtypes=False
@@ -237,14 +247,16 @@ def add_material_layer_set(
                     break
             return old_material_layer_set
 
+    if name is None:
+        total_thickness = float(np.round(sum(thicknesses), numeric_scale))
+        name = (
+            " | ".join([material.Name for material in materials])
+            + f" {total_thickness}"
+        )
+
     material_layer_set = ifcopenshell.api.material.add_material_set(
         file=ifc4_file,
-        name=(
-            name
-            if name
-            else " | ".join([material.Name for material in materials])
-            + f" {sum(thicknesses)}"
-        ),
+        name=name,
         set_type="IfcMaterialLayerSet",
     )
 

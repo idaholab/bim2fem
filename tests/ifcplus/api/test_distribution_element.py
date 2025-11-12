@@ -110,13 +110,11 @@ class TestCreatePipingElements:
             add_shape_representation_to_ports=False,
         )
 
-        horizontal_curve_4 = (
-            ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
-                first_point=(7.0, 1.0, 0.0),
-                second_point=(7.0, 2.0, 0.0),
-                third_point=(8.0, 2.0, 0.0),
-                radius_of_curvature=1.0,
-            )
+        horizontal_curve_4 = ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+            first_point=(7.0, 1.0, 0.0),
+            second_point=(7.0, 2.0, 0.0),
+            third_point=(8.0, 2.0, 0.0),
+            radius_of_curvature=1.0,
         )
 
         ifcplus.api.distribution_element.create_elbow(
@@ -301,13 +299,15 @@ class TestCreateEquipment:
             include_subtypes=False,
         )[0]
 
-        hepa = ifcplus.api.distribution_element.create_air_filtration_containment_housing(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
-            name="HEPA",
-            spatial_element=site,
-            distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+        hepa = (
+            ifcplus.api.distribution_element.create_air_filtration_containment_housing(
+                ifc4_file=ifc_file_with_ventilation_distribution_system,
+                name="HEPA",
+                spatial_element=site,
+                distribution_system=distribution_system,
+                place_object_relative_to_parent=False,
+                add_shape_representation_to_ports=False,
+            )
         )
 
         bbox = ifcplus.util.geometry.BoundingBox.from_ifc_product(

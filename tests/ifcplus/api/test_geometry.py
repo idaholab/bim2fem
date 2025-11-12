@@ -10,6 +10,10 @@ import ifcplus.api.placement
 import numpy as np
 import ifcplus.api.profile
 from tests.conftest import OUTPUT_DIR_FOR_GEOMETRY
+import ifcopenshell.api.root
+import ifcopenshell.api.aggregate
+import ifcopenshell.api.spatial
+from typing import cast
 
 
 class TestAddCsgSolid:
@@ -410,15 +414,17 @@ class TestAddSweptAreaSolid:
         representation_type = ifcopenshell.util.representation.guess_type(
             items=[l_shape_extrusion]
         )
-        assert isinstance(representation_type, str)
 
         shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc_file_with_one_element,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(str, representation_type),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[l_shape_extrusion],
         )
+
         ifcopenshell.api.geometry.assign_representation(
             file=ifc_file_with_one_element,
             product=element,
@@ -437,7 +443,6 @@ class TestAddSweptAreaSolid:
         from pprint import pprint
 
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_add_l_shape_extruded_area_solid_tapered(
@@ -455,31 +460,29 @@ class TestAddSweptAreaSolid:
         thickness = 0.2
         length = 5.0
 
-        l_shape_extrusion = (
-            ifcplus.api.geometry.add_extruded_area_solid_tapered(
+        l_shape_extrusion = ifcplus.api.geometry.add_extruded_area_solid_tapered(
+            ifc4_file=ifc_file_with_one_element,
+            profile_start=ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc_file_with_one_element,
-                profile_start=ifcplus.api.profile.add_parameterized_profile(
-                    ifc4_file=ifc_file_with_one_element,
-                    profile_class="IfcLShapeProfileDef",
-                    dimensions=[depth, width, thickness, None, None, None],
-                    check_for_duplicate=True,
-                ),
-                profile_end=ifcplus.api.profile.add_parameterized_profile(
-                    ifc4_file=ifc_file_with_one_element,
-                    profile_class="IfcLShapeProfileDef",
-                    dimensions=[
-                        depth * 0.25,
-                        width * 0.25,
-                        thickness * 0.25,
-                        None,
-                        None,
-                        None,
-                    ],
-                    check_for_duplicate=True,
-                ),
-                extrusion_depth=length,
-                repositioned_origin=(0.0, 0.0, 0.0),
-            )
+                profile_class="IfcLShapeProfileDef",
+                dimensions=[depth, width, thickness, None, None, None],
+                check_for_duplicate=True,
+            ),
+            profile_end=ifcplus.api.profile.add_parameterized_profile(
+                ifc4_file=ifc_file_with_one_element,
+                profile_class="IfcLShapeProfileDef",
+                dimensions=[
+                    depth * 0.25,
+                    width * 0.25,
+                    thickness * 0.25,
+                    None,
+                    None,
+                    None,
+                ],
+                check_for_duplicate=True,
+            ),
+            extrusion_depth=length,
+            repositioned_origin=(0.0, 0.0, 0.0),
         )
 
         representation_type = ifcopenshell.util.representation.guess_type(

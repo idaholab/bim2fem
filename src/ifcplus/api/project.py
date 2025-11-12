@@ -309,7 +309,7 @@ def write_to_ifc_spf(
     file_path: str,
     add_annotations: bool = False,
 ) -> str:
-    """Write ifcopenshell.file to IFC4-SPF File with option to add annotations"""
+    """Write ifcopenshell.file to IFC4-SPF File with option to add annotations."""
 
     filename = os.path.basename(file_path)
 
