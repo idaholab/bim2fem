@@ -169,7 +169,7 @@ def create_3pt_beam_or_column_or_member(
 
 def create_opening_element(
     voided_element: ifcopenshell.entity_instance,
-    profile_points: list[tuple[float, float]],  # 2D profile in XY coords of opening
+    profile: ifcopenshell.entity_instance,
     depth: float,  # Extrusion depth in the local z direction of the opening element
     origin_relative_to_voided_element: tuple[float, float, float] = (0.0, 0.0, 0.0),
     z_axis_relative_to_voided_element: tuple[float, float, float] = (0.0, 0.0, 1.0),
@@ -178,58 +178,61 @@ def create_opening_element(
 
     ifc4_file = voided_element.file
 
-    # Create Element
     opening_element = ifcopenshell.api.root.create_entity(
         file=ifc4_file,
         ifc_class="IfcOpeningElement",
         name=None,
         predefined_type=None,
     )
-    ifcplus.api.placement.edit_object_placement(
-        product=opening_element,
-        place_object_relative_to_parent=False,
-    )
-    opening_element.ObjectPlacement.PlacementRelTo = voided_element.ObjectPlacement
 
-    # Add Profile
-    profile = ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
-        file=ifc4_file,
-        outer_profile=profile_points,
-        inner_profiles=[],
-        name=None,
-    )
-
-    # Add and Assign Representation
     representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         profile=profile,
         extrusion_depth=depth,
-        repositioned_origin=origin_relative_to_voided_element,
-        repositioned_x_axis=x_axis_relative_to_voided_element,
-        repositioned_z_axis=z_axis_relative_to_voided_element,
+        # repositioned_origin=origin_relative_to_voided_element,
+        # repositioned_x_axis=x_axis_relative_to_voided_element,
+        # repositioned_z_axis=z_axis_relative_to_voided_element,
     )
+
+    representation_type = ifcopenshell.util.representation.guess_type(
+        items=[representation_item]
+    )
+
     shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type="SweptSolid",
+        representation_type=cast(str, representation_type),  # SweptSolid
         context_type="Model",
         target_view="MODEL_VIEW",
         items=[representation_item],
     )
+
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=opening_element,
         representation=shape_model,
     )
 
-    # Void Relationship
     rel_voids_element = ifcopenshell.api.root.create_entity(
         file=ifc4_file,
         ifc_class="IfcRelVoidsElement",
     )
     rel_voids_element.RelatingBuildingElement = voided_element
     rel_voids_element.RelatedOpeningElement = opening_element
+
+    ifcplus.api.placement.edit_object_placement(
+        product=opening_element,
+        place_object_relative_to_parent=False,
+    )
+    opening_element.ObjectPlacement.PlacementRelTo = voided_element.ObjectPlacement
+    opening_element.ObjectPlacement.RelativePlacement = (
+        ifc4_file.createIfcAxis2Placement3D(
+            ifc4_file.createIfcCartesianPoint(origin_relative_to_voided_element),
+            ifc4_file.createIfcDirection(z_axis_relative_to_voided_element),
+            ifc4_file.createIfcDirection(x_axis_relative_to_voided_element),
+        )
+    )
 
     return opening_element
 
@@ -301,7 +304,7 @@ def create_2pt_wall(
     )
     length = float(np.linalg.norm(vector_from_start_point_to_end_point))
 
-    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         profile=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
             file=ifc4_file,
@@ -319,7 +322,7 @@ def create_2pt_wall(
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(
-        items=[extruded_area_solid]
+        items=[representation_item]
     )
 
     shape_model = ifcplus.api.geometry.add_shape_model(
@@ -329,7 +332,7 @@ def create_2pt_wall(
         representation_type=cast(str, representation_type),  # SweptSolid
         context_type="Model",
         target_view="MODEL_VIEW",
-        items=[extruded_area_solid],
+        items=[representation_item],
     )
 
     ifcopenshell.api.geometry.assign_representation(
