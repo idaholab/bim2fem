@@ -612,6 +612,31 @@ class HorizontalCurve:
         self.point_of_tangency = point_of_tangency
         self.center_of_curvature = center_of_curvature
 
+        self.length_of_curve = self.radius_of_curvature * self.central_angle
+        self.long_chord = float(
+            2 * self.radius_of_curvature * np.sin(self.central_angle / 2.0)
+        )
+        self.tangent_length = float(
+            self.radius_of_curvature * np.tan(self.central_angle / 2.0)
+        )
+        self.external_distance = float(
+            self.radius_of_curvature * (1 / np.cos(self.central_angle / 2.0) - 1.0)
+        )
+        self.middle_ordinate_distance = float(
+            self.radius_of_curvature * (1 - np.cos(self.central_angle / 2.0))
+        )
+
+        unit_vector_from_CC_to_PI = calculate_unit_direction_vector_between_two_points(
+            p1=self.center_of_curvature,
+            p2=self.point_of_intersection,
+        )
+        self.point_at_midpoint_of_curve = tuple(
+            (
+                np.array(self.center_of_curvature)
+                + np.array(unit_vector_from_CC_to_PI) * self.radius_of_curvature
+            ).tolist()
+        )
+
     @classmethod
     def from_3pt_polyline(
         cls,

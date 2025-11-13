@@ -317,6 +317,8 @@ def write_to_ifc_spf(
 
     ifc4_file.write(file_path)
 
+    ifcopenshell.open
+
     if add_annotations:
         annotate_ifc_spf(file_path=file_path)
 
