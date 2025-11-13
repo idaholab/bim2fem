@@ -38,6 +38,8 @@ import ifcopenshell.util.representation
 from typing import cast
 import ifcplus.util.geometry
 import ifcplus.util.project
+import ifcopenshell.api.profile
+
 
 BUILT_ELEMENT_FRAME_MEMBER = Literal["IfcBeam", "IfcColumn", "IfcMember"]
 
@@ -303,41 +305,56 @@ def create_2pt_wall(
     )
     length = float(np.linalg.norm(vector_from_start_point_to_end_point))
 
-    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
+    # arbitrary_closed_profile_def = (
+    #     ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
+    #         file=ifc4_file,
+    #         outer_profile=[
+    #             (0.0, 0.0 - total_thickness / 2),
+    #             (0.0 + length, 0.0 - total_thickness / 2),
+    #             (0.0 + length, 0.0 + total_thickness - total_thickness / 2),
+    #             (0.0 + length - length, 0.0 + total_thickness - total_thickness / 2),
+    #             (0.0, 0.0 - total_thickness / 2),
+    #         ],
+    #         inner_profiles=[],
+    #         name=None,
+    #     )
+    # )
+
+    arbitrary_closed_profile_def = ifcopenshell.api.profile.add_arbitrary_profile(
+        file=ifc4_file,
+        profile=[
+            (0.0, 0.0 - total_thickness / 2),
+            (0.0 + length, 0.0 - total_thickness / 2),
+            (0.0 + length, 0.0 + total_thickness - total_thickness / 2),
+            (0.0 + length - length, 0.0 + total_thickness - total_thickness / 2),
+            (0.0, 0.0 - total_thickness / 2),
+        ],
+        name=None,
+    )
+
+    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
-            file=ifc4_file,
-            outer_profile=[
-                (0.0, 0.0 - total_thickness / 2),
-                (0.0 + length, 0.0 - total_thickness / 2),
-                (0.0 + length, 0.0 + total_thickness - total_thickness / 2),
-                (0.0 + length - length, 0.0 + total_thickness - total_thickness / 2),
-                (0.0, 0.0 - total_thickness / 2),
-            ],
-            inner_profiles=[],
-            name=None,
-        ),
+        profile=arbitrary_closed_profile_def,
         extrusion_depth=height,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(
-        items=[representation_item]
-    )
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),  # SweptSolid
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[extruded_area_solid]),
+        ),  # SweptSolid
         context_type="Model",
         target_view="MODEL_VIEW",
-        items=[representation_item],
+        items=[extruded_area_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=wall,
-        representation=shape_model,
+        representation=shape_representation,
     )
 
     if isinstance(parent, ifcopenshell.entity_instance):

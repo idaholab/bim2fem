@@ -309,6 +309,24 @@ class TestWalls:
             place_object_relative_to_parent=True,
         )
 
+        ifcplus.api.built_element.create_curved_wall(
+            point_of_curvature_2d=(1.0 + 10.0, 1.0),
+            point_on_center_of_curvature_side_2d=(1.0 + 10.0, 1.8),
+            point_of_tangency_2d=(7.0 + 10.0, 7.0),
+            radius_of_curvature=6.0,
+            elevation=1.0,
+            height=3.0,
+            materials=[
+                cast(ifcopenshell.entity_instance, concrete_material),
+                cast(ifcopenshell.entity_instance, steel_material),
+                cast(ifcopenshell.entity_instance, concrete_material),
+            ],
+            thicknesses=[0.10, 0.10, 0.20],
+            name="Wall-02",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "curved_walls.ifc")
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
