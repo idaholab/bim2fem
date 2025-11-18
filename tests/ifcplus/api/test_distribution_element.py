@@ -10,33 +10,48 @@ import ifcplus.api.material
 from tests.conftest import OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
 import ifcplus.util.geometry
 import numpy as np
+import ifcopenshell.api.root
+import ifcopenshell.api.aggregate
+import ifcopenshell.api.system
+from pprint import pprint
 
 
 class TestCreatePipingElements:
 
     def test_create_elbows(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
 
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
         ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
+
         material = ifcplus.api.material.add_material_with_structural_properties(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="Galvanized Steel",
             category="steel",
             mass_density=7850.0,
@@ -56,16 +71,15 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_elbow(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve_1,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
             name="Elbow #1",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+            place_object_relative_to_parent=True,
         )
 
         horizontal_curve_2 = (
@@ -77,16 +91,15 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_elbow(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve_2,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
             name="Elbow #2",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+            place_object_relative_to_parent=True,
         )
 
         horizontal_curve_3 = (
@@ -98,16 +111,15 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_elbow(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve_3,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
             name="Elbow #3",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+            place_object_relative_to_parent=True,
         )
 
         horizontal_curve_4 = ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
@@ -118,16 +130,15 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_elbow(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve_4,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
             name="Elbow #4",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+            place_object_relative_to_parent=True,
         )
 
         horizontal_curve_5 = (
@@ -139,31 +150,27 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_elbow(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             horizontal_curve=horizontal_curve_5,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
             name="Elbow #5",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+            place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "elbows.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_create_pipe_segments(
@@ -203,7 +210,6 @@ class TestCreatePipingElements:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         ifcplus.api.distribution_element.create_pipe_segment(
@@ -217,7 +223,6 @@ class TestCreatePipingElements:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "pipe_segments.ifc")
@@ -259,7 +264,6 @@ class TestCreateEquipment:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         bbox = ifcplus.util.geometry.BoundingBox.from_ifc_product(
@@ -306,7 +310,6 @@ class TestCreateEquipment:
                 spatial_element=site,
                 distribution_system=distribution_system,
                 place_object_relative_to_parent=False,
-                add_shape_representation_to_ports=False,
             )
         )
 
@@ -356,7 +359,6 @@ class TestCreateEquipment:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "motorized_valve.ifc")
@@ -395,7 +397,6 @@ class TestCreateEquipment:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         output_path = str(
@@ -436,7 +437,6 @@ class TestCreateEquipment:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "hprs_exhaust_fan.ifc")
@@ -475,7 +475,6 @@ class TestCreateEquipment:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "stack.ifc")

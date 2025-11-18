@@ -1,5 +1,7 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
+"""Distribution Element Creation Module"""
+
 import ifcopenshell
 import ifcopenshell.api.root
 import ifcplus.api.geometry
@@ -33,13 +35,12 @@ def create_elbow(
     horizontal_curve: ifcplus.util.geometry.HorizontalCurve,
     nominal_diameter: float,
     thickness: float,
-    material: ifcopenshell.entity_instance,
+    material: ifcopenshell.entity_instance | None = None,
     elbow: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create piping elbow as an IfcPipeFitting."""
 
@@ -51,31 +52,25 @@ def create_elbow(
             predefined_type="JUNCTION",
         )
 
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[elbow],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[elbow],
-            system=distribution_system,
-        )
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[elbow],
+        material=material,
+    )
 
     outer_radius = nominal_diameter / 2 + thickness / 2
 
+    profile = ifcplus.api.profile.add_parameterized_profile(
+        ifc4_file=ifc4_file,
+        profile_class="IfcCircleHollowProfileDef",
+        dimensions=[outer_radius, thickness],
+        check_for_duplicate=True,
+        calculate_mechanical_properties=True,
+    )
+
     revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
         ifc4_file=ifc4_file,
-        profile=ifcplus.api.profile.add_parameterized_profile(
-            ifc4_file=ifc4_file,
-            profile_class="IfcCircleHollowProfileDef",
-            dimensions=[outer_radius, thickness],
-            check_for_duplicate=True,
-            calculate_mechanical_properties=True,
-        ),
+        profile=profile,
         central_angle_of_curvature=horizontal_curve.central_angle,
         center_of_curvature_in_object_xy_plane=(
             horizontal_curve.radius_of_curvature,
@@ -83,35 +78,47 @@ def create_elbow(
         ),
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(
-        items=[revolved_area_solid]
-    )
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[revolved_area_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[revolved_area_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=elbow,
-        representation=shape_model,
+        representation=shape_representation,
     )
 
-    object_z_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=horizontal_curve.point_of_curvature,
-        p2=horizontal_curve.point_of_intersection,
+    object_z_axis_in_global_coordinates = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=horizontal_curve.point_of_curvature,
+            p2=horizontal_curve.point_of_intersection,
+        )
     )
 
-    object_x_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=horizontal_curve.point_of_curvature,
-        p2=horizontal_curve.center_of_curvature,
+    object_x_axis_in_global_coordinates = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=horizontal_curve.point_of_curvature,
+            p2=horizontal_curve.center_of_curvature,
+        )
     )
 
     object_origin_in_global_coordinates = horizontal_curve.point_of_curvature
+
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[elbow],
+            relating_structure=parent,
+        )
 
     ifcplus.api.placement.edit_object_placement(
         product=elbow,
@@ -121,13 +128,14 @@ def create_elbow(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    ifcopenshell.api.material.assign_material(
-        file=ifc4_file,
-        products=[elbow],
-        material=material,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[elbow],
+            system=distribution_system,
+        )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(0.0, 0.0, 0.0),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
@@ -139,23 +147,28 @@ def create_elbow(
     )
 
     radius_of_curvature = horizontal_curve.radius_of_curvature
+
     central_angle = horizontal_curve.central_angle
+
     source_port_origin_in_object_coordinates = (
         float(radius_of_curvature - radius_of_curvature * np.cos(central_angle)),
         0.0,
         float(radius_of_curvature * np.sin(central_angle)),
     )
+
     source_port_z_axis_in_object_coordinates = (
         float(np.sin(horizontal_curve.central_angle)),
         0.0,
         float(np.cos(horizontal_curve.central_angle)),
     )
+
     source_port_x_axis_in_object_coordinates = (
         float(np.cos(horizontal_curve.central_angle)),
         0.0,
         float(-1 * np.sin(horizontal_curve.central_angle)),
     )
-    source_port = ifcplus.api.system.create_distribution_port(
+
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=source_port_origin_in_object_coordinates,
         port_z_axis_in_distribution_element_coordinates=source_port_z_axis_in_object_coordinates,
@@ -165,12 +178,6 @@ def create_elbow(
         predefined_type="PIPE",
         distribution_system=distribution_system,
     )
-
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=nominal_diameter * 0.10,
-        )
 
     return elbow
 
@@ -187,7 +194,6 @@ def create_pipe_segment(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create an IfcPipeSegment."""
 
@@ -290,7 +296,7 @@ def create_pipe_segment(
         material=material,
     )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(0.0, 0.0, 0.0),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
@@ -301,7 +307,7 @@ def create_pipe_segment(
         distribution_system=distribution_system,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(0.0, 0.0, length),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
@@ -311,12 +317,6 @@ def create_pipe_segment(
         predefined_type="PIPE",
         distribution_system=distribution_system,
     )
-
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=nominal_diameter * 0.10,
-        )
 
     return pipe_segment
 
@@ -331,7 +331,6 @@ def create_make_up_air_unit(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create make-up air unit as an IfcUnitaryEquipment."""
 
@@ -429,7 +428,7 @@ def create_make_up_air_unit(
         relating_type=element_type,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             length,
@@ -444,12 +443,6 @@ def create_make_up_air_unit(
         distribution_system=distribution_system,
     )
 
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[source_port],
-            arrow_size=0.10 * height,
-        )
-
     return element
 
 
@@ -463,7 +456,6 @@ def create_air_filtration_containment_housing(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create air filtration containment housing as an IfcFilter."""
 
@@ -596,7 +588,7 @@ def create_air_filtration_containment_housing(
         relating_type=element_type,
     )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0,
@@ -611,7 +603,7 @@ def create_air_filtration_containment_housing(
         distribution_system=distribution_system,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             length,
@@ -626,12 +618,6 @@ def create_air_filtration_containment_housing(
         distribution_system=distribution_system,
     )
 
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=0.1 * height,
-        )
-
     return element
 
 
@@ -644,7 +630,6 @@ def create_motorized_valve(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create motorized valve as an IfcValve."""
 
@@ -755,7 +740,7 @@ def create_motorized_valve(
         relating_type=element_type,
     )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             1.5 * outer_diameter,
@@ -770,7 +755,7 @@ def create_motorized_valve(
         distribution_system=distribution_system,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             1.5 * outer_diameter,
@@ -785,12 +770,6 @@ def create_motorized_valve(
         distribution_system=distribution_system,
     )
 
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=0.10 * outer_diameter,
-        )
-
     return element
 
 
@@ -804,7 +783,6 @@ def create_generic_air_filter(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create generic air filter as an IfcFilter."""
 
@@ -919,7 +897,7 @@ def create_generic_air_filter(
         relating_type=element_type,
     )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0 + length / 2.0,
@@ -934,7 +912,7 @@ def create_generic_air_filter(
         distribution_system=distribution_system,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0 + length / 2,
@@ -949,12 +927,6 @@ def create_generic_air_filter(
         distribution_system=distribution_system,
     )
 
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=0.4 * thickness,
-        )
-
     return element
 
 
@@ -968,7 +940,6 @@ def create_hprs_exhaust_fan(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create hprs exhaust fan as an IfcFan."""
 
@@ -1013,20 +984,18 @@ def create_hprs_exhaust_fan(
         repositioned_x_axis=(0.0, 0.0, 1.0),
     )
 
-    hollow_cylinder = (
-        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
-            ifc4_file=ifc4_file,
-            radius=1 / 10 * length * 0.9,
-            wall_thickness=1 / 10 * 1 / 10 * length * 0.9,
-            extrusion_depth=width / 2.0,
-            repositioned_origin=(
-                1 / 10 * length,
-                width / 2.0,
-                3.5 / 4 * height,
-            ),
-            repositioned_z_axis=(0.0, 1.0, 0.0),
-            repositioned_x_axis=(1.0, 0.0, 0.0),
-        )
+    hollow_cylinder = ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        ifc4_file=ifc4_file,
+        radius=1 / 10 * length * 0.9,
+        wall_thickness=1 / 10 * 1 / 10 * length * 0.9,
+        extrusion_depth=width / 2.0,
+        repositioned_origin=(
+            1 / 10 * length,
+            width / 2.0,
+            3.5 / 4 * height,
+        ),
+        repositioned_z_axis=(0.0, 1.0, 0.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
     boolean_result = ifcopenshell.api.geometry.add_boolean(
@@ -1079,7 +1048,7 @@ def create_hprs_exhaust_fan(
         relating_type=element_type,
     )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             0.0,
@@ -1094,7 +1063,7 @@ def create_hprs_exhaust_fan(
         distribution_system=distribution_system,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             1 / 10 * length,
@@ -1109,12 +1078,6 @@ def create_hprs_exhaust_fan(
         distribution_system=distribution_system,
     )
 
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=0.1 * height,
-        )
-
     return element
 
 
@@ -1127,7 +1090,6 @@ def create_stack(
     spatial_element: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create exhaust stack as an IfcDistributionElement."""
 
@@ -1153,32 +1115,28 @@ def create_stack(
             system=distribution_system,
         )
 
-    hollow_cylinder_1 = (
-        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
-            ifc4_file=ifc4_file,
-            radius=base_diameter / 2.0,
-            wall_thickness=0.10 * base_diameter,
-            extrusion_depth=height,
-            repositioned_origin=(base_diameter / 2.0, base_diameter / 2.0, 0.0),
-            repositioned_z_axis=(0.0, 0.0, 1.0),
-            repositioned_x_axis=(1.0, 0.0, 0.0),
-        )
+    hollow_cylinder_1 = ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        ifc4_file=ifc4_file,
+        radius=base_diameter / 2.0,
+        wall_thickness=0.10 * base_diameter,
+        extrusion_depth=height,
+        repositioned_origin=(base_diameter / 2.0, base_diameter / 2.0, 0.0),
+        repositioned_z_axis=(0.0, 0.0, 1.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
     )
 
-    hollow_cylinder_2 = (
-        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
-            ifc4_file=ifc4_file,
-            radius=base_diameter / 2.0,
-            wall_thickness=0.10 * base_diameter,
-            extrusion_depth=1.5 * 2 / np.sqrt(2) * base_diameter,
-            repositioned_origin=(
-                base_diameter * 2.0,
-                base_diameter / 2.0,
-                1 / 5 * height,
-            ),
-            repositioned_z_axis=(-1.0, 0.0, 1.0),
-            repositioned_x_axis=(0.0, 1.0, 0.0),
-        )
+    hollow_cylinder_2 = ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        ifc4_file=ifc4_file,
+        radius=base_diameter / 2.0,
+        wall_thickness=0.10 * base_diameter,
+        extrusion_depth=1.5 * 2 / np.sqrt(2) * base_diameter,
+        repositioned_origin=(
+            base_diameter * 2.0,
+            base_diameter / 2.0,
+            1 / 5 * height,
+        ),
+        repositioned_z_axis=(-1.0, 0.0, 1.0),
+        repositioned_x_axis=(0.0, 1.0, 0.0),
     )
 
     boolean_result = ifcopenshell.api.geometry.add_boolean(
@@ -1231,7 +1189,7 @@ def create_stack(
         relating_type=element_type,
     )
 
-    sink_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             base_diameter * 2.0,
@@ -1246,7 +1204,7 @@ def create_stack(
         distribution_system=distribution_system,
     )
 
-    source_port = ifcplus.api.system.create_distribution_port(
+    ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
         port_origin_in_distribution_element_coordinates=(
             base_diameter / 2.0,
@@ -1260,11 +1218,5 @@ def create_stack(
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
-
-    if add_shape_representation_to_ports:
-        ifcplus.api.system.add_shape_representation_to_distribution_ports(
-            ports=[sink_port, source_port],
-            arrow_size=0.1 * base_diameter,
-        )
 
     return element
