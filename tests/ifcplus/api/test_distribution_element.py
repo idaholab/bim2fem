@@ -175,21 +175,38 @@ class TestCreatePipingElements:
 
     def test_create_pipe_segments(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         material = ifcplus.api.material.add_material_with_structural_properties(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="Galvanized Steel",
             category="steel",
             mass_density=7850.0,
@@ -200,7 +217,7 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_pipe_segment(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             start_point=(1.0, 1.0, 0.0),
             end_point=(1.0, 1.0 + 5.0, 0.0),
             nominal_diameter=1.0,
@@ -213,7 +230,7 @@ class TestCreatePipingElements:
         )
 
         ifcplus.api.distribution_element.create_pipe_segment(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             start_point=(1.0, 1.0 + 8.0, 0.0),
             end_point=(1.0, 1.0 + 5.0 + 8.0, 0.0 + 5.0),
             nominal_diameter=1.0,
@@ -227,17 +244,14 @@ class TestCreatePipingElements:
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "pipe_segments.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
 
@@ -245,21 +259,38 @@ class TestCreateEquipment:
 
     def test_create_make_up_air_unit(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         mau = ifcplus.api.distribution_element.create_make_up_air_unit(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="MAU",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -275,37 +306,51 @@ class TestCreateEquipment:
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "make_up_air_unit.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_create_air_filtration_containment_housing(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         hepa = (
             ifcplus.api.distribution_element.create_air_filtration_containment_housing(
-                ifc4_file=ifc_file_with_ventilation_distribution_system,
+                ifc4_file=ifc4_file,
                 name="HEPA",
                 spatial_element=site,
                 distribution_system=distribution_system,
@@ -325,36 +370,50 @@ class TestCreateEquipment:
             / "air_filtration_containment_housing.ifc"
         )
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_create_motorized_valve(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         ifcplus.api.distribution_element.create_motorized_valve(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="V4",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -363,36 +422,50 @@ class TestCreateEquipment:
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "motorized_valve.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_create_generic_air_filter(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         ifcplus.api.distribution_element.create_generic_air_filter(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="F2",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -403,36 +476,50 @@ class TestCreateEquipment:
             OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "generic_air_filter.ifc"
         )
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_create_hprs_exhaust_fan(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         ifcplus.api.distribution_element.create_hprs_exhaust_fan(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="HPRS",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -441,36 +528,50 @@ class TestCreateEquipment:
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "hprs_exhaust_fan.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
     def test_create_stack(
         self,
-        ifc_file_with_ventilation_distribution_system: ifcopenshell.file,
     ):
 
-        distribution_system = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcDistributionSystem",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
 
-        site = ifc_file_with_ventilation_distribution_system.by_type(
-            type="IfcSite",
-            include_subtypes=False,
-        )[0]
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        distribution_system = ifcopenshell.api.system.add_system(file=ifc4_file)
+        distribution_system.Name = "CVS"
+        distribution_system.LongName = "Central Ventilation System"
+        distribution_system.PredefinedType = "VENTILATION"
 
         ifcplus.api.distribution_element.create_stack(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             name="HPRS",
             spatial_element=site,
             distribution_system=distribution_system,
@@ -479,15 +580,12 @@ class TestCreateEquipment:
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "stack.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
