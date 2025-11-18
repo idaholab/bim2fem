@@ -28,17 +28,15 @@ class TestCreatePipingSystem:
             include_subtypes=False,
         )[0]
 
-        galvanized_steel = (
-            ifcplus.api.material.add_material_with_structural_properties(
-                ifc4_file=ifc_file_with_ventilation_distribution_system,
-                name="Galvanized Steel",
-                category="steel",
-                mass_density=7850.0,
-                young_modulus=200.0e9,
-                poisson_ratio=0.3,
-                thermal_expansion_coefficient=1.2e-6,
-                check_for_duplicate=True,
-            )
+        galvanized_steel = ifcplus.api.material.add_material_with_structural_properties(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="Galvanized Steel",
+            category="steel",
+            mass_density=7850.0,
+            young_modulus=200.0e9,
+            poisson_ratio=0.3,
+            thermal_expansion_coefficient=1.2e-6,
+            check_for_duplicate=True,
         )
 
         pipe_run_polyline = [
@@ -103,7 +101,6 @@ class TestConnectEquipment:
             spatial_element=site,
             distribution_system=distribution_system,
             place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
         )
 
         ifcplus.api.placement.edit_object_placement(
@@ -114,13 +111,14 @@ class TestConnectEquipment:
             place_object_relative_to_parent=True,
         )
 
-        hepa = ifcplus.api.distribution_element.create_air_filtration_containment_housing(
-            ifc4_file=ifc_file_with_ventilation_distribution_system,
-            name="HEPA",
-            spatial_element=site,
-            distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
-            add_shape_representation_to_ports=False,
+        hepa = (
+            ifcplus.api.distribution_element.create_air_filtration_containment_housing(
+                ifc4_file=ifc_file_with_ventilation_distribution_system,
+                name="HEPA",
+                spatial_element=site,
+                distribution_system=distribution_system,
+                place_object_relative_to_parent=False,
+            )
         )
 
         ifcplus.api.placement.edit_object_placement(
@@ -141,17 +139,15 @@ class TestConnectEquipment:
             flow_direction="SINK",
         )[0]
 
-        galvanized_steel = (
-            ifcplus.api.material.add_material_with_structural_properties(
-                ifc4_file=ifc_file_with_ventilation_distribution_system,
-                name="Galvanized Steel",
-                category="steel",
-                mass_density=7850.0,
-                young_modulus=200.0e9,
-                poisson_ratio=0.3,
-                thermal_expansion_coefficient=1.2e-6,
-                check_for_duplicate=True,
-            )
+        galvanized_steel = ifcplus.api.material.add_material_with_structural_properties(
+            ifc4_file=ifc_file_with_ventilation_distribution_system,
+            name="Galvanized Steel",
+            category="steel",
+            mass_density=7850.0,
+            young_modulus=200.0e9,
+            poisson_ratio=0.3,
+            thermal_expansion_coefficient=1.2e-6,
+            check_for_duplicate=True,
         )
 
         ifcplus.api.system.connect_two_distribution_ports_via_pipe_run(
