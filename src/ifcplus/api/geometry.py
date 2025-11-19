@@ -102,6 +102,7 @@ def add_block(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
