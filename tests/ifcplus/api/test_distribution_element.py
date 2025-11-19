@@ -292,17 +292,17 @@ class TestCreateEquipment:
         mau = ifcplus.api.distribution_element.create_make_up_air_unit(
             ifc4_file=ifc4_file,
             name="MAU",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
         bbox = ifcplus.util.geometry.BoundingBox.from_ifc_product(
             product=mau,
         )
         bbox_dict = bbox.to_dict()
-        assert bbox_dict["min"] == (0.0, 0.0, 0.0)
-        assert bbox_dict["max"] == (4.0, 1.5, 1.5)
+        assert bbox_dict["min"] == (1.0, 1.0, 0.0)
+        assert bbox_dict["max"] == (5.0, 2.5, 1.5)
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "make_up_air_unit.ifc")
         ifcplus.api.project.write_to_ifc_spf(
@@ -316,7 +316,7 @@ class TestCreateEquipment:
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
-    def test_create_air_filtration_containment_housing(
+    def test_create_hepa_containment_housing(
         self,
     ):
 
@@ -348,26 +348,23 @@ class TestCreateEquipment:
         distribution_system.LongName = "Central Ventilation System"
         distribution_system.PredefinedType = "VENTILATION"
 
-        hepa = (
-            ifcplus.api.distribution_element.create_air_filtration_containment_housing(
-                ifc4_file=ifc4_file,
-                name="HEPA",
-                spatial_element=site,
-                distribution_system=distribution_system,
-                place_object_relative_to_parent=False,
-            )
+        hepa = ifcplus.api.distribution_element.create_hepa_containment_housing(
+            ifc4_file=ifc4_file,
+            name="HEPA",
+            parent=site,
+            distribution_system=distribution_system,
+            place_object_relative_to_parent=True,
         )
 
         bbox = ifcplus.util.geometry.BoundingBox.from_ifc_product(
             product=hepa,
         )
         bbox_dict = bbox.to_dict()
-        assert bbox_dict["min"] == (0.0, 0.0, 0.0)
-        assert bbox_dict["max"] == (8.0, 1.0, 2.0)
+        assert bbox_dict["min"] == (1.0, 1.0, 0.0)
+        assert bbox_dict["max"] == (9.0, 2.0, 2.0)
 
         output_path = str(
-            OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT
-            / "air_filtration_containment_housing.ifc"
+            OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "hepa_containment_housing.ifc"
         )
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
@@ -415,9 +412,9 @@ class TestCreateEquipment:
         ifcplus.api.distribution_element.create_motorized_valve(
             ifc4_file=ifc4_file,
             name="V4",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "motorized_valve.ifc")
@@ -467,9 +464,9 @@ class TestCreateEquipment:
         ifcplus.api.distribution_element.create_generic_air_filter(
             ifc4_file=ifc4_file,
             name="F2",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
         output_path = str(
@@ -521,9 +518,9 @@ class TestCreateEquipment:
         ifcplus.api.distribution_element.create_hprs_exhaust_fan(
             ifc4_file=ifc4_file,
             name="HPRS",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "hprs_exhaust_fan.ifc")
@@ -538,7 +535,7 @@ class TestCreateEquipment:
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
-    def test_create_stack(
+    def test_create_exhaust_stack(
         self,
     ):
 
@@ -570,15 +567,15 @@ class TestCreateEquipment:
         distribution_system.LongName = "Central Ventilation System"
         distribution_system.PredefinedType = "VENTILATION"
 
-        ifcplus.api.distribution_element.create_stack(
+        ifcplus.api.distribution_element.create_exhaust_stack(
             ifc4_file=ifc4_file,
             name="HPRS",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "stack.ifc")
+        output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "exhaust_stack.ifc")
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,

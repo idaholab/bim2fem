@@ -12,6 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import random
 from ifcopenshell.ifcopenshell_wrapper import TriangulationElement
 from dataclasses import dataclass
+from typing import cast
 
 
 def get_coordinates_of_vertex_point(
@@ -453,20 +454,24 @@ class BoundingBox:
         settings = ifcopenshell.geom.settings()
         settings.set(settings.USE_WORLD_COORDS, True)
 
-        shape = ifcopenshell.geom.create_shape(settings, product)
-        assert isinstance(shape, TriangulationElement)
+        shape = cast(
+            typ=TriangulationElement,
+            val=ifcopenshell.geom.create_shape(settings, product),
+        )
 
         geometry = shape.geometry
 
         verts = np.array(geometry.verts).reshape(-1, 3)
 
-        min_bounds = tuple([float(val) for val in verts.min(axis=0)])
-        max_bounds = tuple([float(val) for val in verts.max(axis=0)])
+        xmin = float(verts.min(axis=0)[0])
+        ymin = float(verts.min(axis=0)[1])
+        zmin = float(verts.min(axis=0)[2])
 
-        assert len(min_bounds) == 3
-        assert len(max_bounds) == 3
+        xmax = float(verts.max(axis=0)[0])
+        ymax = float(verts.max(axis=0)[1])
+        zmax = float(verts.max(axis=0)[2])
 
-        return cls(*min_bounds, *max_bounds)
+        return cls(xmin, ymin, zmin, xmax, ymax, zmax)
 
     @classmethod
     def from_multiple(cls, boxes: list["BoundingBox"]) -> "BoundingBox":

@@ -10,9 +10,6 @@ import ifcopenshell.api.spatial
 import ifcplus.api.placement
 import ifcopenshell.api.system
 import ifcplus.api.system
-import ifcopenshell.util.type
-import ifcplus.api.element_type
-import ifcopenshell.api.type
 import numpy as np
 import ifcopenshell.util.representation
 from typing import cast
@@ -335,34 +332,20 @@ def create_make_up_air_unit(
     length: float = 4.0,
     width: float = 1.5,
     height: float = 1.5,
-    element: ifcopenshell.entity_instance | None = None,
+    make_up_air_unit: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create make-up air unit as an IfcUnitaryEquipment."""
 
-    if element is None:
-        element = ifcopenshell.api.root.create_entity(
+    if make_up_air_unit is None:
+        make_up_air_unit = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
             ifc_class="IfcUnitaryEquipment",
             name=name,
             predefined_type="AIRHANDLER",
-        )
-
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[element],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[element],
-            system=distribution_system,
         )
 
     block_1 = ifcplus.api.geometry.add_block(
@@ -396,46 +379,46 @@ def create_make_up_air_unit(
         boolean_result_or_primitive=boolean_results[-1],
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(
-        items=[csg_solid],
-    )
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[csg_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=element,
-        representation=shape_model,
+        product=make_up_air_unit,
+        representation=shape_representation,
     )
 
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[make_up_air_unit],
+            relating_structure=parent,
+        )
+
     ifcplus.api.placement.edit_object_placement(
-        product=element,
+        product=make_up_air_unit,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
         repositioned_x_axis=(1.0, 0.0, 0.0),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = ifcplus.api.element_type.add_element_type(
-        ifc4_file=ifc4_file,
-        ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
-            0
-        ],
-        name="MAKEUP_AIR_UNIT",
-        check_for_duplicate=True,
-    )
-
-    ifcopenshell.api.type.assign_type(
-        file=ifc4_file,
-        related_objects=[element],
-        relating_type=element_type,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[make_up_air_unit],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
@@ -446,49 +429,36 @@ def create_make_up_air_unit(
         ),
         port_z_axis_in_distribution_element_coordinates=(1.0, 0.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
-        distribution_element=element,
+        distribution_element=make_up_air_unit,
         flow_direction="SOURCE",
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
 
-    return element
+    return make_up_air_unit
 
 
-def create_air_filtration_containment_housing(
+def create_hepa_containment_housing(
     ifc4_file: ifcopenshell.file,
     length: float = 8.0,
     width: float = 1.0,
     height: float = 2.0,
-    element: ifcopenshell.entity_instance | None = None,
+    hepa_housing: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create air filtration containment housing as an IfcFilter."""
 
-    if element is None:
-        element = ifcopenshell.api.root.create_entity(
+    if hepa_housing is None:
+        hepa_housing = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
-            ifc_class="IfcFilter",
+            ifc_class="IfcUnitaryEquipment",
             name=name,
-            predefined_type="AIRPARTICLEFILTER",
+            predefined_type="USERDEFINED",
         )
-
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[element],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[element],
-            system=distribution_system,
-        )
+        hepa_housing.ObjectType = "HEPA_CONTAINMENT_HOUSING"
 
     block_1 = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
@@ -558,44 +528,46 @@ def create_air_filtration_containment_housing(
         boolean_result_or_primitive=boolean_result_2,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[csg_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=element,
-        representation=shape_model,
+        product=hepa_housing,
+        representation=shape_representation,
     )
 
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[hepa_housing],
+            relating_structure=parent,
+        )
+
     ifcplus.api.placement.edit_object_placement(
-        product=element,
+        product=hepa_housing,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
         repositioned_x_axis=(1.0, 0.0, 0.0),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = ifcplus.api.element_type.add_element_type(
-        ifc4_file=ifc4_file,
-        ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
-            0
-        ],
-        name="AIR_FILTRATION_CONTAINMENT_HOUSING",
-        check_for_duplicate=True,
-    )
-
-    ifcopenshell.api.type.assign_type(
-        file=ifc4_file,
-        related_objects=[element],
-        relating_type=element_type,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[hepa_housing],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
@@ -606,7 +578,7 @@ def create_air_filtration_containment_housing(
         ),
         port_z_axis_in_distribution_element_coordinates=(1.0, 0.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
-        distribution_element=element,
+        distribution_element=hepa_housing,
         flow_direction="SINK",
         predefined_type="DUCT",
         distribution_system=distribution_system,
@@ -621,48 +593,35 @@ def create_air_filtration_containment_housing(
         ),
         port_z_axis_in_distribution_element_coordinates=(1.0, 0.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
-        distribution_element=element,
+        distribution_element=hepa_housing,
         flow_direction="SOURCE",
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
 
-    return element
+    return hepa_housing
 
 
 def create_motorized_valve(
     ifc4_file: ifcopenshell.file,
     outer_diameter: float = 0.5,
     thickness: float = 0.1,
-    element: ifcopenshell.entity_instance | None = None,
+    motorized_valve: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create motorized valve as an IfcValve."""
 
-    if element is None:
-        element = ifcopenshell.api.root.create_entity(
+    if motorized_valve is None:
+        motorized_valve = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
             ifc_class="IfcValve",
             name=name,
-            predefined_type="MOTORIZED",
+            predefined_type="USERDEFINED",
         )
-
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[element],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[element],
-            system=distribution_system,
-        )
+        motorized_valve.ObjectType = "MOTORIZED_CONTROL_VALVE"
 
     block = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
@@ -710,44 +669,46 @@ def create_motorized_valve(
         boolean_result_or_primitive=boolean_result_2,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[csg_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=element,
-        representation=shape_model,
+        product=motorized_valve,
+        representation=shape_representation,
     )
 
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[motorized_valve],
+            relating_structure=parent,
+        )
+
     ifcplus.api.placement.edit_object_placement(
-        product=element,
+        product=motorized_valve,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
         repositioned_x_axis=(1.0, 0.0, 0.0),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = ifcplus.api.element_type.add_element_type(
-        ifc4_file=ifc4_file,
-        ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
-            0
-        ],
-        name="MOTORIZED_VALVE",
-        check_for_duplicate=True,
-    )
-
-    ifcopenshell.api.type.assign_type(
-        file=ifc4_file,
-        related_objects=[element],
-        relating_type=element_type,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[motorized_valve],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
@@ -758,7 +719,7 @@ def create_motorized_valve(
         ),
         port_z_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(1.0, 0.0, 1.0),
-        distribution_element=element,
+        distribution_element=motorized_valve,
         flow_direction="SINK",
         predefined_type="DUCT",
         distribution_system=distribution_system,
@@ -773,48 +734,34 @@ def create_motorized_valve(
         ),
         port_z_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(1.0, 0.0, 1.0),
-        distribution_element=element,
+        distribution_element=motorized_valve,
         flow_direction="SOURCE",
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
 
-    return element
+    return motorized_valve
 
 
 def create_generic_air_filter(
     ifc4_file: ifcopenshell.file,
     length: float = 0.5,
-    width: float = 0.4,
-    height: float = 0.1,
-    element: ifcopenshell.entity_instance | None = None,
+    width: float = 0.1,
+    height: float = 0.4,
+    air_filter: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create generic air filter as an IfcFilter."""
 
-    if element is None:
-        element = ifcopenshell.api.root.create_entity(
+    if air_filter is None:
+        air_filter = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
             ifc_class="IfcFilter",
             name=name,
             predefined_type="AIRPARTICLEFILTER",
-        )
-
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[element],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[element],
-            system=distribution_system,
         )
 
     thickness = 1 / 12 * length
@@ -867,44 +814,46 @@ def create_generic_air_filter(
         boolean_result_or_primitive=boolean_result_2,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[csg_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=element,
-        representation=shape_model,
+        product=air_filter,
+        representation=shape_representation,
     )
 
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[air_filter],
+            relating_structure=parent,
+        )
+
     ifcplus.api.placement.edit_object_placement(
-        product=element,
+        product=air_filter,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
         repositioned_x_axis=(1.0, 0.0, 0.0),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = ifcplus.api.element_type.add_element_type(
-        ifc4_file=ifc4_file,
-        ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
-            0
-        ],
-        name="GENERIC_AIR_FILTER",
-        check_for_duplicate=True,
-    )
-
-    ifcopenshell.api.type.assign_type(
-        file=ifc4_file,
-        related_objects=[element],
-        relating_type=element_type,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[air_filter],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
@@ -915,7 +864,7 @@ def create_generic_air_filter(
         ),
         port_z_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(-1.0, 0.0, 0.0),
-        distribution_element=element,
+        distribution_element=air_filter,
         flow_direction="SINK",
         predefined_type="DUCT",
         distribution_system=distribution_system,
@@ -930,13 +879,13 @@ def create_generic_air_filter(
         ),
         port_z_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(-1.0, 0.0, 0.0),
-        distribution_element=element,
+        distribution_element=air_filter,
         flow_direction="SOURCE",
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
 
-    return element
+    return air_filter
 
 
 def create_hprs_exhaust_fan(
@@ -944,35 +893,22 @@ def create_hprs_exhaust_fan(
     length: float = 2.0,
     width: float = 1.0,
     height: float = 1.0,
-    element: ifcopenshell.entity_instance | None = None,
+    fan: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create hprs exhaust fan as an IfcFan."""
 
-    if element is None:
-        element = ifcopenshell.api.root.create_entity(
+    if fan is None:
+        fan = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
             ifc_class="IfcFan",
             name=name,
-            predefined_type="CENTRIFUGALBACKWARDINCLINEDCURVED",
+            predefined_type="USERDEFINED",
         )
-
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[element],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[element],
-            system=distribution_system,
-        )
+        fan.ObjectType = "HPRS_EXHAUST_FAN"
 
     block = ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
@@ -1018,44 +954,46 @@ def create_hprs_exhaust_fan(
         boolean_result_or_primitive=boolean_result,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[csg_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=element,
-        representation=shape_model,
+        product=fan,
+        representation=shape_representation,
     )
 
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[fan],
+            relating_structure=parent,
+        )
+
     ifcplus.api.placement.edit_object_placement(
-        product=element,
+        product=fan,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
         repositioned_x_axis=(1.0, 0.0, 0.0),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = ifcplus.api.element_type.add_element_type(
-        ifc4_file=ifc4_file,
-        ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
-            0
-        ],
-        name="HPRS_EXHAUST_FAN",
-        check_for_duplicate=True,
-    )
-
-    ifcopenshell.api.type.assign_type(
-        file=ifc4_file,
-        related_objects=[element],
-        relating_type=element_type,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[fan],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
@@ -1066,7 +1004,7 @@ def create_hprs_exhaust_fan(
         ),
         port_z_axis_in_distribution_element_coordinates=(1.0, 0.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
-        distribution_element=element,
+        distribution_element=fan,
         flow_direction="SINK",
         predefined_type="DUCT",
         distribution_system=distribution_system,
@@ -1081,48 +1019,35 @@ def create_hprs_exhaust_fan(
         ),
         port_z_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
         port_x_axis_in_distribution_element_coordinates=(1.0, 0.0, 0.0),
-        distribution_element=element,
+        distribution_element=fan,
         flow_direction="SOURCE",
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
 
-    return element
+    return fan
 
 
-def create_stack(
+def create_exhaust_stack(
     ifc4_file: ifcopenshell.file,
     base_diameter: float = 0.5,
     height: float = 8.0,
-    element: ifcopenshell.entity_instance | None = None,
+    exhaust_stack: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create exhaust stack as an IfcDistributionElement."""
 
-    if element is None:
-        element = ifcopenshell.api.root.create_entity(
+    if exhaust_stack is None:
+        exhaust_stack = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
-            ifc_class="IfcDistributionElement",
+            ifc_class="IfcStackTerminal",
             name=name,
-            predefined_type="NOTDEFINED",
+            predefined_type="USERDEFINED",
         )
-
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[element],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[element],
-            system=distribution_system,
-        )
+        exhaust_stack.ObjectType = "EXHAUST_STACK"
 
     hollow_cylinder_1 = ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
         ifc4_file=ifc4_file,
@@ -1159,44 +1084,46 @@ def create_stack(
         boolean_result_or_primitive=boolean_result,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(items=[csg_solid])
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[csg_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=element,
-        representation=shape_model,
+        product=exhaust_stack,
+        representation=shape_representation,
     )
 
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[exhaust_stack],
+            relating_structure=parent,
+        )
+
     ifcplus.api.placement.edit_object_placement(
-        product=element,
+        product=exhaust_stack,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
         repositioned_x_axis=(1.0, 0.0, 0.0),
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    element_type = ifcplus.api.element_type.add_element_type(
-        ifc4_file=ifc4_file,
-        ifc_class=ifcopenshell.util.type.get_applicable_types(ifc_class=element.is_a())[
-            0
-        ],
-        name="STACK",
-        check_for_duplicate=True,
-    )
-
-    ifcopenshell.api.type.assign_type(
-        file=ifc4_file,
-        related_objects=[element],
-        relating_type=element_type,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[exhaust_stack],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,
@@ -1207,7 +1134,7 @@ def create_stack(
         ),
         port_z_axis_in_distribution_element_coordinates=(-1.0, 0.0, 1.0),
         port_x_axis_in_distribution_element_coordinates=(0.0, 1.0, 0.0),
-        distribution_element=element,
+        distribution_element=exhaust_stack,
         flow_direction="SINK",
         predefined_type="DUCT",
         distribution_system=distribution_system,
@@ -1222,10 +1149,10 @@ def create_stack(
         ),
         port_z_axis_in_distribution_element_coordinates=(0.0, 0.0, 1.0),
         port_x_axis_in_distribution_element_coordinates=(1.0, 0.0, 0.0),
-        distribution_element=element,
+        distribution_element=exhaust_stack,
         flow_direction="SOURCE",
         predefined_type="DUCT",
         distribution_system=distribution_system,
     )
 
-    return element
+    return exhaust_stack

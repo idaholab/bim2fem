@@ -77,7 +77,6 @@ def create_pipe_run_from_polyline(
     branch_name: str = "Pipe Run",
     spatial_element: ifcopenshell.entity_instance | None = None,
     place_objects_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
     """Create a single path pipe run composed of IfcPipeSegments and
     IfcPipeFittings (Elbows)."""
@@ -212,7 +211,6 @@ def connect_two_distribution_ports_via_pipe_run(
     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
     branch_name: str = "Unnamed Branch",
     spatial_element: ifcopenshell.entity_instance | None = None,
-    add_shape_representation_to_ports: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
     """Connect two IfcDistributionPorts using a pipe run formed via no
     intelligent method."""
@@ -285,7 +283,6 @@ def connect_two_distribution_ports_via_pipe_run(
         spatial_element=spatial_element,
         distribution_system=distribution_system,
         place_objects_relative_to_parent=False,
-        add_shape_representation_to_ports=add_shape_representation_to_ports,
     )
 
     first_pipe_segment = piping_elements[0]
