@@ -94,7 +94,7 @@ def create_pipe_run_from_polyline(
             thickness=thickness,
             material=material,
             name=f"Pipe #1 of {branch_name}",
-            spatial_element=spatial_element,
+            parent=spatial_element,
             distribution_system=distribution_system,
             place_object_relative_to_parent=place_objects_relative_to_parent,
         )
@@ -124,7 +124,7 @@ def create_pipe_run_from_polyline(
                 thickness=thickness,
                 material=material,
                 name=f"Pipe #{[index + 1]} of {branch_name}",
-                spatial_element=spatial_element,
+                parent=spatial_element,
                 distribution_system=distribution_system,
                 place_object_relative_to_parent=place_objects_relative_to_parent,
             )
@@ -148,7 +148,7 @@ def create_pipe_run_from_polyline(
             thickness=thickness,
             material=material,
             name=f"Pipe #{[index + 1]} of {branch_name}",
-            spatial_element=spatial_element,
+            parent=spatial_element,
             distribution_system=distribution_system,
             place_object_relative_to_parent=place_objects_relative_to_parent,
         )

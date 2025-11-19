@@ -191,7 +191,7 @@ def create_pipe_segment(
     material: ifcopenshell.entity_instance,
     pipe_segment: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
     distribution_system: ifcopenshell.entity_instance | None = None,
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
@@ -205,33 +205,29 @@ def create_pipe_segment(
             predefined_type="NOTDEFINED",
         )
 
-    if isinstance(spatial_element, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[pipe_segment],
-            relating_structure=spatial_element,
-        )
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        ifcopenshell.api.system.assign_system(
-            file=ifc4_file,
-            products=[pipe_segment],
-            system=distribution_system,
-        )
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[pipe_segment],
+        material=material,
+    )
 
     object_z_axis_in_global_coordinates = np.array(end_point) - np.array(start_point)
+
     angle_between_local_and_global_z_axes = (
         ifcplus.util.geometry.calculate_angle_between_two_vectors(
             vector1=tuple(object_z_axis_in_global_coordinates.tolist()),
             vector2=(0.0, 0.0, 1.0),
         )
     )
+
     angle_between_local_and_global_z_axes_is_zero = (
         angle_between_local_and_global_z_axes <= 1e-4
     )
+
     angle_between_local_and_global_z_axes_is_pi = (
         abs(angle_between_local_and_global_z_axes - np.pi) <= 1e-4
     )
+
     if (
         angle_between_local_and_global_z_axes_is_zero
         or angle_between_local_and_global_z_axes_is_pi
@@ -242,6 +238,7 @@ def create_pipe_segment(
             np.array([0.0, 0.0, 1.0]),
             object_z_axis_in_global_coordinates,
         )
+
     object_x_axis_in_global_coordinates = np.cross(
         object_y_axis_in_global_coordinates,
         object_z_axis_in_global_coordinates,
@@ -251,34 +248,45 @@ def create_pipe_segment(
 
     outer_radius = nominal_diameter / 2 + thickness / 2
 
+    profile = ifcplus.api.profile.add_parameterized_profile(
+        ifc4_file=ifc4_file,
+        profile_class="IfcCircleHollowProfileDef",
+        dimensions=[outer_radius, thickness],
+        check_for_duplicate=True,
+        calculate_mechanical_properties=True,
+    )
+
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=ifcplus.api.profile.add_parameterized_profile(
-            ifc4_file=ifc4_file,
-            profile_class="IfcCircleHollowProfileDef",
-            dimensions=[outer_radius, thickness],
-            check_for_duplicate=True,
-            calculate_mechanical_properties=True,
-        ),
+        profile=profile,
         extrusion_depth=length,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(
-        items=[extruded_area_solid]
-    )
-
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[extruded_area_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
         items=[extruded_area_solid],
     )
+
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=pipe_segment,
-        representation=shape_model,
+        representation=shape_representation,
     )
+
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[pipe_segment],
+            relating_structure=parent,
+        )
 
     object_origin_in_global_coordinates = start_point
 
@@ -290,11 +298,12 @@ def create_pipe_segment(
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    ifcopenshell.api.material.assign_material(
-        file=ifc4_file,
-        products=[pipe_segment],
-        material=material,
-    )
+    if isinstance(distribution_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[pipe_segment],
+            system=distribution_system,
+        )
 
     ifcplus.api.system.create_distribution_port(
         ifc4_file=ifc4_file,

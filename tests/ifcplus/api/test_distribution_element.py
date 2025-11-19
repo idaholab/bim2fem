@@ -224,9 +224,9 @@ class TestCreatePipingElements:
             thickness=0.10,
             material=material,
             name="Pipe #1",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
         ifcplus.api.distribution_element.create_pipe_segment(
@@ -237,9 +237,9 @@ class TestCreatePipingElements:
             thickness=0.10,
             material=material,
             name="Pipe #2",
-            spatial_element=site,
+            parent=site,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=False,
+            place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_DISTRIBUTION_ELEMENT / "pipe_segments.ifc")
