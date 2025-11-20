@@ -52,6 +52,10 @@ def add_parameterized_profile(
 
     precision = ifcplus.util.project.get_precision_of_project(ifc4_file=ifc4_file)
 
+    numeric_scale = ifcplus.util.project.get_numeric_scale_of_project(
+        ifc4_file=ifc4_file
+    )
+
     dimensions = extend_list_to_length(
         lst=dimensions, target_length=TARGET_LENGTHS[profile_class]
     )
@@ -81,6 +85,14 @@ def add_parameterized_profile(
         file=ifc4_file,
         ifc_class=profile_class,
     )
+
+    dimensions_as_string = "x".join(
+        [str(np.round(dim, numeric_scale)) for dim in dimensions if dim is not None]
+    )
+
+    prefix = profile_class.replace("Ifc", "").replace("ProfileDef", "")
+
+    profile_name = profile_name if profile_name else f"{prefix} {dimensions_as_string}"
 
     if profile_class == "IfcRectangleProfileDef":
         ifcopenshell.api.attribute.edit_attributes(

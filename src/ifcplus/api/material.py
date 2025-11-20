@@ -189,7 +189,7 @@ def add_material_profile_set_with_single_material_profile(
 
     material_profile_set = ifcopenshell.api.material.add_material_set(
         file=ifc4_file,
-        name=name if name else f"{material.Name} {profile.ProfileName}",
+        name=name if name else f"{material.Name} - {profile.ProfileName}",
         set_type="IfcMaterialProfileSet",
     )
 

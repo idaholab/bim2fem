@@ -21,7 +21,6 @@ import ifcplus.api.geometry
 import ifcplus.api.profile
 import ifcopenshell.api.geometry
 import ifcplus.util.geometry
-import ifcopenshell.api.material
 import numpy as np
 import ifcplus.api.system
 import ifcopenshell.util.representation
@@ -55,6 +54,7 @@ def create_elbow(
         ifc4_file=ifc4_file,
         profile_class="IfcCircleHollowProfileDef",
         dimensions=[outer_radius, thickness],
+        profile_name=None,
         check_for_duplicate=True,
         calculate_mechanical_properties=True,
     )
@@ -223,6 +223,32 @@ def create_pipe_segment(
 ) -> ifcopenshell.entity_instance:
     """Create an IfcPipeSegment."""
 
+    outer_radius = nominal_diameter / 2 + thickness / 2
+
+    profile = ifcplus.api.profile.add_parameterized_profile(
+        ifc4_file=ifc4_file,
+        profile_class="IfcCircleHollowProfileDef",
+        dimensions=[outer_radius, thickness],
+        check_for_duplicate=True,
+        calculate_mechanical_properties=True,
+    )
+
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile,
+            name=None,
+            check_for_duplicate=True,
+        )
+    )
+
+    element_type = ifcplus.api.element_type.add_element_type_for_material_profile_set(
+        ifc_class="IfcPipeSegmentType",
+        material_profile_set=material_profile_set,
+        name=material_profile_set.Name,
+        check_for_duplicate=True,
+    )
+
     if pipe_segment is None:
         pipe_segment = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -231,17 +257,17 @@ def create_pipe_segment(
             predefined_type="NOTDEFINED",
         )
 
-    ifcopenshell.api.material.assign_material(
+    ifcopenshell.api.type.assign_type(
         file=ifc4_file,
-        products=[pipe_segment],
-        material=material,
+        related_objects=[pipe_segment],
+        relating_type=element_type,
     )
 
-    object_z_axis_in_global_coordinates = np.array(end_point) - np.array(start_point)
+    z_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
 
     angle_between_local_and_global_z_axes = (
         ifcplus.util.geometry.calculate_angle_between_two_vectors(
-            vector1=tuple(object_z_axis_in_global_coordinates.tolist()),
+            vector1=z_axis,
             vector2=(0.0, 0.0, 1.0),
         )
     )
@@ -258,29 +284,16 @@ def create_pipe_segment(
         angle_between_local_and_global_z_axes_is_zero
         or angle_between_local_and_global_z_axes_is_pi
     ):
-        object_y_axis_in_global_coordinates = np.array([0.0, 1.0, 0.0])
+        y_axis = (0.0, 1.0, 0.0)
     else:
-        object_y_axis_in_global_coordinates = np.cross(
-            np.array([0.0, 0.0, 1.0]),
-            object_z_axis_in_global_coordinates,
+        y_axis = np.cross(
+            (0.0, 0.0, 1.0),
+            z_axis,
         )
 
-    object_x_axis_in_global_coordinates = np.cross(
-        object_y_axis_in_global_coordinates,
-        object_z_axis_in_global_coordinates,
-    )
+    x_axis = tuple(np.cross(y_axis, z_axis).tolist())
 
-    length = float(np.linalg.norm(object_z_axis_in_global_coordinates))
-
-    outer_radius = nominal_diameter / 2 + thickness / 2
-
-    profile = ifcplus.api.profile.add_parameterized_profile(
-        ifc4_file=ifc4_file,
-        profile_class="IfcCircleHollowProfileDef",
-        dimensions=[outer_radius, thickness],
-        check_for_duplicate=True,
-        calculate_mechanical_properties=True,
-    )
+    length = float(np.linalg.norm(z_axis))
 
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
@@ -314,13 +327,11 @@ def create_pipe_segment(
             relating_structure=parent,
         )
 
-    object_origin_in_global_coordinates = start_point
-
     ifcplus.api.placement.edit_object_placement(
         product=pipe_segment,
-        repositioned_origin=object_origin_in_global_coordinates,
-        repositioned_z_axis=tuple(object_z_axis_in_global_coordinates.tolist()),
-        repositioned_x_axis=tuple(object_x_axis_in_global_coordinates.tolist()),
+        repositioned_origin=start_point,
+        repositioned_z_axis=z_axis,
+        repositioned_x_axis=x_axis,
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
