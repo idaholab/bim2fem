@@ -894,61 +894,88 @@ class TestSweptAreaSolids:
 
 class TestBoundingBox:
 
-    def test_add_one_bounding_box(
+    def test_bounding_box(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         bounding_box = ifcplus.api.geometry.add_bounding_box(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=4.0,
             width=2.0,
             height=3.0,
             corner_coordinates=(0.0, 0.0, 0.0),
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[bounding_box]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Box",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[bounding_box]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[bounding_box],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
         )
 
         ifcplus.api.placement.edit_object_placement(
             product=element,
-            repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_bounding_box.ifc")
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "bounding_box.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
 
