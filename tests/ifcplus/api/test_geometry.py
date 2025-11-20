@@ -1286,15 +1286,39 @@ class TestTopologicalRepresentationItems:
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
-    def test_add_one_face_surface(
+    def test_face_surface(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         points_of_outer_bound = [
             (0.0, 0.0, 0.0),
@@ -1305,7 +1329,7 @@ class TestTopologicalRepresentationItems:
 
         vertex_points_of_outer_bound = [
             ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
+                ifc4_file=ifc4_file,
                 point_coordinates=point_of_outer_bound,
             )
             for point_of_outer_bound in points_of_outer_bound
@@ -1316,48 +1340,81 @@ class TestTopologicalRepresentationItems:
             vertex_points_of_inner_bounds=[],
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[face_surface]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[face_surface]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[face_surface],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_face_surface.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "face_surface.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_face_surface_with_voids(
+    def test_face_surface_with_voids(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         points_of_outer_bound = [
             (0.0, 0.0, 0.0),
@@ -1381,7 +1438,7 @@ class TestTopologicalRepresentationItems:
 
         vertex_points_of_outer_bound = [
             ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
+                ifc4_file=ifc4_file,
                 point_coordinates=point_of_outer_bound,
             )
             for point_of_outer_bound in points_of_outer_bound
@@ -1392,7 +1449,7 @@ class TestTopologicalRepresentationItems:
             vertex_points_of_inner_bounds.append(
                 [
                     ifcplus.api.geometry.add_vertex_point(
-                        ifc4_file=ifc_file_with_one_element,
+                        ifc4_file=ifc4_file,
                         point_coordinates=point_of_inner_bound,
                     )
                     for point_of_inner_bound in points_of_inner_bound
@@ -1404,35 +1461,44 @@ class TestTopologicalRepresentationItems:
             vertex_points_of_inner_bounds=vertex_points_of_inner_bounds,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[face_surface]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[face_surface]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[face_surface],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_face_surface_with_voids.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "face_surface_with_voids.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
