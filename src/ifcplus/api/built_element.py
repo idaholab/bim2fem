@@ -291,19 +291,6 @@ def create_curved_frame_member(
         material=None,  # inferred from assigned IfcElementType
     )
 
-    z_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
-
-    vector_from_start_point_to_orientation_point = tuple(
-        (np.array(orientation_point) - np.array(start_point)).tolist()
-    )
-
-    x_axis = tuple(
-        np.cross(
-            vector_from_start_point_to_orientation_point,
-            z_axis,
-        ).tolist()
-    )
-
     horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
         point_of_curvature=start_point,
@@ -317,6 +304,7 @@ def create_curved_frame_member(
             - np.array(horizontal_curve.point_of_curvature)
         ).tolist()
     )
+
     vector_from_start_point_to_orientation_point = tuple(
         (np.array(orientation_point) - np.array(start_point)).tolist()
     )

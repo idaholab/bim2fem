@@ -25,14 +25,22 @@ import ifcopenshell.api.material
 import numpy as np
 import ifcplus.api.system
 import ifcopenshell.util.representation
+import ifcplus.api.material
+import ifcplus.api.element_type
+import ifcopenshell.api.type
 
 
 def create_elbow(
     ifc4_file: ifcopenshell.file,
-    horizontal_curve: ifcplus.util.geometry.HorizontalCurve,
+    start_point: tuple[float, float, float],
+    end_point: tuple[float, float, float],
+    point_defining_plane_of_arc_and_center_of_curvature_side: tuple[
+        float, float, float
+    ],
+    radius_of_curvature: float,
     nominal_diameter: float,
     thickness: float,
-    material: ifcopenshell.entity_instance | None = None,
+    material: ifcopenshell.entity_instance,
     elbow: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     parent: ifcopenshell.entity_instance | None = None,
@@ -40,20 +48,6 @@ def create_elbow(
     place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Create piping elbow as an IfcPipeFitting."""
-
-    if elbow is None:
-        elbow = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcPipeFitting",
-            name=name,
-            predefined_type="JUNCTION",
-        )
-
-    ifcopenshell.api.material.assign_material(
-        file=ifc4_file,
-        products=[elbow],
-        material=material,
-    )
 
     outer_radius = nominal_diameter / 2 + thickness / 2
 
@@ -63,6 +57,43 @@ def create_elbow(
         dimensions=[outer_radius, thickness],
         check_for_duplicate=True,
         calculate_mechanical_properties=True,
+    )
+
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile,
+            name=None,
+            check_for_duplicate=True,
+        )
+    )
+
+    element_type = ifcplus.api.element_type.add_element_type_for_material_profile_set(
+        ifc_class="IfcPipeFittingType",
+        material_profile_set=material_profile_set,
+        name=material_profile_set.Name,
+        check_for_duplicate=True,
+    )
+
+    if elbow is None:
+        elbow = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcPipeFitting",
+            name=name,
+            predefined_type="JUNCTION",
+        )
+
+    ifcopenshell.api.type.assign_type(
+        file=ifc4_file,
+        related_objects=[elbow],
+        relating_type=element_type,
+    )
+
+    horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+        point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
+        point_of_curvature=start_point,
+        point_of_tangency=end_point,
+        radius_of_curvature=radius_of_curvature,
     )
 
     revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
@@ -94,21 +125,19 @@ def create_elbow(
         representation=shape_representation,
     )
 
-    object_z_axis_in_global_coordinates = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=horizontal_curve.point_of_curvature,
-            p2=horizontal_curve.point_of_intersection,
-        )
+    z_axis = tuple(
+        (
+            np.array(horizontal_curve.point_of_intersection)
+            - np.array(horizontal_curve.point_of_curvature)
+        ).tolist()
     )
 
-    object_x_axis_in_global_coordinates = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=horizontal_curve.point_of_curvature,
-            p2=horizontal_curve.center_of_curvature,
-        )
+    x_axis = tuple(
+        (
+            np.array(horizontal_curve.center_of_curvature)
+            - np.array(horizontal_curve.point_of_curvature)
+        ).tolist()
     )
-
-    object_origin_in_global_coordinates = horizontal_curve.point_of_curvature
 
     if isinstance(parent, ifcopenshell.entity_instance):
         ifcopenshell.api.spatial.assign_container(
@@ -119,9 +148,9 @@ def create_elbow(
 
     ifcplus.api.placement.edit_object_placement(
         product=elbow,
-        repositioned_origin=object_origin_in_global_coordinates,
-        repositioned_z_axis=object_z_axis_in_global_coordinates,
-        repositioned_x_axis=object_x_axis_in_global_coordinates,
+        repositioned_origin=horizontal_curve.point_of_curvature,
+        repositioned_z_axis=z_axis,
+        repositioned_x_axis=x_axis,
         place_object_relative_to_parent=place_object_relative_to_parent,
     )
 

@@ -72,7 +72,10 @@ class TestCreatePipingElements:
 
         ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
-            horizontal_curve=horizontal_curve_1,
+            start_point=horizontal_curve_1.point_of_curvature,
+            end_point=horizontal_curve_1.point_of_tangency,
+            point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve_1.center_of_curvature,
+            radius_of_curvature=horizontal_curve_1.radius_of_curvature,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
@@ -92,7 +95,10 @@ class TestCreatePipingElements:
 
         ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
-            horizontal_curve=horizontal_curve_2,
+            start_point=horizontal_curve_2.point_of_curvature,
+            end_point=horizontal_curve_2.point_of_tangency,
+            point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve_2.center_of_curvature,
+            radius_of_curvature=horizontal_curve_2.radius_of_curvature,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
@@ -112,7 +118,10 @@ class TestCreatePipingElements:
 
         ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
-            horizontal_curve=horizontal_curve_3,
+            start_point=horizontal_curve_3.point_of_curvature,
+            end_point=horizontal_curve_3.point_of_tangency,
+            point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve_3.center_of_curvature,
+            radius_of_curvature=horizontal_curve_3.radius_of_curvature,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
@@ -131,7 +140,10 @@ class TestCreatePipingElements:
 
         ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
-            horizontal_curve=horizontal_curve_4,
+            start_point=horizontal_curve_4.point_of_curvature,
+            end_point=horizontal_curve_4.point_of_tangency,
+            point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve_4.center_of_curvature,
+            radius_of_curvature=horizontal_curve_4.radius_of_curvature,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
@@ -151,7 +163,10 @@ class TestCreatePipingElements:
 
         ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
-            horizontal_curve=horizontal_curve_5,
+            start_point=horizontal_curve_5.point_of_curvature,
+            end_point=horizontal_curve_5.point_of_tangency,
+            point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve_5.center_of_curvature,
+            radius_of_curvature=horizontal_curve_5.radius_of_curvature,
             nominal_diameter=1.0,
             thickness=0.10,
             material=material,
