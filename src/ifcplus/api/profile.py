@@ -378,7 +378,18 @@ def add_profile_from_standard_library(
         ydim = matching_section_data_dictionary["Depth"]
         iyy = matching_section_data_dictionary["MomentOfInertiaY"]
         xdim = iyy * 12 / ydim**3
-        xdim = ifcplus.util.unit.convert_unit_of_value(value=xdim, conversion_factor=1)
+        if region == "Europe":
+            conversion_factor = ifcplus.util.unit.get_conversion_factor_to_meters(
+                given_unit="meter"
+            )
+        else:
+            conversion_factor = ifcplus.util.unit.get_conversion_factor_to_meters(
+                given_unit="inch"
+            )
+        xdim = ifcplus.util.unit.convert_unit_of_value(
+            value=xdim,
+            conversion_factor=conversion_factor,
+        )
         dimensions = [
             xdim,
             ydim,
