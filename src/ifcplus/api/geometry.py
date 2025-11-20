@@ -430,57 +430,6 @@ def add_revolved_area_solid(
     return revolved_area_solid
 
 
-def add_revolved_area_solid_old(
-    ifc4_file: ifcopenshell.file,
-    profile: ifcopenshell.entity_instance,
-    central_angle_of_curvature: float,
-    center_of_curvature_in_object_xy_plane: tuple[float, float],
-    repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
-    repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
-    repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
-) -> ifcopenshell.entity_instance:
-    """Add an IfcRevolvedAreaSolid"""
-
-    center_of_curvature_in_object_xyz_coordinates = (
-        center_of_curvature_in_object_xy_plane[0],
-        center_of_curvature_in_object_xy_plane[1],
-        0.0,
-    )
-
-    object_z_axis = (0.0, 0.0, 1.0)
-
-    direction_of_axis_of_rotation = (
-        ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
-            vector1=object_z_axis, vector2=center_of_curvature_in_object_xyz_coordinates
-        )
-    )
-
-    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
-        vector=repositioned_z_axis
-    )
-    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
-        vector=repositioned_x_axis
-    )
-
-    revolved_area_solid = ifc4_file.createIfcRevolvedAreaSolid(
-        profile,
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(repositioned_origin),
-            ifc4_file.createIfcDirection(repositioned_z_axis_normalized),
-            ifc4_file.createIfcDirection(repositioned_x_axis_normalized),
-        ),
-        ifc4_file.createIfcAxis1Placement(
-            ifc4_file.createIfcCartesianPoint(
-                center_of_curvature_in_object_xyz_coordinates
-            ),
-            ifc4_file.createIfcDirection(direction_of_axis_of_rotation),
-        ),
-        central_angle_of_curvature,
-    )
-
-    return revolved_area_solid
-
-
 def add_faceted_brep(
     ifc4_file: ifcopenshell.file,
     points: list[tuple[float, float, float]],
