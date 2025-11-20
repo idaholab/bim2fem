@@ -12,7 +12,7 @@ import ifcplus.api.built_element
 import ifcplus.api.material
 from typing import cast
 import ifcopenshell.api.profile
-import pytest
+from pprint import pprint
 
 
 class TestWalls:
@@ -102,8 +102,6 @@ class TestWalls:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
@@ -244,8 +242,6 @@ class TestWalls:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
@@ -338,8 +334,6 @@ class TestWalls:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
@@ -444,8 +438,6 @@ class TestSlabs:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
@@ -544,30 +536,14 @@ class TestSlabs:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
 
 class TestFrameMembers:
 
-    @pytest.mark.parametrize(
-        "parametrized_profile_def_class",
-        [
-            "IfcRectangleProfileDef",
-            "IfcRectangleHollowProfileDef",
-            "IfcCircleProfileDef",
-            "IfcCircleHollowProfileDef",
-            "IfcIShapeProfileDef",
-            "IfcLShapeProfileDef",
-            "IfcUShapeProfileDef",
-            "IfcTShapeProfileDef",
-        ],
-    )
     def test_add_custom_beams(
         self,
-        parametrized_profile_def_class: ifcplus.api.profile.PARAMETERIZED_PROFILE_CLASSES,
     ):
 
         ifc4_file = ifcplus.api.project.create_ifc4_file(
@@ -610,137 +586,150 @@ class TestFrameMembers:
             check_for_duplicate=True,
         )
 
-        if parametrized_profile_def_class == "IfcRectangleProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.2, 0.3],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
+        x_shift = 0.0
+
+        for parametrized_profile_def_class in [
+            "IfcRectangleProfileDef",
+            "IfcRectangleHollowProfileDef",
+            "IfcCircleProfileDef",
+            "IfcCircleHollowProfileDef",
+            "IfcIShapeProfileDef",
+            "IfcLShapeProfileDef",
+            "IfcUShapeProfileDef",
+            "IfcTShapeProfileDef",
+        ]:
+
+            if parametrized_profile_def_class == "IfcRectangleProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.2, 0.3],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = concrete_material
+
+            elif parametrized_profile_def_class == "IfcRectangleHollowProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.2, 0.3, 0.02, None, None],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = steel_material
+
+            elif parametrized_profile_def_class == "IfcCircleProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.1],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = concrete_material
+
+            elif parametrized_profile_def_class == "IfcCircleHollowProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.1, 0.02],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = steel_material
+
+            elif parametrized_profile_def_class == "IfcIShapeProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = steel_material
+
+            elif parametrized_profile_def_class == "IfcLShapeProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.3, 0.2, 0.03, None, None, None],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = steel_material
+
+            elif parametrized_profile_def_class == "IfcUShapeProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = steel_material
+
+            elif parametrized_profile_def_class == "IfcTShapeProfileDef":
+                profile = ifcplus.api.profile.add_parameterized_profile(
+                    ifc4_file=ifc4_file,
+                    profile_class=parametrized_profile_def_class,
+                    dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None, None, None],
+                    profile_name=None,
+                    check_for_duplicate=True,
+                    calculate_mechanical_properties=True,
+                )
+                material = steel_material
+
+            prefix = parametrized_profile_def_class.replace("Ifc", "").replace(
+                "ProfileDef", ""
             )
-            material = concrete_material
 
-        elif parametrized_profile_def_class == "IfcRectangleHollowProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.2, 0.3, 0.02, None, None],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
+            ifcplus.api.built_element.create_linear_frame_member(
+                frame_member_class="IfcBeam",
+                start_point=(1.0 + x_shift, 6.0, 0.0),
+                end_point=(1.0 + x_shift, 1.0, 0.0),
+                orientation_point=(1.0 + x_shift, 6.0, 1.0),
+                profile=profile,
+                material=cast(ifcopenshell.entity_instance, material),
+                name=f"{prefix}-Beam-01",
+                parent=site,
+                place_object_relative_to_parent=True,
             )
-            material = steel_material
 
-        elif parametrized_profile_def_class == "IfcCircleProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.1],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
+            ifcplus.api.built_element.create_linear_frame_member(
+                frame_member_class="IfcBeam",
+                start_point=(1.0 + 1.0 + x_shift, 6.0, 0.0),
+                end_point=(1.0 + 1.0 + x_shift, 1.0, 0.0),
+                orientation_point=(1.1 + 1.0 + x_shift, 6.0, 1.0),
+                profile=profile,
+                material=cast(ifcopenshell.entity_instance, material),
+                name=f"{prefix}-Beam-02",
+                parent=site,
+                place_object_relative_to_parent=True,
             )
-            material = concrete_material
 
-        elif parametrized_profile_def_class == "IfcCircleHollowProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.1, 0.02],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
+            ifcplus.api.built_element.create_linear_frame_member(
+                frame_member_class="IfcBeam",
+                start_point=(1.0 + 1.0 * 2 + x_shift, 6.0, 0.0),
+                end_point=(1.0 + 1.0 * 2 + x_shift, 1.0, 0.5),
+                orientation_point=(1.1 + 1.0 * 2 + x_shift, 6.0, 1.0),
+                profile=profile,
+                material=cast(ifcopenshell.entity_instance, material),
+                name=f"{prefix}-Beam-03",
+                parent=site,
+                place_object_relative_to_parent=True,
             )
-            material = steel_material
 
-        elif parametrized_profile_def_class == "IfcIShapeProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
-            )
-            material = steel_material
+            x_shift += 3.0
 
-        elif parametrized_profile_def_class == "IfcLShapeProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.3, 0.2, 0.03, None, None, None],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
-            )
-            material = steel_material
-
-        elif parametrized_profile_def_class == "IfcUShapeProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
-            )
-            material = steel_material
-
-        elif parametrized_profile_def_class == "IfcTShapeProfileDef":
-            profile = ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc4_file,
-                profile_class=parametrized_profile_def_class,
-                dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None, None, None],
-                profile_name=None,
-                check_for_duplicate=True,
-                calculate_mechanical_properties=True,
-            )
-            material = steel_material
-
-        prefix = parametrized_profile_def_class.replace("Ifc", "").replace(
-            "ProfileDef", ""
-        )
-
-        ifcplus.api.built_element.create_linear_frame_member(
-            frame_member_class="IfcBeam",
-            start_point=(1.0, 6.0, 0.0),
-            end_point=(1.0, 1.0, 0.0),
-            orientation_point=(1.0, 6.0, 1.0),
-            profile=profile,
-            material=cast(ifcopenshell.entity_instance, material),
-            name=f"{prefix}-Beam-01",
-            parent=site,
-            place_object_relative_to_parent=True,
-        )
-
-        x_shift = 1.0
-
-        ifcplus.api.built_element.create_linear_frame_member(
-            frame_member_class="IfcBeam",
-            start_point=(1.0 + x_shift, 6.0, 0.0),
-            end_point=(1.0 + x_shift, 1.0, 0.0),
-            orientation_point=(1.1 + x_shift, 6.0, 1.0),
-            profile=profile,
-            material=cast(ifcopenshell.entity_instance, material),
-            name=f"{prefix}-Beam-02",
-            parent=site,
-            place_object_relative_to_parent=True,
-        )
-
-        ifcplus.api.built_element.create_linear_frame_member(
-            frame_member_class="IfcBeam",
-            start_point=(1.0 + x_shift * 2, 6.0, 0.0),
-            end_point=(1.0 + x_shift * 2, 1.0, 0.5),
-            orientation_point=(1.1 + x_shift * 2, 6.0, 1.0),
-            profile=profile,
-            material=cast(ifcopenshell.entity_instance, material),
-            name=f"{prefix}-Beam-03",
-            parent=site,
-            place_object_relative_to_parent=True,
-        )
-
-        output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"{prefix}_custom_beams.ifc")
+        output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"custom_beams.ifc")
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
@@ -749,7 +738,5 @@ class TestFrameMembers:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0

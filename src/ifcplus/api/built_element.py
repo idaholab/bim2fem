@@ -60,11 +60,26 @@ def create_linear_frame_member(
 ) -> ifcopenshell.entity_instance:
     """
     Add a linear, prismatic, and homogenous IfcBeam or IfcColumn or IfcMember with
-    IfcMaterialProfileSetUsage. The ObjectPlacement z-axis is the longitudinal axis.
-    The ObjectPlacement y-axis is the vertical orientation of the cross-section. The
-    ObjectPlacement xy plane contains the cross-section. The orientation point defines
-    a plane (with the start point and and point) containing the ObjectPlacement z and
-    y-axes.
+    IfcMaterialProfileSetUsage.
+
+    The start and end points define the endpoints of the frame member and the
+    direction of the z-axis of the Object coordinate systm.
+
+    The orientation point defines a plane (with the start and end points) containing
+    the z-axis and y-axis of the Object coordinate system.
+
+    The y-axis usually corresponds to the axis of weak bending for the cross-section,
+    whereas the x-axis usually corresponds to the axis of strong bending.
+
+    The ObjectPlacement z-axis is the longitudinal axis in the direction of intial
+    tangency.
+
+    The ObjectPlacement y-axis is the vertical orientation of the cross-section.
+    The
+    ObjectPlacement xy plane contains the cross-section.
+
+    The orientation point defines a plane containing the ObjectPlacement z and
+    y-axes and the start and end points.
     """
 
     ifc4_file = profile.file
@@ -113,17 +128,18 @@ def create_linear_frame_member(
         material=None,  # inferred from assigned IfcElementType
     )
 
-    vector_from_start_point_to_end_point = np.array(end_point) - np.array(start_point)
-    vector_from_start_point_to_orientation_point = np.array(
-        orientation_point
-    ) - np.array(start_point)
+    z_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
+
+    vector_from_start_point_to_orientation_point = tuple(
+        (np.array(orientation_point) - np.array(start_point)).tolist()
+    )
+
     x_axis = tuple(
         np.cross(
             vector_from_start_point_to_orientation_point,
-            vector_from_start_point_to_end_point,
+            z_axis,
         ).tolist()
     )
-    z_axis = tuple(vector_from_start_point_to_end_point.tolist())
 
     frame_member_length = float(
         np.linalg.norm(np.array(end_point) - np.array(start_point))
