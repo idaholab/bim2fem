@@ -1574,3 +1574,39 @@ def filter_out_colinear_points_from_polyline(
         )
 
     return new_polyline
+
+
+def transform_point(
+    four_by_four_transformation_matrix: np.ndarray,
+    point: tuple[float, float, float],
+) -> tuple[float, float, float]:
+
+    vector_3d = np.array(point)
+
+    vector_in_homogeneous_coordinates = np.append(vector_3d, 1)
+
+    result = np.dot(
+        four_by_four_transformation_matrix, vector_in_homogeneous_coordinates
+    )
+
+    result_3d = result[:3] / result[3]
+
+    return tuple(result_3d.tolist())
+
+
+def transform_direction_vector(
+    four_by_four_transformation_matrix: np.ndarray,
+    point: tuple[float, float, float],
+) -> tuple[float, float, float]:
+
+    vector_3d = np.array(point)
+
+    vector_in_homogeneous_coordinates = np.append(vector_3d, 0)
+
+    result = np.dot(
+        four_by_four_transformation_matrix, vector_in_homogeneous_coordinates
+    )
+
+    result_3d = result[:3]
+
+    return tuple(result_3d.tolist())

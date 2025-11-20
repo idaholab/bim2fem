@@ -179,42 +179,6 @@ def create_linear_frame_member(
     return frame_member
 
 
-def transform_point(
-    four_by_four_transformation_matrix: np.ndarray,
-    point: tuple[float, float, float],
-) -> tuple[float, float, float]:
-
-    vector_3d = np.array(point)
-
-    vector_in_homogeneous_coordinates = np.append(vector_3d, 1)
-
-    result = np.dot(
-        four_by_four_transformation_matrix, vector_in_homogeneous_coordinates
-    )
-
-    result_3d = result[:3] / result[3]
-
-    return tuple(result_3d.tolist())
-
-
-def transform_direction_vector(
-    four_by_four_transformation_matrix: np.ndarray,
-    point: tuple[float, float, float],
-) -> tuple[float, float, float]:
-
-    vector_3d = np.array(point)
-
-    vector_in_homogeneous_coordinates = np.append(vector_3d, 0)
-
-    result = np.dot(
-        four_by_four_transformation_matrix, vector_in_homogeneous_coordinates
-    )
-
-    result_3d = result[:3]
-
-    return tuple(result_3d.tolist())
-
-
 def create_curved_frame_member(
     frame_member_class: FRAME_MEMBER_CLASS,
     start_point: tuple[float, float, float],
@@ -328,7 +292,7 @@ def create_curved_frame_member(
         transformation_matrix_from_local_to_global
     )
 
-    center_of_curvature_in_local_coords = transform_point(
+    center_of_curvature_in_local_coords = ifcplus.util.geometry.transform_point(
         four_by_four_transformation_matrix=transformation_matrix_from_global_to_local,
         point=horizontal_curve.center_of_curvature,
     )
