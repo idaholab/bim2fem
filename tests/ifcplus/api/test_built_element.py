@@ -740,3 +740,109 @@ class TestFrameMembers:
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
         pprint(logger.statements)
         assert len(logger.statements) == 0
+
+    def test_add_curved_beams(
+        self,
+    ):
+
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(
+            type="IfcProject",
+            include_subtypes=False,
+        )[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        steel_material = ifcplus.api.material.add_material_from_standard_library(
+            ifc4_file=ifc4_file,
+            region="Europe",
+            material_name="S355",
+            check_for_duplicate=True,
+        )
+
+        profile = ifcplus.api.profile.add_parameterized_profile(
+            ifc4_file=ifc4_file,
+            profile_class="IfcLShapeProfileDef",
+            dimensions=[0.3, 0.2, 0.03, None, None, None],
+            profile_name=None,
+            check_for_duplicate=True,
+            calculate_mechanical_properties=True,
+        )
+
+        ifcplus.api.built_element.create_linear_frame_member(
+            frame_member_class="IfcBeam",
+            start_point=(1.0, 6.0, 0.0),
+            end_point=(1.0, 1.0, 0.0),
+            orientation_point=(1.0, 6.0, 1.0),
+            profile=profile,
+            material=cast(ifcopenshell.entity_instance, steel_material),
+            name=f"Beam-01",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        ifcplus.api.built_element.create_curved_frame_member(
+            frame_member_class="IfcBeam",
+            start_point=(2.0, 6.0, 0.0),
+            end_point=(7.0, 1.0, 0.0),
+            orientation_point=(2.0, 6.0, 0.0 + 1.0),
+            point_defining_plane_of_arc_and_center_of_curvature_side=(
+                2.0 + 1.0,
+                6.0,
+                0.0,
+            ),
+            radius_of_curvature=5.0,
+            profile=profile,
+            material=cast(ifcopenshell.entity_instance, steel_material),
+            name=f"Beam-02",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        ifcplus.api.built_element.create_curved_frame_member(
+            frame_member_class="IfcBeam",
+            start_point=(2.0, 6.0, 0.0),
+            end_point=(2.0, 6.0 - 5.0, 0.0 + 5.0),
+            orientation_point=(2.0, 6.0, 0.0 + 1.0),
+            point_defining_plane_of_arc_and_center_of_curvature_side=(
+                2.0,
+                6.0,
+                1.0,
+            ),
+            radius_of_curvature=5.0,
+            profile=profile,
+            material=cast(ifcopenshell.entity_instance, steel_material),
+            name=f"Beam-03",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"curved_beams.ifc")
+        ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0

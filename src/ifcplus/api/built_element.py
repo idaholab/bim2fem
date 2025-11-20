@@ -37,6 +37,7 @@ from typing import cast
 import ifcplus.util.geometry
 import ifcplus.util.project
 import ifcopenshell.api.profile
+import ifcopenshell.util.placement
 
 
 FRAME_MEMBER_CLASS = Literal[
@@ -70,16 +71,6 @@ def create_linear_frame_member(
 
     The y-axis usually corresponds to the axis of weak bending for the cross-section,
     whereas the x-axis usually corresponds to the axis of strong bending.
-
-    The ObjectPlacement z-axis is the longitudinal axis in the direction of intial
-    tangency.
-
-    The ObjectPlacement y-axis is the vertical orientation of the cross-section.
-    The
-    ObjectPlacement xy plane contains the cross-section.
-
-    The orientation point defines a plane containing the ObjectPlacement z and
-    y-axes and the start and end points.
     """
 
     ifc4_file = profile.file
@@ -162,6 +153,218 @@ def create_linear_frame_member(
         context_type="Model",
         target_view="MODEL_VIEW",
         items=[extruded_area_solid],
+    )
+
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=frame_member,
+        representation=shape_representation,
+    )
+
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[frame_member],
+            relating_structure=parent,
+        )
+
+    ifcplus.api.placement.edit_object_placement(
+        product=frame_member,
+        repositioned_origin=start_point,
+        repositioned_z_axis=z_axis,
+        repositioned_x_axis=x_axis,
+        place_object_relative_to_parent=place_object_relative_to_parent,
+    )
+
+    return frame_member
+
+
+def transform_point(
+    four_by_four_transformation_matrix: np.ndarray,
+    point: tuple[float, float, float],
+) -> tuple[float, float, float]:
+
+    vector_3d = np.array(point)
+
+    vector_in_homogeneous_coordinates = np.append(vector_3d, 1)
+
+    result = np.dot(
+        four_by_four_transformation_matrix, vector_in_homogeneous_coordinates
+    )
+
+    result_3d = result[:3] / result[3]
+
+    return tuple(result_3d.tolist())
+
+
+def transform_direction_vector(
+    four_by_four_transformation_matrix: np.ndarray,
+    point: tuple[float, float, float],
+) -> tuple[float, float, float]:
+
+    vector_3d = np.array(point)
+
+    vector_in_homogeneous_coordinates = np.append(vector_3d, 0)
+
+    result = np.dot(
+        four_by_four_transformation_matrix, vector_in_homogeneous_coordinates
+    )
+
+    result_3d = result[:3]
+
+    return tuple(result_3d.tolist())
+
+
+def create_curved_frame_member(
+    frame_member_class: FRAME_MEMBER_CLASS,
+    start_point: tuple[float, float, float],
+    end_point: tuple[float, float, float],
+    orientation_point: tuple[float, float, float],
+    point_defining_plane_of_arc_and_center_of_curvature_side: tuple[
+        float, float, float
+    ],
+    radius_of_curvature: float,
+    profile: ifcopenshell.entity_instance,
+    material: ifcopenshell.entity_instance,
+    frame_member: ifcopenshell.entity_instance | None = None,
+    name: str | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
+    place_object_relative_to_parent: bool = False,
+) -> ifcopenshell.entity_instance:
+    """
+    Add a curved, prismatic, and homogenous IfcBeam or IfcColumn or IfcMember with
+    IfcMaterialProfileSetUsage.
+
+    The start and end points define the endpoints of the frame member and the
+    direction of the z-axis of the Object coordinate systm.
+
+    The orientation point defines a plane (with the start and end points) containing
+    the z-axis and y-axis of the Object coordinate system.
+
+    The y-axis usually corresponds to the axis of weak bending for the cross-section,
+    whereas the x-axis usually corresponds to the axis of strong bending.
+    """
+
+    ifc4_file = profile.file
+
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile,
+            name=None,
+            check_for_duplicate=True,
+        )
+    )
+
+    if frame_member_class == "IfcBeam":
+        element_type_class = "IfcBeamType"
+    elif frame_member_class == "IfcColumn":
+        element_type_class = "IfcColumnType"
+    else:
+        element_type_class = "IfcMemberType"
+
+    element_type = ifcplus.api.element_type.add_element_type_for_material_profile_set(
+        ifc_class=element_type_class,
+        material_profile_set=material_profile_set,
+        name=material_profile_set.Name,
+        check_for_duplicate=True,
+    )
+
+    if frame_member is None:
+        frame_member = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class=frame_member_class,
+            name=name,
+            predefined_type="NOTDEFINED",
+        )
+
+    ifcopenshell.api.type.assign_type(
+        file=ifc4_file,
+        related_objects=[frame_member],
+        relating_type=element_type,
+    )
+
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[frame_member],
+        type="IfcMaterialProfileSetUsage",
+        material=None,  # inferred from assigned IfcElementType
+    )
+
+    z_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
+
+    vector_from_start_point_to_orientation_point = tuple(
+        (np.array(orientation_point) - np.array(start_point)).tolist()
+    )
+
+    x_axis = tuple(
+        np.cross(
+            vector_from_start_point_to_orientation_point,
+            z_axis,
+        ).tolist()
+    )
+
+    horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+        point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
+        point_of_curvature=start_point,
+        point_of_tangency=end_point,
+        radius_of_curvature=radius_of_curvature,
+    )
+
+    z_axis = tuple(
+        (
+            np.array(horizontal_curve.point_of_intersection)
+            - np.array(horizontal_curve.point_of_curvature)
+        ).tolist()
+    )
+    vector_from_start_point_to_orientation_point = tuple(
+        (np.array(orientation_point) - np.array(start_point)).tolist()
+    )
+
+    x_axis = tuple(
+        np.cross(
+            vector_from_start_point_to_orientation_point,
+            z_axis,
+        ).tolist()
+    )
+
+    central_angle_of_curvature = horizontal_curve.central_angle
+
+    transformation_matrix_from_local_to_global = ifcopenshell.util.placement.a2p(
+        o=start_point,
+        z=z_axis,
+        x=x_axis,
+    )
+
+    transformation_matrix_from_global_to_local = np.linalg.inv(
+        transformation_matrix_from_local_to_global
+    )
+
+    center_of_curvature_in_local_coords = transform_point(
+        four_by_four_transformation_matrix=transformation_matrix_from_global_to_local,
+        point=horizontal_curve.center_of_curvature,
+    )
+
+    center_of_curvature_in_object_xy_plane = center_of_curvature_in_local_coords[0:2]
+
+    revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
+        ifc4_file=ifc4_file,
+        swept_area=profile,
+        central_angle_of_curvature=central_angle_of_curvature,
+        center_of_curvature_in_object_xy_plane=center_of_curvature_in_object_xy_plane,
+    )
+
+    shape_representation = ifcplus.api.geometry.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcShapeRepresentation",
+        representation_identifier="Body",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[revolved_area_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
+        items=[revolved_area_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
