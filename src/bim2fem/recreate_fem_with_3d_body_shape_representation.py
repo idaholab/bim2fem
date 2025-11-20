@@ -182,8 +182,10 @@ def recreate_structural_surface_members(
                 vector1=v12, vector2=v23
             )
         )
-        local_x_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=points_3d[0], p2=points_3d[1]
+        local_x_axis_in_global_coordinates = (
+            ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+                p1=points_3d[0], p2=points_3d[1]
+            )
         )
         transformation_matrix = ifcopenshell.util.placement.a2p(
             o=points_3d[0],
@@ -226,14 +228,14 @@ def recreate_structural_surface_members(
         # Add and assign representation
         representation_item = ifcplus.api.geometry.add_extruded_area_solid(
             ifc4_file=ifc4_arch_file,
-            profile=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
+            swept_area=ifcplus.api.profile.add_arbitrary_profile_with_or_without_voids(
                 file=ifc4_arch_file,
                 outer_profile=points_2d_relative,
                 inner_profiles=[],
                 name=None,
             ),
             repositioned_origin=(0.0, 0.0, -thickness / 2),
-            extrusion_depth=thickness,
+            depth=thickness,
         )
         shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_arch_file,
@@ -335,8 +337,8 @@ def recreate_linear_structural_curve_members(
         # Add and assign representation
         representation_item = ifcplus.api.geometry.add_extruded_area_solid(
             ifc4_file=ifc4_arch_file,
-            profile=profile_def,
-            extrusion_depth=length,
+            swept_area=profile_def,
+            depth=length,
         )
         shape_model = ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_arch_file,
@@ -399,8 +401,10 @@ def recreate_structural_point_connections(
             )
 
             # Get point
-            coordinates_of_node = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
-                structural_point_connection=structural_point_connection
+            coordinates_of_node = (
+                ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                    structural_point_connection=structural_point_connection
+                )
             )
 
             # Add and assign representation

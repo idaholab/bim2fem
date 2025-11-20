@@ -131,8 +131,8 @@ def create_linear_frame_member(
 
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=frame_member_length,
+        swept_area=profile,
+        depth=frame_member_length,
     )
 
     shape_representation = ifcplus.api.geometry.add_shape_model(
@@ -192,8 +192,8 @@ def create_opening_element(
 
     representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=depth,
+        swept_area=profile,
+        depth=depth,
     )
 
     representation_type = ifcopenshell.util.representation.guess_type(
@@ -320,8 +320,8 @@ def create_linear_wall(
 
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=arbitrary_closed_profile_def,
-        extrusion_depth=height,
+        swept_area=arbitrary_closed_profile_def,
+        depth=height,
     )
 
     shape_representation = ifcplus.api.geometry.add_shape_model(
@@ -559,8 +559,8 @@ def create_curved_wall(
 
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=arbitrary_closed_profile_def,
-        extrusion_depth=height,
+        swept_area=arbitrary_closed_profile_def,
+        depth=height,
     )
 
     shape_representation = ifcplus.api.geometry.add_shape_model(
@@ -660,8 +660,8 @@ def create_slab(
 
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=total_thickness,
+        swept_area=profile,
+        depth=total_thickness,
     )
 
     shape_representation = ifcplus.api.geometry.add_shape_model(

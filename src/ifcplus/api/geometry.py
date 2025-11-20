@@ -171,8 +171,8 @@ def add_cylindrical_extruded_area_solid(
 
     extruded_area_solid = add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=extrusion_depth,
+        swept_area=profile,
+        depth=extrusion_depth,
         repositioned_origin=repositioned_origin,
         repositioned_z_axis=repositioned_z_axis,
         repositioned_x_axis=repositioned_x_axis,
@@ -201,8 +201,8 @@ def add_hollow_cylindrical_extruded_area_solid(
 
     extruded_area_solid = add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=extrusion_depth,
+        swept_area=profile,
+        depth=extrusion_depth,
         repositioned_origin=repositioned_origin,
         repositioned_z_axis=repositioned_z_axis,
         repositioned_x_axis=repositioned_x_axis,
@@ -260,9 +260,9 @@ def add_bounding_box(
 
 def add_extruded_area_solid_tapered(
     ifc4_file: ifcopenshell.file,
-    profile_start: ifcopenshell.entity_instance,
-    profile_end: ifcopenshell.entity_instance,
-    extrusion_depth: float,
+    swept_area: ifcopenshell.entity_instance,
+    end_swept_area: ifcopenshell.entity_instance,
+    depth: float,
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
     repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
     repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
@@ -273,29 +273,46 @@ def add_extruded_area_solid_tapered(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
 
-    extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolidTapered(
-        profile_start,
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(repositioned_origin),
-            ifc4_file.createIfcDirection(repositioned_z_axis_normalized),
-            ifc4_file.createIfcDirection(repositioned_x_axis_normalized),
+    position = ifc4_file.create_entity(
+        type="IfcAxis2Placement3D",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=repositioned_origin,
         ),
-        ifc4_file.createIfcDirection(extruded_direction),
-        extrusion_depth,
-        profile_end,
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_z_axis_normalized,
+        ),
+        RefDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_x_axis_normalized,
+        ),
     )
 
-    return extruded_area_solid
+    extruded_area_solid_tapered = ifc4_file.create_entity(
+        type="IfcExtrudedAreaSolidTapered",
+        SweptArea=swept_area,
+        Position=position,
+        ExtrudedDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=extruded_direction,
+        ),
+        Depth=depth,
+        EndSweptArea=end_swept_area,
+    )
+
+    return extruded_area_solid_tapered
 
 
 def add_extruded_area_solid(
     ifc4_file: ifcopenshell.file,
-    profile: ifcopenshell.entity_instance,
-    extrusion_depth: float,
+    swept_area: ifcopenshell.entity_instance,
+    depth: float,
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
     repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
     repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
@@ -306,25 +323,114 @@ def add_extruded_area_solid(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
 
-    extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolid(
-        profile,
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(repositioned_origin),
-            ifc4_file.createIfcDirection(repositioned_z_axis_normalized),
-            ifc4_file.createIfcDirection(repositioned_x_axis_normalized),
+    position = ifc4_file.create_entity(
+        type="IfcAxis2Placement3D",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=repositioned_origin,
         ),
-        ifc4_file.createIfcDirection(extruded_direction),
-        extrusion_depth,
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_z_axis_normalized,
+        ),
+        RefDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_x_axis_normalized,
+        ),
+    )
+
+    extruded_area_solid = ifc4_file.create_entity(
+        type="IfcExtrudedAreaSolid",
+        SweptArea=swept_area,
+        Position=position,
+        ExtrudedDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=extruded_direction,
+        ),
+        Depth=depth,
     )
 
     return extruded_area_solid
 
 
 def add_revolved_area_solid(
+    ifc4_file: ifcopenshell.file,
+    swept_area: ifcopenshell.entity_instance,
+    central_angle_of_curvature: float,
+    center_of_curvature_in_object_xy_plane: tuple[float, float],
+    repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
+) -> ifcopenshell.entity_instance:
+    """Add an IfcRevolvedAreaSolid"""
+
+    center_of_curvature_in_object_xyz_coordinates = (
+        center_of_curvature_in_object_xy_plane[0],
+        center_of_curvature_in_object_xy_plane[1],
+        0.0,
+    )
+
+    object_z_axis = (0.0, 0.0, 1.0)
+
+    direction_of_axis_of_rotation = (
+        ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+            vector1=object_z_axis, vector2=center_of_curvature_in_object_xyz_coordinates
+        )
+    )
+
+    repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_z_axis
+    )
+
+    repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
+        vector=repositioned_x_axis
+    )
+
+    position = ifc4_file.create_entity(
+        type="IfcAxis2Placement3D",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=repositioned_origin,
+        ),
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_z_axis_normalized,
+        ),
+        RefDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_x_axis_normalized,
+        ),
+    )
+
+    axis = ifc4_file.create_entity(
+        type="IfcAxis1Placement",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=center_of_curvature_in_object_xyz_coordinates,
+        ),
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=direction_of_axis_of_rotation,
+        ),
+    )
+
+    revolved_area_solid = ifc4_file.create_entity(
+        type="IfcRevolvedAreaSolid",
+        SweptArea=swept_area,
+        Position=position,
+        Axis=axis,
+        Angle=central_angle_of_curvature,
+    )
+
+    return revolved_area_solid
+
+
+def add_revolved_area_solid_old(
     ifc4_file: ifcopenshell.file,
     profile: ifcopenshell.entity_instance,
     central_angle_of_curvature: float,

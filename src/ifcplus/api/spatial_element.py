@@ -18,9 +18,9 @@ def create_arbitrary_solid_space_with_or_without_voids(
     outer_profile: list[tuple[float, float]],
     inner_profiles: list[list[tuple[float, float]]],
     height: float,
-    origin: tuple[float, float, float] = (0., 0., 0.),
-    z_axis: tuple[float, float, float] = (0., 0., 1.),
-    x_axis: tuple[float, float, float] = (1., 0., 0.),
+    origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
     space: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     structure_contained_in: ifcopenshell.entity_instance | None = None,
@@ -62,8 +62,8 @@ def create_arbitrary_solid_space_with_or_without_voids(
     # Add and Assign Representation
     representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=height,
+        swept_area=profile,
+        depth=height,
     )
     shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
@@ -99,7 +99,7 @@ def create_rectangular_solid_space(
     height: float,
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
     repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
-    repositioned_x_axis: tuple[float, float, float] = (1., 0., 0.),
+    repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
     space: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     spatial_element: ifcopenshell.entity_instance | None = None,
@@ -147,8 +147,8 @@ def create_rectangular_solid_space(
     # Add and assign representation
     representation_item = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=height,
+        swept_area=profile,
+        depth=height,
     )
     shape_model = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,

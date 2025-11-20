@@ -67,7 +67,7 @@ def create_elbow(
 
     revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
+        swept_area=profile,
         central_angle_of_curvature=horizontal_curve.central_angle,
         center_of_curvature_in_object_xy_plane=(
             horizontal_curve.radius_of_curvature,
@@ -255,8 +255,8 @@ def create_pipe_segment(
 
     extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=length,
+        swept_area=profile,
+        depth=length,
     )
 
     shape_representation = ifcplus.api.geometry.add_shape_model(
