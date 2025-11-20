@@ -491,54 +491,58 @@ def add_edge(
     return edge
 
 
-def add_curved_edge(
+def add_edge_curve(
     point_of_curvature_as_vertex_point: ifcopenshell.entity_instance,
     point_of_tangency_as_vertex_point: ifcopenshell.entity_instance,
-    center_of_curvature: tuple[float, float, float],
+    point_defining_plane_of_arc_and_center_of_curvature_side: tuple[
+        float, float, float
+    ],
+    radius_of_curvature: float,
 ) -> ifcopenshell.entity_instance:
     """Add an IfcEdgeCurve"""
 
     ifc4_file = point_of_curvature_as_vertex_point.file
 
     point_of_curvature = point_of_curvature_as_vertex_point.VertexGeometry.Coordinates
-    point_of_tangency = point_of_tangency_as_vertex_point.VertexGeometry.Coordinates
 
-    radius_of_curvature = float(
-        np.linalg.norm(np.array(point_of_curvature) - np.array(center_of_curvature))
-    )
+    point_of_tangency = point_of_tangency_as_vertex_point.VertexGeometry.Coordinates
 
     horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_of_curvature=point_of_curvature,
-        point_on_center_of_curvature_side=center_of_curvature,
+        point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
         point_of_tangency=point_of_tangency,
         radius_of_curvature=radius_of_curvature,
     )
 
-    z_axis = horizontal_curve.direction_of_axis_of_rotation
-
-    x_axis = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=horizontal_curve.point_of_curvature,
-        p2=horizontal_curve.point_of_tangency,
+    some_valid_direction_vector_for_ref_dir = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=horizontal_curve.point_of_curvature,
+            p2=horizontal_curve.point_of_intersection,
+        )
     )
 
     position = ifc4_file.createIfcAxis2Placement3D(
-        ifc4_file.createIfcCartesianPoint(center_of_curvature),
-        ifc4_file.createIfcDirection(z_axis),
-        ifc4_file.createIfcDirection(x_axis),
+        Location=ifc4_file.createIfcCartesianPoint(
+            horizontal_curve.center_of_curvature
+        ),
+        Axis=ifc4_file.createIfcDirection(
+            horizontal_curve.direction_of_axis_of_rotation
+        ),
+        RefDirection=ifc4_file.createIfcDirection(
+            some_valid_direction_vector_for_ref_dir
+        ),
     )
 
-    edge_geometry = ifc4_file.createIfcCircle(
-        position,
-        radius_of_curvature,
+    circle = ifc4_file.createIfcCircle(
+        Position=position,
+        Radius=radius_of_curvature,
     )
-
-    same_sense = True
 
     edge_curve = ifc4_file.createIfcEdgeCurve(
-        point_of_curvature_as_vertex_point,
-        point_of_tangency_as_vertex_point,
-        edge_geometry,
-        same_sense,
+        EdgeStart=point_of_curvature_as_vertex_point,
+        EdgeEnd=point_of_tangency_as_vertex_point,
+        EdgeGeometry=circle,
+        SameSense=True,
     )
 
     return edge_curve

@@ -124,10 +124,12 @@ def create_linear_structural_curve_member(
     )
 
     # Add and Assign MaterialProfileSetUsage
-    material_profile_set = ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-        material=material,
-        profile=profile_def,
-        check_for_duplicate=True,
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile_def,
+            check_for_duplicate=True,
+        )
     )
     material_profile_set_usage = ifc4_file.create_entity(
         type="IfcMaterialProfileSetUsage"
@@ -217,7 +219,7 @@ def create_curved_structural_curve_member(
         )
 
     # Add and assign representation
-    representation_item = ifcplus.api.geometry.add_curved_edge(
+    representation_item = ifcplus.api.geometry.add_edge_curve(
         point_of_curvature_as_vertex_point=vertex_points[0],
         point_of_tangency_as_vertex_point=vertex_points[1],
         center_of_curvature=horizontal_curve.center_of_curvature,
@@ -238,10 +240,12 @@ def create_curved_structural_curve_member(
     )
 
     # Add and Assign MaterialProfileSetUsage
-    material_profile_set = ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-        material=material,
-        profile=profile_def,
-        check_for_duplicate=True,
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile_def,
+            check_for_duplicate=True,
+        )
     )
     material_profile_set_usage = ifc4_file.create_entity(
         type="IfcMaterialProfileSetUsage"
@@ -491,8 +495,10 @@ def merge_all_coincident_structural_point_connections(
     y_vals = set()
     z_vals = set()
     for node in all_nodes:
-        coordinates_of_node = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
-            structural_point_connection=node,
+        coordinates_of_node = (
+            ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                structural_point_connection=node,
+            )
         )
         x_vals.add(coordinates_of_node[0])
         y_vals.add(coordinates_of_node[1])
@@ -509,8 +515,10 @@ def merge_all_coincident_structural_point_connections(
 
     # Sort the nodes into groups
     for node in all_nodes:
-        coordinates_of_node = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
-            structural_point_connection=node,
+        coordinates_of_node = (
+            ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                structural_point_connection=node,
+            )
         )
         x_val = coordinates_of_node[0]
         x_group_num = math.floor(slope_for_x * x_val + -slope_for_x * x_val_min)
@@ -722,20 +730,22 @@ def divide_structural_curve_member(
     length_of_original_member = float(
         np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
     )
-    direction_vector = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=original_start_point,
-        p2=original_end_point,
+    direction_vector = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=original_start_point,
+            p2=original_end_point,
+        )
     )
-    local_orientation_axis_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=original_start_point,
-        p2=original_orientation_point,
+    local_orientation_axis_in_global_coordinates = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=original_start_point,
+            p2=original_orientation_point,
+        )
     )
 
     # Get assigned product
-    assigned_product = (
-        ifcplus.util.structural.get_assigned_product_of_structural_item(
-            structural_item=structural_curve_member
-        )
+    assigned_product = ifcplus.util.structural.get_assigned_product_of_structural_item(
+        structural_item=structural_curve_member
     )
 
     # Get ProfileDef and Material
@@ -747,8 +757,10 @@ def divide_structural_curve_member(
     profile_def = material_profile_set.MaterialProfiles[0].Profile
     material = material_profile_set.MaterialProfiles[0].Material
 
-    structural_analysis_model = ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
-        structural_item=structural_curve_member
+    structural_analysis_model = (
+        ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
+            structural_item=structural_curve_member
+        )
     )
     assert structural_analysis_model
 
@@ -822,9 +834,11 @@ def calculate_orientation_point_from_endpoints(
     p2: tuple[float, float, float],
 ) -> tuple[float, float, float]:
 
-    local_x_axis = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=p1,
-        p2=p2,
+    local_x_axis = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=p1,
+            p2=p2,
+        )
     )
     global_x_axis = (1.0, 0.0, 1.0)
     angle = np.round(
