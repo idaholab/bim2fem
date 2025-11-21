@@ -11,12 +11,62 @@ import ifcplus.util.structural
 import ifcplus.util.project
 import ifcopenshell.api.project
 import ifcplus.api.material
-import ifcplus.api.product
 import math
 import numpy as np
 import ifcplus.api.structural
 import ifcopenshell.util.element
-from ifcplus.util.geometry import HorizontalCurve
+import ifcopenshell.util.representation
+from typing import cast
+import ifcopenshell
+import ifcopenshell.api.owner
+import ifcopenshell.guid
+
+
+def assign_structural_items_to_product(
+    file: ifcopenshell.file,
+    structural_items: list[ifcopenshell.entity_instance],
+    product: ifcopenshell.entity_instance,
+) -> ifcopenshell.entity_instance | None:
+    """Assigns IfcStructuralItems to an IfcProduct
+
+    If an object is already assigned to the product, it will not be assigned
+    twice.
+
+    :param objects: A list of IfcObjects to assign to the product
+    :param product: The IfcProduct to assign the objects to
+    :return: The IfcRelAssignsToProduct relationship
+        or `None` if `objects` was empty list.
+
+    Example:
+
+    .. code:: python
+
+        product = ifcopenshell.api.root.create_entity(file, "IfcBeam")
+        ifcopenshell.api.product.assign_product(file,
+            objects=model.by_type("IfcStructuralCurveMember"), product=product)
+    """
+    if not structural_items:
+        return
+
+    referenced_by: tuple[ifcopenshell.entity_instance, ...]
+    if not (referenced_by := product.ReferencedBy):
+        return file.create_entity(
+            "IfcRelAssignsToProduct",
+            **{
+                "GlobalId": ifcopenshell.guid.new(),
+                "OwnerHistory": ifcopenshell.api.owner.create_owner_history(file),
+                "RelatedObjects": structural_items,
+                "RelatingProduct": product,
+            },
+        )
+    rel = referenced_by[0]
+    related_objects = set(rel.RelatedObjects) or set()
+    objects_set = set(structural_items)
+    if objects_set.issubset(related_objects):
+        return rel
+    rel.RelatedObjects = list(related_objects | objects_set)
+    ifcopenshell.api.owner.update_owner_history(file=file, element=rel)
+    return rel
 
 
 def add_structural_analysis_model(
@@ -34,11 +84,13 @@ def add_structural_analysis_model(
     )
 
     shared_placement = ifc4_file.createIfcLocalPlacement()
+
     shared_placement.RelativePlacement = ifc4_file.createIfcAxis2Placement3D(
         ifc4_file.createIfcCartesianPoint((0.0, 0.0, 0.0)),
         ifc4_file.createIfcDirection((0.0, 0.0, 1.0)),
         ifc4_file.createIfcDirection((1.0, 0.0, 0.0)),
     )
+
     structural_analysis_model.SharedPlacement = shared_placement
 
     project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
@@ -56,19 +108,17 @@ def create_linear_structural_curve_member(
     start_point: tuple[float, float, float],
     end_point: tuple[float, float, float],
     orientation_point: tuple[float, float, float],
-    profile_def: ifcopenshell.entity_instance,
+    profile: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
     structural_analysis_model: ifcopenshell.entity_instance,
     structural_curve_member: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    corresponding_product: ifcopenshell.entity_instance | None = None,
+    product_to_be_assigned_to: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
     """Create Linear IfcStructuralCurveMember"""
 
-    # Get IFC4 File
-    ifc4_file = profile_def.file
+    ifc4_file = profile.file
 
-    # Create StructuralCurveMember
     if structural_curve_member is None:
         structural_curve_member = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -77,71 +127,90 @@ def create_linear_structural_curve_member(
             predefined_type="NOTDEFINED",
         )
         if name is None:
-            name = f"FrameMember-{structural_curve_member.id()}"
+            name = f"StructuralCurveMember-{structural_curve_member.id()}"
             structural_curve_member.Name = name
 
-    # Assign StructuralCurveMember to StructuralAnalysisModel
     ifcopenshell.api.structural.assign_structural_analysis_model(
         file=structural_analysis_model.file,
         products=[structural_curve_member],
         structural_analysis_model=structural_analysis_model,
     )
+
     structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
-    # Add Axis (aka Z-axis orientation) attribute
-    z_axis = np.array(orientation_point) - np.array(start_point)
-    structural_curve_member.Axis = ifc4_file.createIfcDirection(
-        tuple([float(val) for val in z_axis])
-    )
-
-    # Create Vertex Points
-    vertex_points = []
-    for point in [start_point, end_point]:
-        vertex_points.append(
-            ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc4_file, point_coordinates=point
-            )
-        )
-
-    # Add and assign representation
-    representation_item = ifcplus.api.geometry.add_edge(
-        edge_start_as_vertex_point=vertex_points[0],
-        edge_end_as_vertex_point=vertex_points[1],
-    )
-    shape_model = ifcplus.api.geometry.add_shape_model(
-        ifc4_file=ifc4_file,
-        shape_model_class="IfcTopologyRepresentation",
-        representation_identifier="Reference",
-        representation_type="Edge",
-        context_type="Model",
-        target_view="MODEL_VIEW",
-        items=[representation_item],
-    )
-    ifcopenshell.api.geometry.assign_representation(
-        file=ifc4_file,
-        product=structural_curve_member,
-        representation=shape_model,
-    )
-
-    # Add and Assign MaterialProfileSetUsage
     material_profile_set = (
         ifcplus.api.material.add_material_profile_set_with_single_material_profile(
             material=material,
-            profile=profile_def,
+            profile=profile,
             check_for_duplicate=True,
         )
     )
+
     material_profile_set_usage = ifc4_file.create_entity(
-        type="IfcMaterialProfileSetUsage"
+        type="IfcMaterialProfileSetUsage",
+        ForProfileSet=material_profile_set,
     )
-    material_profile_set_usage.ForProfileSet = material_profile_set
+
     ifcopenshell.api.material.assign_material(
         file=ifc4_file,
         products=[structural_curve_member],
         material=material_profile_set_usage,
     )
 
-    # Add and Assign StructuralPointConnections
+    x_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
+
+    vector_from_start_point_to_orientation_point = tuple(
+        (np.array(orientation_point) - np.array(start_point)).tolist()
+    )
+
+    y_axis = tuple(
+        np.cross(
+            vector_from_start_point_to_orientation_point,
+            x_axis,
+        ).tolist()
+    )
+
+    z_axis = ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+        vector1=x_axis,
+        vector2=y_axis,
+        unit_normalize=True,
+    )
+
+    structural_curve_member.Axis = ifc4_file.createIfcDirection(z_axis)
+
+    vertex_points = []
+    for point in [start_point, end_point]:
+        vertex_points.append(
+            ifcplus.api.geometry.add_vertex_point(
+                ifc4_file=ifc4_file,
+                point_coordinates=point,
+            )
+        )
+
+    edge = ifcplus.api.geometry.add_edge(
+        edge_start_as_vertex_point=vertex_points[0],
+        edge_end_as_vertex_point=vertex_points[1],
+    )
+
+    shape_representation = ifcplus.api.geometry.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcTopologyRepresentation",
+        representation_identifier="Reference",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[edge]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
+        items=[edge],
+    )
+
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=structural_curve_member,
+        representation=shape_representation,
+    )
+
     for vertex_point in vertex_points:
         structural_point_connection = create_structural_point_connection(
             vertex_point=vertex_point,
@@ -154,33 +223,35 @@ def create_linear_structural_curve_member(
             related_structural_connection=structural_point_connection,
         )
 
-    # Assign to corresponding IfcProduct
-    if corresponding_product:
-        ifcplus.api.product.assign_product(
+    if product_to_be_assigned_to:
+        assign_structural_items_to_product(
             file=ifc4_file,
-            objects=[structural_curve_member],
-            product=corresponding_product,
+            structural_items=[structural_curve_member],
+            product=product_to_be_assigned_to,
         )
 
     return structural_curve_member
 
 
 def create_curved_structural_curve_member(
-    horizontal_curve: HorizontalCurve,
+    start_point: tuple[float, float, float],
+    end_point: tuple[float, float, float],
     orientation_point: tuple[float, float, float],
-    profile_def: ifcopenshell.entity_instance,
+    point_defining_plane_of_arc_and_center_of_curvature_side: tuple[
+        float, float, float
+    ],
+    radius_of_curvature: float,
+    profile: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
     structural_analysis_model: ifcopenshell.entity_instance,
     structural_curve_member: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
-    corresponding_product: ifcopenshell.entity_instance | None = None,
+    product_to_be_assigned_to: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
-    """Create Linear IfcStructuralCurveMember"""
+    """Create Curved IfcStructuralCurveMember"""
 
-    # Get IFC4 File
-    ifc4_file = profile_def.file
+    ifc4_file = profile.file
 
-    # Create StructuralCurveMember
     if structural_curve_member is None:
         structural_curve_member = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -189,24 +260,64 @@ def create_curved_structural_curve_member(
             predefined_type="NOTDEFINED",
         )
         if name is None:
-            name = f"FrameMember-{structural_curve_member.id()}"
+            name = f"StructuralCurveMember-{structural_curve_member.id()}"
             structural_curve_member.Name = name
 
-    # Assign StructuralCurveMember to StructuralAnalysisModel
     ifcopenshell.api.structural.assign_structural_analysis_model(
         file=structural_analysis_model.file,
         products=[structural_curve_member],
         structural_analysis_model=structural_analysis_model,
     )
+
     structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
-    # Add Axis (aka Z-axis orientation) attribute
-    z_axis = np.array(orientation_point) - np.array(horizontal_curve.point_of_curvature)
-    structural_curve_member.Axis = ifc4_file.createIfcDirection(
-        tuple([float(val) for val in z_axis])
+    material_profile_set = (
+        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+            material=material,
+            profile=profile,
+            check_for_duplicate=True,
+        )
     )
 
-    # Create Vertex Points
+    material_profile_set_usage = ifc4_file.create_entity(
+        type="IfcMaterialProfileSetUsage",
+        ForProfileSet=material_profile_set,
+    )
+
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[structural_curve_member],
+        material=material_profile_set_usage,
+    )
+
+    horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+        point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
+        point_of_curvature=start_point,
+        point_of_tangency=end_point,
+        radius_of_curvature=radius_of_curvature,
+    )
+
+    x_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
+
+    vector_from_start_point_to_orientation_point = tuple(
+        (np.array(orientation_point) - np.array(start_point)).tolist()
+    )
+
+    y_axis = tuple(
+        np.cross(
+            vector_from_start_point_to_orientation_point,
+            x_axis,
+        ).tolist()
+    )
+
+    z_axis = ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+        vector1=x_axis,
+        vector2=y_axis,
+        unit_normalize=True,
+    )
+
+    structural_curve_member.Axis = ifc4_file.createIfcDirection(z_axis)
+
     vertex_points = []
     for point in [
         horizontal_curve.point_of_curvature,
@@ -218,46 +329,32 @@ def create_curved_structural_curve_member(
             )
         )
 
-    # Add and assign representation
-    representation_item = ifcplus.api.geometry.add_edge_curve(
+    edge_curve = ifcplus.api.geometry.add_edge_curve(
         point_of_curvature_as_vertex_point=vertex_points[0],
         point_of_tangency_as_vertex_point=vertex_points[1],
-        center_of_curvature=horizontal_curve.center_of_curvature,
+        point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve.center_of_curvature,
+        radius_of_curvature=horizontal_curve.radius_of_curvature,
     )
-    shape_model = ifcplus.api.geometry.add_shape_model(
+
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
-        representation_type="Edge",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[edge_curve]),
+        ),
         context_type="Model",
         target_view="MODEL_VIEW",
-        items=[representation_item],
+        items=[edge_curve],
     )
+
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=structural_curve_member,
-        representation=shape_model,
+        representation=shape_representation,
     )
 
-    # Add and Assign MaterialProfileSetUsage
-    material_profile_set = (
-        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-            material=material,
-            profile=profile_def,
-            check_for_duplicate=True,
-        )
-    )
-    material_profile_set_usage = ifc4_file.create_entity(
-        type="IfcMaterialProfileSetUsage"
-    )
-    material_profile_set_usage.ForProfileSet = material_profile_set
-    ifcopenshell.api.material.assign_material(
-        file=ifc4_file,
-        products=[structural_curve_member],
-        material=material_profile_set_usage,
-    )
-
-    # Add and Assign StructuralPointConnections
     for vertex_point in vertex_points:
         structural_point_connection = create_structural_point_connection(
             vertex_point=vertex_point,
@@ -270,33 +367,30 @@ def create_curved_structural_curve_member(
             related_structural_connection=structural_point_connection,
         )
 
-    # Assign to corresponding IfcProduct
-    if corresponding_product:
-        ifcplus.api.product.assign_product(
+    if product_to_be_assigned_to:
+        assign_structural_items_to_product(
             file=ifc4_file,
-            objects=[structural_curve_member],
-            product=corresponding_product,
+            structural_items=[structural_curve_member],
+            product=product_to_be_assigned_to,
         )
 
     return structural_curve_member
 
 
-def create_npt_structural_surface_member(
-    outer_profile: list[tuple[float, float, float]],  # Global XYZ
-    inner_profiles: list[list[tuple[float, float, float]]],  # Global XYZ
-    thickness: float,
-    material: ifcopenshell.entity_instance,
+def create_structural_surface_member(
+    outer_profile: list[tuple[float, float, float]],
+    materials: list[ifcopenshell.entity_instance],
+    thicknesses: list[float],
     structural_analysis_model: ifcopenshell.entity_instance,
+    inner_profiles: list[list[tuple[float, float, float]]] = [],
     structural_surface_member: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     corresponding_product: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
-    """Create npt IfcStructuralSurfaceMember"""
+    """Create IfcStructuralSurfaceMember"""
 
-    # Get IFC4 File
-    ifc4_file = material.file
+    ifc4_file = materials[0].file
 
-    # Create StructuralCurveMember
     if structural_surface_member is None:
         structural_surface_member = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -308,20 +402,42 @@ def create_npt_structural_surface_member(
         name = f"StructuralSurfaceMember-{structural_surface_member.id()}"
         structural_surface_member.Name = name
 
-    # Assign StructuralSurfaceMember to StructuralAnalysisModel
     ifcopenshell.api.structural.assign_structural_analysis_model(
         file=structural_analysis_model.file,
         products=[structural_surface_member],
         structural_analysis_model=structural_analysis_model,
     )
+
     structural_surface_member.ObjectPlacement = (
         structural_analysis_model.SharedPlacement
     )
 
-    # Assign thickness
-    structural_surface_member.Thickness = thickness
+    material_layer_set = ifcplus.api.material.add_material_layer_set(
+        materials=materials,
+        thicknesses=thicknesses,
+        check_for_duplicate=True,
+    )
 
-    # Create Vertex Points of Outer Profile
+    total_thickness = 0.0
+    for material_layer in material_layer_set.MaterialLayers:
+        total_thickness += material_layer.LayerThickness
+
+    material_layer_set_usage = ifc4_file.create_entity(
+        type="IfcMaterialLayerSetUsage",
+        ForLayerSet=material_layer_set,
+        LayerSetDirection="AXIS3",
+        DirectionSense="POSITIVE",
+        OffsetFromReferenceLine=-total_thickness / 2,
+    )
+
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[structural_surface_member],
+        material=material_layer_set_usage,
+    )
+
+    structural_surface_member.Thickness = total_thickness
+
     vertex_points_of_outer_profile = []
     for point in outer_profile:
         vertex_points_of_outer_profile.append(
@@ -331,7 +447,6 @@ def create_npt_structural_surface_member(
             )
         )
 
-    # Create Vertex Points of Inner Profiles
     vertex_points_of_inner_profiles = []
     for inner_profile in inner_profiles:
         vertex_points_of_inner_profile = []
@@ -344,45 +459,30 @@ def create_npt_structural_surface_member(
             )
         vertex_points_of_inner_profiles.append(vertex_points_of_inner_profile)
 
-    # Add and assign representation
-    representation_item = ifcplus.api.geometry.add_face_surface(
+    face_surface = ifcplus.api.geometry.add_face_surface(
         vertex_points_of_outer_bound=vertex_points_of_outer_profile,
         vertex_points_of_inner_bounds=vertex_points_of_inner_profiles,
     )
-    shape_model = ifcplus.api.geometry.add_shape_model(
+
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
-        representation_type="Face",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[face_surface]),
+        ),  # Face
         context_type="Model",
         target_view="MODEL_VIEW",
-        items=[representation_item],
+        items=[face_surface],
     )
+
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=structural_surface_member,
-        representation=shape_model,
+        representation=shape_representation,
     )
 
-    # Add and Assign MaterialLayerSetUsage
-    material_layer_set = ifcplus.api.material.add_material_layer_set(
-        materials=[material],
-        thicknesses=[thickness],
-        name=None,
-        check_for_duplicate=True,
-    )
-    material_layer_set_usage = ifc4_file.create_entity(type="IfcMaterialLayerSetUsage")
-    material_layer_set_usage.ForLayerSet = material_layer_set
-    material_layer_set_usage.LayerSetDirection = "AXIS3"
-    material_layer_set_usage.DirectionSense = "POSITIVE"
-    material_layer_set_usage.OffsetFromReferenceLine = -thickness / 2
-    ifcopenshell.api.material.assign_material(
-        file=ifc4_file,
-        products=[structural_surface_member],
-        material=material_layer_set_usage,
-    )
-
-    # Add and Assign StructuralPointConnections
     for vertex_point in vertex_points_of_outer_profile:
         structural_point_connection = create_structural_point_connection(
             vertex_point=vertex_point,
@@ -407,11 +507,10 @@ def create_npt_structural_surface_member(
                 related_structural_connection=structural_point_connection,
             )
 
-    # Assign to corresponding IfcProduct
     if corresponding_product:
-        ifcplus.api.product.assign_product(
+        assign_structural_items_to_product(
             file=ifc4_file,
-            objects=[structural_surface_member],
+            structural_items=[structural_surface_member],
             product=corresponding_product,
         )
 
@@ -425,10 +524,8 @@ def create_structural_point_connection(
 ) -> ifcopenshell.entity_instance:
     """Create IfcStructuralPointConnection"""
 
-    # Get IFC4 File
     ifc4_file = vertex_point.file
 
-    # Create IfcStructuralPointConnection
     structural_point_connection = ifcopenshell.api.root.create_entity(
         file=ifc4_file,
         ifc_class="IfcStructuralPointConnection",
@@ -438,30 +535,33 @@ def create_structural_point_connection(
         name = f"Node-{structural_point_connection.id()}"
         structural_point_connection.Name = name
 
-    # Assign StructuralCurveMember to StructuralAnalysisModel
     ifcopenshell.api.structural.assign_structural_analysis_model(
         file=structural_analysis_model.file,
         products=[structural_point_connection],
         structural_analysis_model=structural_analysis_model,
     )
+
     structural_point_connection.ObjectPlacement = (
         structural_analysis_model.SharedPlacement
     )
 
-    # Add and assign representation
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_representation = ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
-        representation_type="Vertex",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[vertex_point]),
+        ),  # Vertex
         context_type="Model",
         target_view="MODEL_VIEW",
         items=[vertex_point],
     )
+
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=structural_point_connection,
-        representation=shape_model,
+        representation=shape_representation,
     )
 
     return structural_point_connection
@@ -469,14 +569,12 @@ def create_structural_point_connection(
 
 def merge_all_coincident_structural_point_connections(
     ifc4sav_file: ifcopenshell.file,
-):
+) -> ifcopenshell.file:
 
-    # Get Model Precision
     model_precision = ifcplus.util.project.get_precision_of_project(
         ifc4_file=ifc4sav_file
     )
 
-    # Set up node groups
     node_groups = {}
     num_x_divisions = 8
     num_y_divisions = 8
@@ -490,7 +588,6 @@ def merge_all_coincident_structural_point_connections(
         type="IfcStructuralPointConnection", include_subtypes=False
     )
 
-    # Get parameters for equations used to group nodes
     x_vals = set()
     y_vals = set()
     z_vals = set()
@@ -513,7 +610,6 @@ def merge_all_coincident_structural_point_connections(
     z_val_max = max(z_vals) + 1
     slope_for_z = num_z_divisions / (z_val_max - z_val_min)
 
-    # Sort the nodes into groups
     for node in all_nodes:
         coordinates_of_node = (
             ifcplus.util.structural.get_coordinates_of_structural_point_connection(
@@ -529,14 +625,12 @@ def merge_all_coincident_structural_point_connections(
         group_key = f"{x_group_num}{y_group_num}{z_group_num}"
         node_groups[group_key].append(node)
 
-    # Sanity Check
     count_of_nodes_in_groups = 0
     for node_group in node_groups.values():
         count_of_nodes_in_groups += len(node_group)
     if count_of_nodes_in_groups != len(all_nodes):
-        exit("Not all nodes accounted for. Aborting.")
+        return ifc4sav_file
 
-    # Merge Nodes
     all_merged_nodes = []
     for node_group in node_groups.values():
         trial_nodes = node_group
@@ -568,13 +662,8 @@ def merge_two_structural_point_connections_together(
     replaced_structural_point_connection: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance:
 
-    # Get IFC File
     ifc4sav_file = replacing_structural_point_connection.file
 
-    # Replace structural connections
-    assert isinstance(
-        replaced_structural_point_connection.ConnectsStructuralMembers, tuple
-    )
     for (
         rel_connects_structural_member
     ) in replaced_structural_point_connection.ConnectsStructuralMembers:
@@ -582,22 +671,22 @@ def merge_two_structural_point_connections_together(
             replacing_structural_point_connection
         )
 
-    # Replace VertexPoint
     replacing_vertex_point = (
         ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replacing_structural_point_connection,
         )
     )
+
     replaced_vertex_point = (
         ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replaced_structural_point_connection,
         )
     )
-    assert isinstance(replaced_vertex_point, ifcopenshell.entity_instance)
-    entities_refercing_replaced_vertex_point = ifc4sav_file.get_inverse(
+
+    entities_referencing_replaced_vertex_point = ifc4sav_file.get_inverse(
         inst=replaced_vertex_point
     )
-    for entity in entities_refercing_replaced_vertex_point:
+    for entity in entities_referencing_replaced_vertex_point:
         if not isinstance(entity, ifcopenshell.entity_instance):
             continue
         elif entity.is_a() == "IfcEdge":
@@ -615,22 +704,16 @@ def merge_two_structural_point_connections_together(
                 entity.EdgeEnd = replacing_vertex_point
                 continue
 
-    # Get replaced CartesianPoint
     replaced_cartesian_point = replaced_vertex_point.VertexGeometry
 
-    # Get replaced ProductDefinitionShape
     replaced_product_definition_shape = (
         replaced_structural_point_connection.Representation
     )
 
-    # Get replaced Topologyrepresentation
-    assert isinstance(replaced_product_definition_shape, ifcopenshell.entity_instance)
-    assert isinstance(replaced_product_definition_shape.Representations, tuple)
     replaced_topology_representation = (
         replaced_product_definition_shape.Representations[0]
     )
 
-    # Get replaced OwnerHistory
     ifc4_file = replaced_structural_point_connection.file
     owner_history_of_replaced_structural_point_connection = (
         replaced_structural_point_connection.OwnerHistory
@@ -645,7 +728,6 @@ def merge_two_structural_point_connections_together(
     else:
         replaced_owner_history = None
 
-    # Remove replaced entities
     for replaced_entity in [
         replaced_cartesian_point,
         replaced_vertex_point,
@@ -706,13 +788,10 @@ def divide_structural_curve_member(
     division_locations_as_proportions_of_length: list[float],
 ) -> list[ifcopenshell.entity_instance]:
 
-    # Check number of divisions
     if len(division_locations_as_proportions_of_length) == 0:
         return [structural_curve_member]
 
-    # Validate the input list to ensure all division locations are between 0.0 and 1.0 (exclusive)
     if all(0.0 < num < 1.0 for num in division_locations_as_proportions_of_length):
-        # Sort the list in ascending order
         division_locations_as_proportions_of_length = sorted(
             division_locations_as_proportions_of_length
         )
@@ -721,39 +800,41 @@ def divide_structural_curve_member(
             "All elements in the list must be between 0.0 and 1.0 (exclusive)"
         )
 
-    # Get various parameters
     original_start_point, original_end_point, original_orientation_point = (
         ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=structural_curve_member
         )
     )
+
     length_of_original_member = float(
         np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
     )
-    direction_vector = (
+
+    original_x_axis = (
         ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
             p1=original_start_point,
             p2=original_end_point,
         )
     )
-    local_orientation_axis_in_global_coordinates = (
+
+    original_z_axis = (
         ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
             p1=original_start_point,
             p2=original_orientation_point,
         )
     )
 
-    # Get assigned product
-    assigned_product = ifcplus.util.structural.get_assigned_product_of_structural_item(
-        structural_item=structural_curve_member
+    product_assigned_to = (
+        ifcplus.util.structural.get_assigned_product_of_structural_item(
+            structural_item=structural_curve_member
+        )
     )
 
-    # Get ProfileDef and Material
     material_profile_set = ifcopenshell.util.element.get_material(
         element=structural_curve_member,
         should_skip_usage=True,
     )
-    assert isinstance(material_profile_set, ifcopenshell.entity_instance)
+    material_profile_set = cast(ifcopenshell.entity_instance, material_profile_set)
     profile_def = material_profile_set.MaterialProfiles[0].Profile
     material = material_profile_set.MaterialProfiles[0].Material
 
@@ -762,98 +843,88 @@ def divide_structural_curve_member(
             structural_item=structural_curve_member
         )
     )
-    assert structural_analysis_model
+
+    structural_analysis_model = cast(
+        ifcopenshell.entity_instance, structural_analysis_model
+    )
 
     new_end_points = []
     for (
         division_location_as_proportion_of_length
     ) in division_locations_as_proportions_of_length + [1.0]:
         new_end_point = tuple(
-            float(val)
-            for val in (
+            (
                 np.array(original_start_point)
-                + np.array(direction_vector)
+                + np.array(original_x_axis)
                 * division_location_as_proportion_of_length
                 * length_of_original_member
             ).tolist()
         )
-        assert len(new_end_point) == 3
         new_end_points.append(new_end_point)
 
     new_structural_curve_members = []
     new_start_point = original_start_point
     for index, new_end_point in enumerate(new_end_points):
+
         new_orientation_point = tuple(
-            float(val)
-            for val in (
-                np.array(new_start_point)
-                + np.array(local_orientation_axis_in_global_coordinates) * 1.0
-            ).tolist()
+            (np.array(new_start_point) + np.array(original_z_axis) * 1.0).tolist()
         )
-        assert len(new_orientation_point) == 3
 
         if index == 0:
-            translation = tuple(
-                float(val)
-                for val in (
-                    np.array(new_end_point) - np.array(original_end_point)
-                ).tolist()
-            )
-            assert len(translation) == 3
-            second_node_of_structural_curve_member = ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
-                linear_structural_curve_member=structural_curve_member
-            )[
-                1
-            ]
-            translate_structural_point_connection(
-                structural_point_connection=second_node_of_structural_curve_member,
-                translation=translation,
-            )
-            new_structural_curve_members.append(structural_curve_member)
+
+            pass
+
         else:
+
             new_structural_curve_member = (
                 ifcplus.api.structural.create_linear_structural_curve_member(
                     start_point=new_start_point,
                     end_point=new_end_point,
                     orientation_point=new_orientation_point,
-                    profile_def=profile_def,
+                    profile=profile_def,
                     material=material,
                     structural_analysis_model=structural_analysis_model,
-                    corresponding_product=assigned_product,
+                    product_to_be_assigned_to=product_assigned_to,
                 )
             )
+
             new_structural_curve_members.append(new_structural_curve_member)
 
         new_start_point = new_end_point
 
+    _, original_end_node_of_whole_member = (
+        ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+            linear_structural_curve_member=structural_curve_member,
+        )
+    )
+
+    segment_1 = structural_curve_member
+
+    edge_1 = segment_1.Representation.Representations[0].Items[0]
+
+    segment_2 = new_structural_curve_members[0]
+
+    edge_2 = segment_2.Representation.Representations[0].Items[0]
+
+    edge_1.EdgeEnd = edge_2.EdgeStart
+
+    start_node_of_segment_2 = (
+        ifcplus.util.structural.get_structural_point_connection_of_vertex_point(
+            vertex_point=edge_2.EdgeStart,
+        )
+    )
+
+    for connection_relationship in segment_1.ConnectedBy:
+        if not connection_relationship.is_a("IfcRelConnectsStructuralMember"):
+            continue
+        if (
+            connection_relationship.RelatedStructuralConnection
+            == original_end_node_of_whole_member
+        ):
+            connection_relationship.RelatedStructuralConnection = (
+                start_node_of_segment_2
+            )
+
+    new_structural_curve_members = [segment_1] + new_structural_curve_members
+
     return new_structural_curve_members
-
-
-def calculate_orientation_point_from_endpoints(
-    p1: tuple[float, float, float],
-    p2: tuple[float, float, float],
-) -> tuple[float, float, float]:
-
-    local_x_axis = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=p1,
-            p2=p2,
-        )
-    )
-    global_x_axis = (1.0, 0.0, 1.0)
-    angle = np.round(
-        ifcplus.util.geometry.calculate_angle_between_two_vectors(
-            vector1=local_x_axis,
-            vector2=global_x_axis,
-        ),
-        4,
-    )
-    if angle == 0.0 or angle == np.pi:
-        p3 = (0.0, 0.0, 1.0)
-    else:
-        p3 = ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
-            vector1=local_x_axis,
-            vector2=global_x_axis,
-        )
-
-    return p3

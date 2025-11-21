@@ -176,8 +176,10 @@ def snap_walls_to_slabs(
 
                 nodes_that_need_translation = []
                 for connected_wall in connected_walls:
-                    nodes_of_connected_wall = ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
-                        triangular_structural_surface_member=connected_wall
+                    nodes_of_connected_wall = list(
+                        ifcplus.util.structural.get_structural_point_connections_of_triangular_structural_surface_member(
+                            triangular_structural_surface_member=connected_wall
+                        )
                     )
                     nodes_that_need_translation += nodes_of_connected_wall
                 nodes_that_need_translation = list(set(nodes_that_need_translation))
@@ -205,8 +207,10 @@ def get_walls_connected_to_wall(
     wall: ifcopenshell.entity_instance,
 ) -> list[ifcopenshell.entity_instance]:
 
-    nodes_of_given_wall = ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
-        triangular_structural_surface_member=wall
+    nodes_of_given_wall = list(
+        ifcplus.util.structural.get_structural_point_connections_of_triangular_structural_surface_member(
+            triangular_structural_surface_member=wall
+        )
     )
 
     walls_connected_to_nodes_of_given_wall = []

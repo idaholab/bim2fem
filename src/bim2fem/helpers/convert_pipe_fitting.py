@@ -259,17 +259,13 @@ def convert_pipe_fitting_to_structural_items(
             )
             assert isinstance(material, ifcopenshell.entity_instance)
 
-            incoming_segment_vector = (
-                ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-                    p1=incoming_segment[0],
-                    p2=incoming_segment[1],
-                )
+            incoming_segment_vector = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+                p1=incoming_segment[0],
+                p2=incoming_segment[1],
             )
-            outgoing_segment_vector = (
-                ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-                    p1=outgoing_segment[0],
-                    p2=outgoing_segment[1],
-                )
+            outgoing_segment_vector = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+                p1=outgoing_segment[0],
+                p2=outgoing_segment[1],
             )
             local_z_axis_in_global_coordinates = (
                 ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
@@ -287,10 +283,10 @@ def convert_pipe_fitting_to_structural_items(
                 ifcplus.api.structural.create_curved_structural_curve_member(
                     horizontal_curve,
                     orientation_point=orientation_point,
-                    profile_def=profile_def,
+                    profile=profile_def,
                     material=material,
                     structural_analysis_model=structural_analysis_model,
-                    corresponding_product=pipe_fitting_copied_to_destination_file,
+                    product_to_be_assigned_to=pipe_fitting_copied_to_destination_file,
                 )
             )
 

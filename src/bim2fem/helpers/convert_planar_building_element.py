@@ -129,10 +129,12 @@ def convert_planar_building_element_to_structural_surface_members(
             )
         }
     )
-    standard_material_name = ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
-        element=planar_building_element_from_source_file,
-        region=region,
-        other_material_names=material_names_from_destination_file,
+    standard_material_name = (
+        ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
+            element=planar_building_element_from_source_file,
+            region=region,
+            other_material_names=material_names_from_destination_file,
+        )
     )
     if standard_material_name is None:
         if region == "Europe":
@@ -228,13 +230,11 @@ def convert_planar_building_element_to_structural_surface_members(
         element_type_class = "IfcWallType"
     else:
         element_type_class = "IfcPlateType"
-    element_type = (
-        ifcplus.api.element_type.add_slab_or_wall_or_plate_element_type(
-            ifc_class=element_type_class,
-            materials=[material],
-            thicknesses=[thickness],
-            check_for_duplicate=True,
-        )
+    element_type = ifcplus.api.element_type.add_slab_or_wall_or_plate_element_type(
+        ifc_class=element_type_class,
+        materials=[material],
+        thicknesses=[thickness],
+        check_for_duplicate=True,
     )
     ifcopenshell.api.type.assign_type(
         file=ifc4_destination_file,
@@ -268,7 +268,7 @@ def convert_planar_building_element_to_structural_surface_members(
                 ).tolist()
             )
             translated_coordinates_of_face_in_group_1.append(translated_point)
-        ifcplus.api.structural.create_npt_structural_surface_member(
+        ifcplus.api.structural.create_structural_surface_member(
             outer_profile=translated_coordinates_of_face_in_group_1,
             inner_profiles=[],
             thickness=thickness,

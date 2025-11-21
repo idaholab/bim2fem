@@ -28,3 +28,6 @@ OUTPUT_DIR_FOR_NUCLEAR.mkdir(exist_ok=True)
 
 OUTPUT_DIR_FOR_BUILT_ELEMENT = OUTPUT_DIR / "built_element"
 OUTPUT_DIR_FOR_BUILT_ELEMENT.mkdir(exist_ok=True)
+
+OUTPUT_DIR_FOR_STRUCTURAL = OUTPUT_DIR / "structural"
+OUTPUT_DIR_FOR_STRUCTURAL.mkdir(exist_ok=True)

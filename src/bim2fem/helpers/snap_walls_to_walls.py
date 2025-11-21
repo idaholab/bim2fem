@@ -64,15 +64,13 @@ def snap_walls_to_perpendicular_walls(
                 wall_2
             ]
 
-            walls_are_perpendicular, _ = (
-                ifcplus.util.geometry.planes_are_right_angled(
-                    a1=original_coordinates_of_points_of_wall_1[0],
-                    b1=original_coordinates_of_points_of_wall_1[1],
-                    c1=original_coordinates_of_points_of_wall_1[2],
-                    a2=original_coordinates_of_points_of_wall_2[0],
-                    b2=original_coordinates_of_points_of_wall_2[1],
-                    c2=original_coordinates_of_points_of_wall_2[2],
-                )
+            walls_are_perpendicular, _ = ifcplus.util.geometry.planes_are_right_angled(
+                a1=original_coordinates_of_points_of_wall_1[0],
+                b1=original_coordinates_of_points_of_wall_1[1],
+                c1=original_coordinates_of_points_of_wall_1[2],
+                a2=original_coordinates_of_points_of_wall_2[0],
+                b2=original_coordinates_of_points_of_wall_2[1],
+                c2=original_coordinates_of_points_of_wall_2[2],
             )
             if not walls_are_perpendicular:
                 continue
@@ -121,11 +119,15 @@ def snap_walls_to_perpendicular_walls(
             # p1 = tuple(float(val) for val in p1.tolist())
             # assert len(p1) == 3
 
-            nodes_of_wall_1 = ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
-                triangular_structural_surface_member=wall_1
+            nodes_of_wall_1 = list(
+                ifcplus.util.structural.get_structural_point_connections_of_triangular_structural_surface_member(
+                    triangular_structural_surface_member=wall_1
+                )
             )
-            nodes_of_wall_2 = ifcplus.util.structural.get_ordered_structural_point_connections_of_triangular_structural_surface_member(
-                triangular_structural_surface_member=wall_2
+            nodes_of_wall_2 = list(
+                ifcplus.util.structural.get_structural_point_connections_of_triangular_structural_surface_member(
+                    triangular_structural_surface_member=wall_2
+                )
             )
 
             for wall_node in nodes_of_wall_1 + nodes_of_wall_2:

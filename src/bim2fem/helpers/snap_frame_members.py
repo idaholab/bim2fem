@@ -330,8 +330,10 @@ def get_allowable_snapping_distance_between_structural_curve_members(
         #         ]
         #     )
 
-        largest_dimension = ifcplus.util.profile.get_large_dimension_of_parameterized_profile_def(
-            parameterized_profile_def=profile_def
+        largest_dimension = (
+            ifcplus.util.profile.get_large_dimension_of_parameterized_profile_def(
+                parameterized_profile_def=profile_def
+            )
         )
 
         # Append to list
@@ -409,7 +411,7 @@ def snap_sets_of_structural_curve_members_together(
             )
 
             # Get StructuralPointConnections of snapping member
-            structural_point_connections_of_snapping_member = ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
+            structural_point_connections_of_snapping_member = ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
                 linear_structural_curve_member=snapping_member,
             )
 
