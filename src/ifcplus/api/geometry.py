@@ -102,6 +102,7 @@ def add_block(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
@@ -170,8 +171,8 @@ def add_cylindrical_extruded_area_solid(
 
     extruded_area_solid = add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=extrusion_depth,
+        swept_area=profile,
+        depth=extrusion_depth,
         repositioned_origin=repositioned_origin,
         repositioned_z_axis=repositioned_z_axis,
         repositioned_x_axis=repositioned_x_axis,
@@ -200,8 +201,8 @@ def add_hollow_cylindrical_extruded_area_solid(
 
     extruded_area_solid = add_extruded_area_solid(
         ifc4_file=ifc4_file,
-        profile=profile,
-        extrusion_depth=extrusion_depth,
+        swept_area=profile,
+        depth=extrusion_depth,
         repositioned_origin=repositioned_origin,
         repositioned_z_axis=repositioned_z_axis,
         repositioned_x_axis=repositioned_x_axis,
@@ -259,9 +260,9 @@ def add_bounding_box(
 
 def add_extruded_area_solid_tapered(
     ifc4_file: ifcopenshell.file,
-    profile_start: ifcopenshell.entity_instance,
-    profile_end: ifcopenshell.entity_instance,
-    extrusion_depth: float,
+    swept_area: ifcopenshell.entity_instance,
+    end_swept_area: ifcopenshell.entity_instance,
+    depth: float,
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
     repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
     repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
@@ -272,29 +273,46 @@ def add_extruded_area_solid_tapered(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
 
-    extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolidTapered(
-        profile_start,
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(repositioned_origin),
-            ifc4_file.createIfcDirection(repositioned_z_axis_normalized),
-            ifc4_file.createIfcDirection(repositioned_x_axis_normalized),
+    position = ifc4_file.create_entity(
+        type="IfcAxis2Placement3D",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=repositioned_origin,
         ),
-        ifc4_file.createIfcDirection(extruded_direction),
-        extrusion_depth,
-        profile_end,
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_z_axis_normalized,
+        ),
+        RefDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_x_axis_normalized,
+        ),
     )
 
-    return extruded_area_solid
+    extruded_area_solid_tapered = ifc4_file.create_entity(
+        type="IfcExtrudedAreaSolidTapered",
+        SweptArea=swept_area,
+        Position=position,
+        ExtrudedDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=extruded_direction,
+        ),
+        Depth=depth,
+        EndSweptArea=end_swept_area,
+    )
+
+    return extruded_area_solid_tapered
 
 
 def add_extruded_area_solid(
     ifc4_file: ifcopenshell.file,
-    profile: ifcopenshell.entity_instance,
-    extrusion_depth: float,
+    swept_area: ifcopenshell.entity_instance,
+    depth: float,
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
     repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
     repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
@@ -305,19 +323,36 @@ def add_extruded_area_solid(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
 
-    extruded_area_solid = ifc4_file.createIfcExtrudedAreaSolid(
-        profile,
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(repositioned_origin),
-            ifc4_file.createIfcDirection(repositioned_z_axis_normalized),
-            ifc4_file.createIfcDirection(repositioned_x_axis_normalized),
+    position = ifc4_file.create_entity(
+        type="IfcAxis2Placement3D",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=repositioned_origin,
         ),
-        ifc4_file.createIfcDirection(extruded_direction),
-        extrusion_depth,
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_z_axis_normalized,
+        ),
+        RefDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_x_axis_normalized,
+        ),
+    )
+
+    extruded_area_solid = ifc4_file.create_entity(
+        type="IfcExtrudedAreaSolid",
+        SweptArea=swept_area,
+        Position=position,
+        ExtrudedDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=extruded_direction,
+        ),
+        Depth=depth,
     )
 
     return extruded_area_solid
@@ -325,7 +360,7 @@ def add_extruded_area_solid(
 
 def add_revolved_area_solid(
     ifc4_file: ifcopenshell.file,
-    profile: ifcopenshell.entity_instance,
+    swept_area: ifcopenshell.entity_instance,
     central_angle_of_curvature: float,
     center_of_curvature_in_object_xy_plane: tuple[float, float],
     repositioned_origin: tuple[float, float, float] = (0.0, 0.0, 0.0),
@@ -351,24 +386,45 @@ def add_revolved_area_solid(
     repositioned_z_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_z_axis
     )
+
     repositioned_x_axis_normalized = ifcplus.util.geometry.unit_normalize_vector(
         vector=repositioned_x_axis
     )
 
-    revolved_area_solid = ifc4_file.createIfcRevolvedAreaSolid(
-        profile,
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(repositioned_origin),
-            ifc4_file.createIfcDirection(repositioned_z_axis_normalized),
-            ifc4_file.createIfcDirection(repositioned_x_axis_normalized),
+    position = ifc4_file.create_entity(
+        type="IfcAxis2Placement3D",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=repositioned_origin,
         ),
-        ifc4_file.createIfcAxis1Placement(
-            ifc4_file.createIfcCartesianPoint(
-                center_of_curvature_in_object_xyz_coordinates
-            ),
-            ifc4_file.createIfcDirection(direction_of_axis_of_rotation),
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_z_axis_normalized,
         ),
-        central_angle_of_curvature,
+        RefDirection=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=repositioned_x_axis_normalized,
+        ),
+    )
+
+    axis = ifc4_file.create_entity(
+        type="IfcAxis1Placement",
+        Location=ifc4_file.create_entity(
+            type="IfcCartesianPoint",
+            Coordinates=center_of_curvature_in_object_xyz_coordinates,
+        ),
+        Axis=ifc4_file.create_entity(
+            type="IfcDirection",
+            DirectionRatios=direction_of_axis_of_rotation,
+        ),
+    )
+
+    revolved_area_solid = ifc4_file.create_entity(
+        type="IfcRevolvedAreaSolid",
+        SweptArea=swept_area,
+        Position=position,
+        Axis=axis,
+        Angle=central_angle_of_curvature,
     )
 
     return revolved_area_solid
@@ -435,54 +491,58 @@ def add_edge(
     return edge
 
 
-def add_curved_edge(
+def add_edge_curve(
     point_of_curvature_as_vertex_point: ifcopenshell.entity_instance,
     point_of_tangency_as_vertex_point: ifcopenshell.entity_instance,
-    center_of_curvature: tuple[float, float, float],
+    point_defining_plane_of_arc_and_center_of_curvature_side: tuple[
+        float, float, float
+    ],
+    radius_of_curvature: float,
 ) -> ifcopenshell.entity_instance:
     """Add an IfcEdgeCurve"""
 
     ifc4_file = point_of_curvature_as_vertex_point.file
 
     point_of_curvature = point_of_curvature_as_vertex_point.VertexGeometry.Coordinates
-    point_of_tangency = point_of_tangency_as_vertex_point.VertexGeometry.Coordinates
 
-    radius_of_curvature = float(
-        np.linalg.norm(np.array(point_of_curvature) - np.array(center_of_curvature))
-    )
+    point_of_tangency = point_of_tangency_as_vertex_point.VertexGeometry.Coordinates
 
     horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_of_curvature=point_of_curvature,
-        point_on_center_of_curvature_side=center_of_curvature,
+        point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
         point_of_tangency=point_of_tangency,
         radius_of_curvature=radius_of_curvature,
     )
 
-    z_axis = horizontal_curve.direction_of_axis_of_rotation
-
-    x_axis = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=horizontal_curve.point_of_curvature,
-        p2=horizontal_curve.point_of_tangency,
+    some_valid_direction_vector_for_ref_dir = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=horizontal_curve.point_of_curvature,
+            p2=horizontal_curve.point_of_intersection,
+        )
     )
 
     position = ifc4_file.createIfcAxis2Placement3D(
-        ifc4_file.createIfcCartesianPoint(center_of_curvature),
-        ifc4_file.createIfcDirection(z_axis),
-        ifc4_file.createIfcDirection(x_axis),
+        Location=ifc4_file.createIfcCartesianPoint(
+            horizontal_curve.center_of_curvature
+        ),
+        Axis=ifc4_file.createIfcDirection(
+            horizontal_curve.direction_of_axis_of_rotation
+        ),
+        RefDirection=ifc4_file.createIfcDirection(
+            some_valid_direction_vector_for_ref_dir
+        ),
     )
 
-    edge_geometry = ifc4_file.createIfcCircle(
-        position,
-        radius_of_curvature,
+    circle = ifc4_file.createIfcCircle(
+        Position=position,
+        Radius=radius_of_curvature,
     )
-
-    same_sense = True
 
     edge_curve = ifc4_file.createIfcEdgeCurve(
-        point_of_curvature_as_vertex_point,
-        point_of_tangency_as_vertex_point,
-        edge_geometry,
-        same_sense,
+        EdgeStart=point_of_curvature_as_vertex_point,
+        EdgeEnd=point_of_tangency_as_vertex_point,
+        EdgeGeometry=circle,
+        SameSense=True,
     )
 
     return edge_curve

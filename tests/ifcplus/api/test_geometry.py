@@ -14,22 +14,47 @@ import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
 import ifcopenshell.api.spatial
 from typing import cast
+from pprint import pprint
 
 
-class TestAddCsgSolid:
+class TestCsgSolids:
 
-    def test_add_one_block(
+    def test_block(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         block = ifcplus.api.geometry.add_block(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=1.0,
             width=2.0,
             height=3.0,
@@ -39,58 +64,91 @@ class TestAddCsgSolid:
             boolean_result_or_primitive=block,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[csg_solid]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[csg_solid],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_block.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "block.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_three_blocks(
+    def test_csg_of_blocks(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         block_1 = ifcplus.api.geometry.add_block(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=0.5,
             width=1.0,
             height=4.0,
         )
 
         block_2 = ifcplus.api.geometry.add_block(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=3.5,
             width=1.0,
             height=0.5,
@@ -98,7 +156,7 @@ class TestAddCsgSolid:
         )
 
         block_3 = ifcplus.api.geometry.add_block(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=0.5,
             width=1.0,
             height=4.0,
@@ -106,7 +164,7 @@ class TestAddCsgSolid:
         )
 
         boolean_results = ifcopenshell.api.geometry.add_boolean(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             first_item=block_1,
             second_items=[block_2, block_3],
             operator="UNION",
@@ -116,57 +174,84 @@ class TestAddCsgSolid:
             boolean_result_or_primitive=boolean_results[-1],
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[csg_solid]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[csg_solid],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
         )
 
         ifcplus.api.placement.edit_object_placement(
             product=element,
-            repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "three_blocks.ifc")
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "csg_of_blocks.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_rectangular_pyramid(
+    def test_create_rectangular_pyramid(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         rectangular_pyramid = ifcplus.api.geometry.add_rectangular_pyramid(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=1.0,
             width=2.0,
             height=3.0,
@@ -176,58 +261,91 @@ class TestAddCsgSolid:
             boolean_result_or_primitive=rectangular_pyramid,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[csg_solid]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[csg_solid],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_rectangular_pyramid.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "rectangular_pyramid.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_obelisk(
+    def test_csg_of_block_and_pyramid(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         block = ifcplus.api.geometry.add_block(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=1.0,
             width=1.0,
             height=4.0,
         )
 
         rect_pyramid = ifcplus.api.geometry.add_rectangular_pyramid(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=1.0,
             width=1.0,
             height=0.5,
@@ -235,7 +353,7 @@ class TestAddCsgSolid:
         )
 
         boolean_results = ifcopenshell.api.geometry.add_boolean(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             first_item=block,
             second_items=[rect_pyramid],
             operator="UNION",
@@ -245,101 +363,171 @@ class TestAddCsgSolid:
             boolean_result_or_primitive=boolean_results[-1],
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[csg_solid]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[csg_solid],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "obelisk.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "csg_of_block_and_pyramid.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_right_circular_cylinder(
+    def test_create_right_circular_cylinder(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
-
-        cylinder = ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
-            ifc4_file=ifc_file_with_one_element,
-            radius=0.5,
-            extrusion_depth=4.0,
-            repositioned_origin=(0.5, 0.5, 0.0),
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[cylinder]
-        )
-        assert isinstance(representation_type, str)
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
 
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
+
+        cylindrical_extruded_area_solid = (
+            ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+                ifc4_file=ifc4_file,
+                radius=0.5,
+                extrusion_depth=4.0,
+                repositioned_origin=(0.5, 0.5, 0.0),
+            )
+        )
+
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
-            items=[cylinder],
-        )
-        ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
-            product=element,
-            representation=shape_model,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(
+                    items=[cylindrical_extruded_area_solid]
+                ),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
+            items=[cylindrical_extruded_area_solid],
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_right_circular_cylinder.ifc")
+        ifcopenshell.api.geometry.assign_representation(
+            file=ifc4_file,
+            product=element,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "right_circular_cylinder.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_sphere(
+    def test_create_sphere(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         sphere = ifcplus.api.geometry.add_sphere(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             radius=0.5,
             repositioned_origin=(0.5, 0.5, 0.5),
         )
@@ -348,194 +536,308 @@ class TestAddCsgSolid:
             boolean_result_or_primitive=sphere,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[csg_solid]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
-            items=[csg_solid],
-        )
-        ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
-            product=element,
-            representation=shape_model,
-        )
-
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_sphere.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
-            file_path=output_path,
-            add_annotations=True,
-        )
-
-        logger = ifcopenshell.validate.json_logger()
-        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
-        pprint(logger.statements)
-
-        assert len(logger.statements) == 0
-
-
-class TestAddSweptAreaSolid:
-
-    def test_add_l_shape_extruded_area_solid(
-        self,
-        ifc_file_with_one_element: ifcopenshell.file,
-    ):
-
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
-
-        depth = 2.0
-        width = 1.0
-        thickness = 0.2
-        length = 5.0
-
-        l_shape_extrusion = ifcplus.api.geometry.add_extruded_area_solid(
-            ifc4_file=ifc_file_with_one_element,
-            profile=ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc_file_with_one_element,
-                profile_class="IfcLShapeProfileDef",
-                dimensions=[depth, width, thickness, None, None, None],
-                check_for_duplicate=True,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[csg_solid]),
             ),
-            extrusion_depth=length,
-            repositioned_origin=(0.0, 0.0, 0.0),
-        )
-
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[l_shape_extrusion]
-        )
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
-            shape_model_class="IfcShapeRepresentation",
-            representation_identifier="Body",
-            representation_type=cast(str, representation_type),
             context_type="Model",
             target_view="MODEL_VIEW",
-            items=[l_shape_extrusion],
+            items=[csg_solid],
         )
 
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "l_shape_extrusion.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "sphere.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
-    def test_add_l_shape_extruded_area_solid_tapered(
+
+class TestSweptAreaSolids:
+
+    def test_extruded_area_solid(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         depth = 2.0
         width = 1.0
         thickness = 0.2
-        length = 5.0
+        length = 8.0
 
-        l_shape_extrusion = ifcplus.api.geometry.add_extruded_area_solid_tapered(
-            ifc4_file=ifc_file_with_one_element,
-            profile_start=ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc_file_with_one_element,
-                profile_class="IfcLShapeProfileDef",
-                dimensions=[depth, width, thickness, None, None, None],
-                check_for_duplicate=True,
-            ),
-            profile_end=ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc_file_with_one_element,
-                profile_class="IfcLShapeProfileDef",
-                dimensions=[
-                    depth * 0.25,
-                    width * 0.25,
-                    thickness * 0.25,
-                    None,
-                    None,
-                    None,
-                ],
-                check_for_duplicate=True,
-            ),
-            extrusion_depth=length,
-            repositioned_origin=(0.0, 0.0, 0.0),
+        profile = ifcplus.api.profile.add_parameterized_profile(
+            ifc4_file=ifc4_file,
+            profile_class="IfcLShapeProfileDef",
+            dimensions=[depth, width, thickness, None, None, None],
+            check_for_duplicate=True,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[l_shape_extrusion]
+        extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            swept_area=profile,
+            depth=length,
         )
-        assert isinstance(representation_type, str)
 
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
-            items=[l_shape_extrusion],
-        )
-        ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
-            product=element,
-            representation=shape_model,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(
+                    items=[extruded_area_solid]
+                ),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
+            items=[extruded_area_solid],
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "l_shape_extrusion_tapered.ifc")
+        ifcopenshell.api.geometry.assign_representation(
+            file=ifc4_file,
+            product=element,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            repositioned_origin=(0.0, 8.0, 0.0),
+            repositioned_x_axis=(1.0, 0.0, 0.0),
+            repositioned_z_axis=(0.0, -1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "extruded_area_solid.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_l_shape_revolved_area_solid(
+    def test_extruded_area_solid_tapered(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
+
+        depth = 2.0
+        width = 1.0
+        thickness = 0.2
+        length = 8.0
+
+        starting_profile = ifcplus.api.profile.add_parameterized_profile(
+            ifc4_file=ifc4_file,
+            profile_class="IfcLShapeProfileDef",
+            dimensions=[depth, width, thickness, None, None, None],
+            check_for_duplicate=True,
+        )
+
+        ending_profile = ifcplus.api.profile.add_parameterized_profile(
+            ifc4_file=ifc4_file,
+            profile_class="IfcLShapeProfileDef",
+            dimensions=[
+                depth * 0.25,
+                width * 0.25,
+                thickness * 0.25,
+                None,
+                None,
+                None,
+            ],
+            check_for_duplicate=True,
+        )
+
+        extruded_area_solid_tapered = (
+            ifcplus.api.geometry.add_extruded_area_solid_tapered(
+                ifc4_file=ifc4_file,
+                swept_area=starting_profile,
+                end_swept_area=ending_profile,
+                depth=length,
+            )
+        )
+
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
+            shape_model_class="IfcShapeRepresentation",
+            representation_identifier="Body",
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(
+                    items=[extruded_area_solid_tapered]
+                ),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
+            items=[extruded_area_solid_tapered],
+        )
+
+        ifcopenshell.api.geometry.assign_representation(
+            file=ifc4_file,
+            product=element,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            repositioned_origin=(0.0, 8.0, 0.0),
+            repositioned_x_axis=(1.0, 0.0, 0.0),
+            repositioned_z_axis=(0.0, -1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "extruded_area_solid_tapered.ifc")
+        ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+    def test_revolved_area_solid(
+        self,
+    ):
+
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         depth = 2.0
         width = 1.0
         thickness = 0.2
 
-        l_shape_extrusion = ifcplus.api.geometry.add_revolved_area_solid(
-            ifc4_file=ifc_file_with_one_element,
-            profile=ifcplus.api.profile.add_parameterized_profile(
-                ifc4_file=ifc_file_with_one_element,
+        revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
+            ifc4_file=ifc4_file,
+            swept_area=ifcplus.api.profile.add_parameterized_profile(
+                ifc4_file=ifc4_file,
                 profile_class="IfcLShapeProfileDef",
                 dimensions=[depth, width, thickness, None, None, None],
                 check_for_duplicate=True,
@@ -545,111 +847,173 @@ class TestAddSweptAreaSolid:
             repositioned_origin=(0.0, 0.0, 0.0),
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[l_shape_extrusion]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
-            items=[l_shape_extrusion],
-        )
-        ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
-            product=element,
-            representation=shape_model,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(
+                    items=[revolved_area_solid]
+                ),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
+            items=[revolved_area_solid],
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "l_shape_extrusion_revolved.ifc")
+        ifcopenshell.api.geometry.assign_representation(
+            file=ifc4_file,
+            product=element,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "revolved_area_solid.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
 
-class TestAddBoundingBox:
+class TestBoundingBox:
 
-    def test_add_one_bounding_box(
+    def test_bounding_box(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         bounding_box = ifcplus.api.geometry.add_bounding_box(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             length=4.0,
             width=2.0,
             height=3.0,
             corner_coordinates=(0.0, 0.0, 0.0),
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[bounding_box]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Box",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[bounding_box]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[bounding_box],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
         )
 
         ifcplus.api.placement.edit_object_placement(
             product=element,
-            repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_bounding_box.ifc")
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "bounding_box.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
 
-class TestAddFacetedBrep:
+class TestFacetedBrep:
 
     def test_add_one_faceted_brep(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         points = [
             (-0.5 + 0.5, -0.5 + 0.5, 0.5 + 0.5),
@@ -678,169 +1042,283 @@ class TestAddFacetedBrep:
         ]
 
         faceted_brep = ifcplus.api.geometry.add_faceted_brep(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             points=points,
             triangles=triangles,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[faceted_brep]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[faceted_brep]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[faceted_brep],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
         )
 
         ifcplus.api.placement.edit_object_placement(
             product=element,
-            repositioned_origin=(2.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_faceted_brep.ifc")
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "faceted_brep.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
 
-class TestAddTopologyRepresentation:
+class TestTopologicalRepresentationItems:
 
-    def test_add_one_edge(
+    def test_edge(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         edge = ifcplus.api.geometry.add_edge(
             edge_start_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
+                ifc4_file=ifc4_file,
                 point_coordinates=(0.0, 0.0, 1.0),
             ),
             edge_end_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
+                ifc4_file=ifc4_file,
                 point_coordinates=(4.0, 0.0, 1.0),
             ),
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(items=[edge])
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[edge]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[edge],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_edge.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "edge.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_edge_curve(
+    def test_edge_curve(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
-
-        edge_curve = ifcplus.api.geometry.add_curved_edge(
-            point_of_curvature_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
-                point_coordinates=(0.0, 0.0, 0.0),
-            ),
-            point_of_tangency_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
-                point_coordinates=(5.0, 0.0, 5.0),
-            ),
-            center_of_curvature=(5.0, 0.0, 0.0),
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[edge_curve]
-        )
-        assert isinstance(representation_type, str)
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
 
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
+
+        vertex_point_1 = ifcplus.api.geometry.add_vertex_point(
+            ifc4_file=ifc4_file,
+            point_coordinates=(2.0, 6.0, 0.0),
+        )
+
+        vertex_point_2 = ifcplus.api.geometry.add_vertex_point(
+            ifc4_file=ifc4_file,
+            point_coordinates=(7.0, 1.0, 0.0),
+        )
+
+        vertex_point_3 = ifcplus.api.geometry.add_vertex_point(
+            ifc4_file=ifc4_file,
+            point_coordinates=(2.0, 6.0 - 5.0, 0.0 + 5.0),
+        )
+
+        edge_curve_1 = ifcplus.api.geometry.add_edge_curve(
+            point_of_curvature_as_vertex_point=vertex_point_1,
+            point_of_tangency_as_vertex_point=vertex_point_2,
+            point_defining_plane_of_arc_and_center_of_curvature_side=(7.0, 6.0, 0.0),
+            radius_of_curvature=5.0,
+        )
+
+        edge_curve_2 = ifcplus.api.geometry.add_edge_curve(
+            point_of_curvature_as_vertex_point=vertex_point_1,
+            point_of_tangency_as_vertex_point=vertex_point_3,
+            point_defining_plane_of_arc_and_center_of_curvature_side=(2.0, 6.0, 1.0),
+            radius_of_curvature=5.0,
+        )
+
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
-            representation_type=representation_type,
-            items=[edge_curve],
-        )
-        ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
-            product=element,
-            representation=shape_model,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(
+                    items=[edge_curve_1, edge_curve_2]
+                ),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
+            items=[edge_curve_1, edge_curve_2],
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_edge_curve.ifc")
+        ifcopenshell.api.geometry.assign_representation(
+            file=ifc4_file,
+            product=element,
+            representation=shape_representation,
+        )
+
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "edge_curve.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_face_surface(
+    def test_face_surface(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         points_of_outer_bound = [
             (0.0, 0.0, 0.0),
@@ -851,7 +1329,7 @@ class TestAddTopologyRepresentation:
 
         vertex_points_of_outer_bound = [
             ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
+                ifc4_file=ifc4_file,
                 point_coordinates=point_of_outer_bound,
             )
             for point_of_outer_bound in points_of_outer_bound
@@ -862,48 +1340,81 @@ class TestAddTopologyRepresentation:
             vertex_points_of_inner_bounds=[],
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[face_surface]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[face_surface]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[face_surface],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_face_surface.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "face_surface.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0
 
-    def test_add_one_face_surface_with_voids(
+    def test_face_surface_with_voids(
         self,
-        ifc_file_with_one_element: ifcopenshell.file,
     ):
 
-        element = ifc_file_with_one_element.by_type(
-            type="IfcBuildingElementProxy",
-            include_subtypes=False,
-        )[0]
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        element = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcBuildingElementProxy",
+            name="Element-01",
+            predefined_type=None,
+        )
 
         points_of_outer_bound = [
             (0.0, 0.0, 0.0),
@@ -927,7 +1438,7 @@ class TestAddTopologyRepresentation:
 
         vertex_points_of_outer_bound = [
             ifcplus.api.geometry.add_vertex_point(
-                ifc4_file=ifc_file_with_one_element,
+                ifc4_file=ifc4_file,
                 point_coordinates=point_of_outer_bound,
             )
             for point_of_outer_bound in points_of_outer_bound
@@ -938,7 +1449,7 @@ class TestAddTopologyRepresentation:
             vertex_points_of_inner_bounds.append(
                 [
                     ifcplus.api.geometry.add_vertex_point(
-                        ifc4_file=ifc_file_with_one_element,
+                        ifc4_file=ifc4_file,
                         point_coordinates=point_of_inner_bound,
                     )
                     for point_of_inner_bound in points_of_inner_bound
@@ -950,35 +1461,44 @@ class TestAddTopologyRepresentation:
             vertex_points_of_inner_bounds=vertex_points_of_inner_bounds,
         )
 
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[face_surface]
-        )
-        assert isinstance(representation_type, str)
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc_file_with_one_element,
+        shape_representation = ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
-            representation_type=representation_type,
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(items=[face_surface]),
+            ),
+            context_type="Model",
+            target_view="MODEL_VIEW",
             items=[face_surface],
         )
+
         ifcopenshell.api.geometry.assign_representation(
-            file=ifc_file_with_one_element,
+            file=ifc4_file,
             product=element,
-            representation=shape_model,
+            representation=shape_representation,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "one_face_surface_with_voids.ifc")
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[element],
+            relating_structure=site,
+        )
+
+        ifcplus.api.placement.edit_object_placement(
+            product=element,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "face_surface_with_voids.ifc")
         ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc_file_with_one_element,
+            ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
         )
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
-
         assert len(logger.statements) == 0

@@ -167,17 +167,14 @@ def add_material_from_standard_library(
 
 
 def add_material_profile_set_with_single_material_profile(
-    material: ifcopenshell.entity_instance,
-    profile: ifcopenshell.entity_instance,
+    material: ifcopenshell.entity_instance,  # IfcMaterial
+    profile: ifcopenshell.entity_instance,  # IfcProfileDef
     name: str | None = None,
     check_for_duplicate: bool = False,
 ) -> ifcopenshell.entity_instance:
     """Crean an IfcMaterialProfileSet for with a single IfcMaterialProfile. Suitable
     for prismatic and homogenous frame members (i.e., IfcBeam, IfcColumn, and
     IfcMember)"""
-
-    assert material.is_a("IfcMaterial")
-    assert profile.is_a("IfcProfileDef")
 
     ifc4_file = material.file
 
@@ -192,7 +189,7 @@ def add_material_profile_set_with_single_material_profile(
 
     material_profile_set = ifcopenshell.api.material.add_material_set(
         file=ifc4_file,
-        name=name if name else f"{material.Name} {profile.ProfileName}",
+        name=name if name else f"{material.Name} - {profile.ProfileName}",
         set_type="IfcMaterialProfileSet",
     )
 

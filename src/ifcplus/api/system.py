@@ -3,12 +3,8 @@
 import ifcopenshell.api.system
 import ifcopenshell.util.system
 import ifcplus.api.distribution_element
-import ifcplus.api.geometry
-import ifcopenshell.api.geometry
 import ifcplus.util.geometry
-import ifcplus.api.style
 import numpy as np
-import ifcopenshell.util.representation
 import ifcplus.util.system
 import ifcplus.api.placement
 from typing import Literal
@@ -70,91 +66,6 @@ def create_distribution_port(
     return distribution_port
 
 
-def add_shape_representation_to_distribution_ports(
-    ports: list[ifcopenshell.entity_instance],
-    arrow_size: float = 0.1,
-) -> None:
-    """Add ShapeRepresentation to DistributionPorts as RectangularPyramids pointing
-    in the direction of flow.
-    """
-
-    ifc4_file = ports[0].file
-
-    sink_arrow = None
-    source_arrow = None
-    ambiguous_arrow = None
-
-    for port in ports:
-        if port.FlowDirection == "SINK":
-            if sink_arrow is None:
-                sink_arrow = ifcplus.api.geometry.add_csg_solid(
-                    boolean_result_or_primitive=ifcplus.api.geometry.add_rectangular_pyramid(
-                        ifc4_file=ifc4_file,
-                        length=arrow_size,
-                        width=arrow_size,
-                        height=arrow_size,
-                        repositioned_origin=(-arrow_size / 2, -arrow_size / 2, 0.0),
-                    ),
-                )
-            csg_solid = sink_arrow
-            color = (0.0, 0.0, 1.0)
-
-        elif port.FlowDirection == "SOURCE":
-            if source_arrow is None:
-                source_arrow = ifcplus.api.geometry.add_csg_solid(
-                    boolean_result_or_primitive=ifcplus.api.geometry.add_rectangular_pyramid(
-                        ifc4_file=ifc4_file,
-                        length=arrow_size,
-                        width=arrow_size,
-                        height=arrow_size,
-                        repositioned_origin=(
-                            -arrow_size / 2,
-                            -arrow_size / 2,
-                            -arrow_size,
-                        ),
-                    ),
-                )
-            csg_solid = source_arrow
-            color = (1.0, 0.0, 0.0)
-
-        else:
-            if ambiguous_arrow is None:
-                ambiguous_arrow = ifcplus.api.geometry.add_csg_solid(
-                    boolean_result_or_primitive=ifcplus.api.geometry.add_sphere(
-                        ifc4_file=ifc4_file,
-                        radius=arrow_size,
-                    ),
-                )
-            csg_solid = ambiguous_arrow
-            color = None
-
-        representation_type = ifcopenshell.util.representation.guess_type(
-            items=[csg_solid]
-        )
-        if representation_type is None:
-            return None
-
-        shape_model = ifcplus.api.geometry.add_shape_model(
-            ifc4_file=ifc4_file,
-            shape_model_class="IfcShapeRepresentation",
-            representation_identifier="Body",
-            representation_type=representation_type,
-            items=[csg_solid],
-        )
-        ifcopenshell.api.geometry.assign_representation(
-            file=ifc4_file,
-            product=port,
-            representation=shape_model,
-        )
-
-        if color:
-            ifcplus.api.style.assign_color_to_element(
-                element=port,
-                rgb_triplet=color,
-                transparency=0.0,
-            )
-
-
 def create_pipe_run_from_polyline(
     ifc4_file: ifcopenshell.file,
     polyline: list[tuple[float, float, float]],
@@ -166,7 +77,6 @@ def create_pipe_run_from_polyline(
     branch_name: str = "Pipe Run",
     spatial_element: ifcopenshell.entity_instance | None = None,
     place_objects_relative_to_parent: bool = False,
-    add_shape_representation_to_ports: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
     """Create a single path pipe run composed of IfcPipeSegments and
     IfcPipeFittings (Elbows)."""
@@ -183,10 +93,9 @@ def create_pipe_run_from_polyline(
             thickness=thickness,
             material=material,
             name=f"Pipe #1 of {branch_name}",
-            spatial_element=spatial_element,
+            parent=spatial_element,
             distribution_system=distribution_system,
             place_object_relative_to_parent=place_objects_relative_to_parent,
-            add_shape_representation_to_ports=add_shape_representation_to_ports,
         )
         return [pipe_segment]
 
@@ -206,31 +115,26 @@ def create_pipe_run_from_polyline(
     for index in range(len(polyline)):
 
         if index + 2 == len(polyline):
-            last_pipe_segment = (
-                ifcplus.api.distribution_element.create_pipe_segment(
-                    ifc4_file=ifc4_file,
-                    start_point=pipe_segment_start_point,
-                    end_point=polyline[-1],
-                    nominal_diameter=nominal_diameter,
-                    thickness=thickness,
-                    material=material,
-                    name=f"Pipe #{[index + 1]} of {branch_name}",
-                    spatial_element=spatial_element,
-                    distribution_system=distribution_system,
-                    place_object_relative_to_parent=place_objects_relative_to_parent,
-                    add_shape_representation_to_ports=add_shape_representation_to_ports,
-                )
+            last_pipe_segment = ifcplus.api.distribution_element.create_pipe_segment(
+                ifc4_file=ifc4_file,
+                start_point=pipe_segment_start_point,
+                end_point=polyline[-1],
+                nominal_diameter=nominal_diameter,
+                thickness=thickness,
+                material=material,
+                name=f"Pipe #{[index + 1]} of {branch_name}",
+                parent=spatial_element,
+                distribution_system=distribution_system,
+                place_object_relative_to_parent=place_objects_relative_to_parent,
             )
             piping_elements += [last_pipe_segment]
             break
 
-        horizontal_curve = (
-            ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
-                first_point=polyline[index],
-                second_point=polyline[index + 1],
-                third_point=polyline[index + 2],
-                radius_of_curvature=radius_of_curvature,
-            )
+        horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+            first_point=polyline[index],
+            second_point=polyline[index + 1],
+            third_point=polyline[index + 2],
+            radius_of_curvature=radius_of_curvature,
         )
 
         pipe_segment_end_point = horizontal_curve.point_of_curvature
@@ -243,23 +147,24 @@ def create_pipe_run_from_polyline(
             thickness=thickness,
             material=material,
             name=f"Pipe #{[index + 1]} of {branch_name}",
-            spatial_element=spatial_element,
+            parent=spatial_element,
             distribution_system=distribution_system,
             place_object_relative_to_parent=place_objects_relative_to_parent,
-            add_shape_representation_to_ports=add_shape_representation_to_ports,
         )
 
         elbow = ifcplus.api.distribution_element.create_elbow(
             ifc4_file=ifc4_file,
-            horizontal_curve=horizontal_curve,
+            start_point=horizontal_curve.point_of_curvature,
+            end_point=horizontal_curve.point_of_tangency,
+            point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve.center_of_curvature,
+            radius_of_curvature=horizontal_curve.radius_of_curvature,
             nominal_diameter=nominal_diameter,
             thickness=thickness,
             material=material,
             name=f"Elbow #{[index + 1]} of {branch_name}",
-            spatial_element=spatial_element,
+            parent=spatial_element,
             distribution_system=distribution_system,
             place_object_relative_to_parent=place_objects_relative_to_parent,
-            add_shape_representation_to_ports=add_shape_representation_to_ports,
         )
 
         piping_elements += [pipe_segment, elbow]
@@ -309,7 +214,6 @@ def connect_two_distribution_ports_via_pipe_run(
     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
     branch_name: str = "Unnamed Branch",
     spatial_element: ifcopenshell.entity_instance | None = None,
-    add_shape_representation_to_ports: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
     """Connect two IfcDistributionPorts using a pipe run formed via no
     intelligent method."""
@@ -324,9 +228,7 @@ def connect_two_distribution_ports_via_pipe_run(
     sink_port_origin = ifcplus.util.system.get_port_location(
         distribution_port=sink_port,
     )
-    sink_port_z_axis = ifcplus.util.system.get_port_z_axis(
-        distribution_port=sink_port
-    )
+    sink_port_z_axis = ifcplus.util.system.get_port_z_axis(distribution_port=sink_port)
 
     outer_diameter_of_piping = nominal_diameter + thickness
 
@@ -384,7 +286,6 @@ def connect_two_distribution_ports_via_pipe_run(
         spatial_element=spatial_element,
         distribution_system=distribution_system,
         place_objects_relative_to_parent=False,
-        add_shape_representation_to_ports=add_shape_representation_to_ports,
     )
 
     first_pipe_segment = piping_elements[0]

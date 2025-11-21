@@ -3,10 +3,11 @@
 import math
 from typing import Literal
 
-import ifcopenshell
 
-
-def round_to_sig_digits(value: float, digits: int) -> float:
+def round_to_sig_digits(
+    value: float,
+    digits: int,
+) -> float:
     """Round to significant digits
 
     Args:
@@ -35,7 +36,9 @@ def round_to_sig_digits(value: float, digits: int) -> float:
         return round(value * factor) / factor
 
 
-def count_significant_digits(value: float) -> int:
+def count_significant_digits(
+    value: float,
+) -> int:
     """_summary_
 
     Args:
@@ -71,7 +74,9 @@ def count_significant_digits(value: float) -> int:
 
 
 def convert_unit_of_value(
-    value: float, conversion_factor: float, use_sig_figs: bool = False
+    value: float,
+    conversion_factor: float,
+    use_sig_figs: bool = False,
 ) -> float:
     """Convert unit of given value
 

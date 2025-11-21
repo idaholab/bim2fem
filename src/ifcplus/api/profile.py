@@ -52,6 +52,10 @@ def add_parameterized_profile(
 
     precision = ifcplus.util.project.get_precision_of_project(ifc4_file=ifc4_file)
 
+    numeric_scale = ifcplus.util.project.get_numeric_scale_of_project(
+        ifc4_file=ifc4_file
+    )
+
     dimensions = extend_list_to_length(
         lst=dimensions, target_length=TARGET_LENGTHS[profile_class]
     )
@@ -65,8 +69,6 @@ def add_parameterized_profile(
             if not classes_match:
                 continue
             old_dimensions = list(old_profile.get_info().values())[5:]
-            if len(dimensions) != len(old_dimensions):
-                exit("unexpected behavior")
             old_dimensions_array = np.array(
                 [dim if dim else 0 for dim in old_dimensions]
             )
@@ -84,16 +86,15 @@ def add_parameterized_profile(
         ifc_class=profile_class,
     )
 
-    def join_profile_dims_into_string(profile_dims: list):
-        return "x".join(
-            str(np.round(x * 1000, 1)) if x is not None else "0" for x in profile_dims
-        )
+    dimensions_as_string = "x".join(
+        [str(np.round(dim, numeric_scale)) for dim in dimensions if dim is not None]
+    )
+
+    prefix = profile_class.replace("Ifc", "").replace("ProfileDef", "")
+
+    profile_name = profile_name if profile_name else f"{prefix} {dimensions_as_string}"
 
     if profile_class == "IfcRectangleProfileDef":
-        if not profile_name:
-            profile_name = "Rectangle_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -106,10 +107,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcRectangleHollowProfileDef":
-        if not profile_name:
-            profile_name = "RectangleHollow_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -125,10 +122,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcCircleProfileDef":
-        if not profile_name:
-            profile_name = "Circle_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -140,10 +133,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcCircleHollowProfileDef":
-        if not profile_name:
-            profile_name = "CircleHollow_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -156,10 +145,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcIShapeProfileDef":
-        if not profile_name:
-            profile_name = "IShape_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -177,10 +162,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcLShapeProfileDef":
-        if not profile_name:
-            profile_name = "LShape_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -197,10 +178,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcUShapeProfileDef":
-        if not profile_name:
-            profile_name = "UShape_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -218,10 +195,6 @@ def add_parameterized_profile(
         )
 
     elif profile_class == "IfcTShapeProfileDef":
-        if not profile_name:
-            profile_name = "TShape_" + join_profile_dims_into_string(
-                profile_dims=dimensions
-            )
         ifcopenshell.api.attribute.edit_attributes(
             file=ifc4_file,
             product=profile,
@@ -405,7 +378,18 @@ def add_profile_from_standard_library(
         ydim = matching_section_data_dictionary["Depth"]
         iyy = matching_section_data_dictionary["MomentOfInertiaY"]
         xdim = iyy * 12 / ydim**3
-        xdim = ifcplus.util.unit.convert_unit_of_value(value=xdim, conversion_factor=1)
+        if region == "Europe":
+            conversion_factor = ifcplus.util.unit.get_conversion_factor_to_meters(
+                given_unit="meter"
+            )
+        else:
+            conversion_factor = ifcplus.util.unit.get_conversion_factor_to_meters(
+                given_unit="inch"
+            )
+        xdim = ifcplus.util.unit.convert_unit_of_value(
+            value=xdim,
+            conversion_factor=conversion_factor,
+        )
         dimensions = [
             xdim,
             ydim,
@@ -483,8 +467,6 @@ def calculate_section_data_for_l_shape(
 ) -> dict:
     """Calculate section properties for an IfcLShapeProfileDef"""
 
-    assert profile.is_a("IfcLShapeProfileDef")
-
     d = profile.Depth
     b = profile.Width
     t = profile.Thickness
@@ -529,8 +511,6 @@ def calculate_section_data_for_rect_shape(
 ) -> dict:
     """Calculate section properties for an IfcRectangleProfileDef"""
 
-    assert profile.is_a("IfcRectangleProfileDef")
-
     xdim = profile.XDim
     ydim = profile.YDim
     area = xdim * ydim
@@ -564,8 +544,6 @@ def calculate_section_data_for_rect_hollow_shape(
 ) -> dict:
     """Calculate section properties for an IfcRectangleHollowProfileDef"""
 
-    assert profile.is_a("IfcRectangleHollowProfileDef")
-
     b = profile.XDim
     h = profile.YDim
     t = profile.WallThickness
@@ -596,8 +574,6 @@ def calculate_section_data_for_u_shape(
     profile: ifcopenshell.entity_instance,
 ) -> dict:
     """Calculate section properties for an IfcUShapeProfileDef"""
-
-    assert profile.is_a("IfcUShapeProfileDef")
 
     d = profile.Depth
     b = profile.FlangeWidth
@@ -662,8 +638,6 @@ def calculate_section_data_for_i_shape(
 ) -> dict:
     """Calculate section properties for an IfcIShapeProfileDef"""
 
-    assert profile.is_a("IfcIShapeProfileDef")
-
     d = profile.OverallDepth
     b = profile.OverallWidth
     tw = profile.WebThickness
@@ -725,8 +699,6 @@ def calculate_section_data_for_circle_shape(
 ) -> dict:
     """Calculate section properties for an IfcCircleProfileDef"""
 
-    assert profile.is_a("IfcCircleProfileDef")
-
     r = profile.Radius
     d = r * 2
 
@@ -757,8 +729,6 @@ def calculate_section_data_for_circle_hollow_shape(
     profile: ifcopenshell.entity_instance,
 ) -> dict:
     """Calculate section properties for an IfcCircleHollowProfileDef"""
-
-    assert profile.is_a("IfcCircleHollowProfileDef")
 
     r_o = profile.Radius
     t = profile.WallThickness
@@ -792,8 +762,6 @@ def calculate_section_data_for_t_shape(
     profile: ifcopenshell.entity_instance,
 ) -> dict:
     """Calculate section properties for an IfcTShapeProfileDef"""
-
-    assert profile.is_a("IfcTShapeProfileDef")
 
     d = profile.Depth
     b = profile.FlangeWidth

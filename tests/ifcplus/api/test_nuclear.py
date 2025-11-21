@@ -10,11 +10,12 @@ import ifcplus.api.placement
 import ifcplus.api.material
 from typing import cast
 import ifcopenshell
+from pprint import pprint
 
 
 class TestCreateNuclearPowerPlant:
 
-    def test_create_reactor_containment_structure(
+    def test_create_nuclear_reactor_containment_structure(
         self,
     ):
 
@@ -47,15 +48,17 @@ class TestCreateNuclearPowerPlant:
             check_for_duplicate=True,
         )
 
-        ifcplus.api.nuclear.create_reactor_containment_structure(
+        ifcplus.api.nuclear.create_nuclear_reactor_containment_structure(
             ifc4_file=ifc4_file,
             material=cast(ifcopenshell.entity_instance, concrete_material),
-            name="Reactor Containment Structure",
+            name="Nuclear Reactor Containment Structure",
             parent=building,
             place_object_relative_to_parent=True,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_NUCLEAR / "reactor_containment_structure.ifc")
+        output_path = str(
+            OUTPUT_DIR_FOR_NUCLEAR / "nuclear_reactor_containment_structure.ifc"
+        )
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
@@ -64,8 +67,6 @@ class TestCreateNuclearPowerPlant:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
@@ -102,15 +103,10 @@ class TestCreateNuclearPowerPlant:
             check_for_duplicate=True,
         )
 
-        ifcplus.api.nuclear.create_reactor_containment_structure(
+        ifcplus.api.nuclear.create_nuclear_reactor_containment_structure(
             ifc4_file=ifc4_file,
             material=cast(ifcopenshell.entity_instance, concrete_material),
-            slab_outer_radius=25.0,
-            slab_thickness=3.0,
-            cylinder_outer_radius=23.0,
-            cylinder_wall_thickness=1.0,
-            cylinder_height=35.0,
-            name="Reactor Containment Structure",
+            name="Nuclear Reactor Containment Structure",
             parent=building,
             place_object_relative_to_parent=True,
         )
@@ -118,15 +114,17 @@ class TestCreateNuclearPowerPlant:
         reactor_box_length = 15.0
         reactor_box_width = 19.0
         reactor_box_height = 14.0
+
         reactor_box = ifcplus.api.nuclear.create_reactor_box(
             ifc4_file=ifc4_file,
             length=reactor_box_length,
             width=reactor_box_width,
             height=reactor_box_height,
-            name="Reactor Containment Structure",
+            name="Reactor Box",
             parent=building,
             place_object_relative_to_parent=True,
         )
+
         ifcplus.api.placement.edit_object_placement(
             product=reactor_box,
             repositioned_origin=(
@@ -151,7 +149,5 @@ class TestCreateNuclearPowerPlant:
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        from pprint import pprint
-
         pprint(logger.statements)
         assert len(logger.statements) == 0
