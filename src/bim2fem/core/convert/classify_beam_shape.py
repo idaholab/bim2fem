@@ -5,7 +5,6 @@ import ifcopenshell.util.placement
 import numpy as np
 import bim2fem.ifcplus.util.geometry
 from typing import Literal
-import math
 
 
 PRESET_SHAPE_MATRICES = {

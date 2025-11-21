@@ -6,11 +6,19 @@ Files."""
 
 import ifcopenshell
 
-from bim2fem.core.helpers.snap_frame_members import snap_frame_members
-from bim2fem.core.helpers.snap_floor_beam_systems import snap_floor_beam_systems
-from bim2fem.core.helpers.snap_beams_to_walls import snap_beams_to_walls
-from bim2fem.core.helpers.snap_walls_to_slabs import snap_walls_to_slabs
-from bim2fem.core.helpers.snap_walls_to_walls import (
+from bim2fem.core.adjust_element_connectivity.snap_frame_members import (
+    snap_frame_members,
+)
+from bim2fem.core.adjust_element_connectivity.snap_floor_beam_systems import (
+    snap_floor_beam_systems,
+)
+from bim2fem.core.adjust_element_connectivity.snap_beams_to_walls import (
+    snap_beams_to_walls,
+)
+from bim2fem.core.adjust_element_connectivity.snap_walls_to_slabs import (
+    snap_walls_to_slabs,
+)
+from bim2fem.core.adjust_element_connectivity.snap_walls_to_walls import (
     snap_walls_to_perpendicular_walls,
 )
 import bim2fem.ifcplus.api.structural

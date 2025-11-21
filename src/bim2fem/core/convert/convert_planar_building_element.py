@@ -15,103 +15,28 @@ from bim2fem.ifcplus.util.geometry import TriangularMesh
 import ifcopenshell.api.spatial
 import bim2fem.ifcplus.api.element_type
 import ifcopenshell.api.type
-import ifcopenshell.api.project
 import bim2fem.ifcplus.util.project
+from typing import cast
 
 
-def convert_planar_wall_to_structural_surface_members(
-    wall_from_source_file: ifcopenshell.entity_instance,
+def convert_planar_wall_or_slab_to_structural_surface_members(
+    planar_wall_or_slab_from_source_file: ifcopenshell.entity_instance,
     ifc4_destination_file: ifcopenshell.file,
     region: REGION,
     structural_analysis_model: ifcopenshell.entity_instance,
 ) -> list[ifcopenshell.entity_instance] | None:
 
-    # Check IFC Class
-    required_ifc_class = "IfcWall"
-    if not wall_from_source_file.is_a(required_ifc_class):
-        print(
-            " ".join(
-                [
-                    "\tWarning: Failed Conversion for",
-                    f"{wall_from_source_file}. ",
-                    f"IfcElement class must be {required_ifc_class}.",
-                ]
-            )
-        )
-        return None
-
-    # Convert Element
-    structural_surface_members_from_destination_file = (
-        convert_planar_building_element_to_structural_surface_members(
-            planar_building_element_from_source_file=wall_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
-        )
-    )
-
-    return structural_surface_members_from_destination_file
-
-
-def convert_planar_slab_to_structural_surface_members(
-    slab_from_source_file: ifcopenshell.entity_instance,
-    ifc4_destination_file: ifcopenshell.file,
-    region: REGION,
-    structural_analysis_model: ifcopenshell.entity_instance,
-) -> list[ifcopenshell.entity_instance] | None:
-
-    # Check IFC Class
-    required_ifc_class = "IfcSlab"
-    if not slab_from_source_file.is_a(required_ifc_class):
-        print(
-            " ".join(
-                [
-                    "\tWarning: Failed Conversion for",
-                    f"{slab_from_source_file}. ",
-                    f"IfcElement class must be {required_ifc_class}.",
-                ]
-            )
-        )
-        return None
-
-    # Convert Element
-    structural_surface_members_from_destination_file = (
-        convert_planar_building_element_to_structural_surface_members(
-            planar_building_element_from_source_file=slab_from_source_file,
-            ifc4_destination_file=ifc4_destination_file,
-            region=region,
-            structural_analysis_model=structural_analysis_model,
-        )
-    )
-
-    return structural_surface_members_from_destination_file
-
-
-def convert_planar_building_element_to_structural_surface_members(
-    planar_building_element_from_source_file: ifcopenshell.entity_instance,
-    ifc4_destination_file: ifcopenshell.file,
-    region: REGION,
-    structural_analysis_model: ifcopenshell.entity_instance,
-) -> list[ifcopenshell.entity_instance] | None:
-
-    print("\tconvert_planar_building_element_to_structural_surface_members()")
-    print(f"\telement_from_source_file: {planar_building_element_from_source_file}")
-    print(f"\tregion: {region}")
-    print(f"\tstructural_analysis_model: {structural_analysis_model}")
-
-    # Copy Element to Destination File
     planar_building_element_copied_to_destination_file = (
         ifcopenshell.api.root.create_entity(
             file=ifc4_destination_file,
-            ifc_class=planar_building_element_from_source_file.is_a(),
-            name=planar_building_element_from_source_file.Name,
+            ifc_class=planar_wall_or_slab_from_source_file.is_a(),
+            name=planar_wall_or_slab_from_source_file.Name,
         )
     )
     planar_building_element_copied_to_destination_file.GlobalId = (
-        planar_building_element_from_source_file.GlobalId
+        planar_wall_or_slab_from_source_file.GlobalId
     )
 
-    # Assign Element to Site
     site = ifc4_destination_file.by_type(type="IfcSite", include_subtypes=False)[0]
     ifcopenshell.api.spatial.assign_container(
         file=ifc4_destination_file,
@@ -119,7 +44,6 @@ def convert_planar_building_element_to_structural_surface_members(
         relating_structure=site,
     )
 
-    # Get best matching standard material name, if it exists
     material_names_from_destination_file = list(
         {
             material.Name
@@ -130,7 +54,7 @@ def convert_planar_building_element_to_structural_surface_members(
         }
     )
     standard_material_name = bim2fem.ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
-        element=planar_building_element_from_source_file,
+        element=planar_wall_or_slab_from_source_file,
         region=region,
         other_material_names=material_names_from_destination_file,
     )
@@ -141,24 +65,19 @@ def convert_planar_building_element_to_structural_surface_members(
             standard_material_name = "A36"
         else:
             standard_material_name = "S355"
-    print(f"\tstandard_material_name: {standard_material_name}")
 
-    # Create the standard material
     material = bim2fem.ifcplus.api.material.add_material_from_standard_library(
         ifc4_file=ifc4_destination_file,
         region=region,
         material_name=standard_material_name,
         check_for_duplicate=True,
     )
-    assert isinstance(material, ifcopenshell.entity_instance)
+    material = cast(ifcopenshell.entity_instance, material)
 
-    # Triangular Mesh
     triangular_mesh = TriangularMesh.from_ifc_element(
-        element=planar_building_element_from_source_file
+        element=planar_wall_or_slab_from_source_file
     )
-    # triangular_mesh.plot_all()
 
-    # Get largest face
     indices_of_all_faces = [_ for _ in range(len(triangular_mesh.faces))]
     areas_of_all_faces = []
     for index_of_face in indices_of_all_faces:
@@ -166,7 +85,6 @@ def convert_planar_building_element_to_structural_surface_members(
         areas_of_all_faces.append(area_of_face)
     index_of_largest_face_in_group_1 = areas_of_all_faces.index(max(areas_of_all_faces))
 
-    # Get faces coplanar to largest face
     indices_of_faces_in_group_1 = []
     indices_of_faces_in_group_2 = []
     for index_of_trial_face in indices_of_all_faces:
@@ -178,13 +96,7 @@ def convert_planar_building_element_to_structural_surface_members(
             indices_of_faces_in_group_1.append(index_of_trial_face)
         else:
             indices_of_faces_in_group_2.append(index_of_trial_face)
-    # triangular_mesh.plot_faces_3d(
-    #     faces_as_tuples_with_coordinates=triangular_mesh.get_coordinates_of_faces(
-    #         indices_of_faces=indices_of_faces_in_group_1
-    #     )
-    # )
 
-    # Get largest face in group 2
     areas_of_faces_in_group_2 = []
     for index_of_face in indices_of_faces_in_group_2:
         area_of_face = triangular_mesh.calculate_area_of_face(face_index=index_of_face)
@@ -193,12 +105,10 @@ def convert_planar_building_element_to_structural_surface_members(
         areas_of_faces_in_group_2.index(max(areas_of_faces_in_group_2))
     ]
 
-    # Get numeric scale of project (for rounding thickness to a reasonable number)
     numeric_scale = bim2fem.ifcplus.util.project.get_numeric_scale_of_project(
         ifc4_file=ifc4_destination_file
     )
 
-    # Calculate distance between largest face in group 1 and largest face in group 2
     normal_vector_of_group_1 = triangular_mesh.calculate_normal_vector_of_face(
         face_index=index_of_largest_face_in_group_1
     )
@@ -221,18 +131,18 @@ def convert_planar_building_element_to_structural_surface_members(
         )
     )
 
-    # Add and assign Type
-    if planar_building_element_copied_to_destination_file.is_a("IfcSlab"):
-        element_type_class = "IfcSlabType"
-    elif planar_building_element_copied_to_destination_file.is_a("IfcWall"):
-        element_type_class = "IfcWallType"
-    else:
-        element_type_class = "IfcPlateType"
+    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
+        materials=[material],
+        thicknesses=[thickness],
+        name=None,
+        check_for_duplicate=True,
+    )
     element_type = (
-        bim2fem.ifcplus.api.element_type.add_slab_or_wall_or_plate_element_type(
-            ifc_class=element_type_class,
-            materials=[material],
-            thicknesses=[thickness],
+        bim2fem.ifcplus.api.element_type.add_element_type_for_material_layer_set(
+            ifc_class=planar_building_element_copied_to_destination_file.is_a()
+            + "Type",
+            material_layer_set=material_layer_set,
+            name=material_layer_set.LayerSetName,
             check_for_duplicate=True,
         )
     )
@@ -242,17 +152,6 @@ def convert_planar_building_element_to_structural_surface_members(
         relating_type=element_type,
     )
 
-    # Declare Type on Project
-    project = ifc4_destination_file.by_type(type="IfcProject", include_subtypes=False)[
-        0
-    ]
-    ifcopenshell.api.project.assign_declaration(
-        file=ifc4_destination_file,
-        definitions=[element_type],
-        relating_context=project,
-    )
-
-    # Create StructuralItem
     structural_items = []
     for index_of_face_in_group_1 in indices_of_faces_in_group_1:
         coordinates_of_face_in_group_1 = triangular_mesh.get_coordinates_of_faces(
@@ -271,8 +170,8 @@ def convert_planar_building_element_to_structural_surface_members(
         bim2fem.ifcplus.api.structural.create_structural_surface_member(
             outer_profile=translated_coordinates_of_face_in_group_1,
             inner_profiles=[],
-            thickness=thickness,
-            material=material,
+            thicknesses=[thickness],
+            materials=[material],
             structural_analysis_model=structural_analysis_model,
             corresponding_product=planar_building_element_copied_to_destination_file,
         )

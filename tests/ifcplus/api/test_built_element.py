@@ -2,6 +2,7 @@
 
 import ifcopenshell
 import ifcopenshell.validate
+from bim2fem import ifcplus
 import bim2fem.ifcplus.api.project
 import bim2fem.ifcplus.api.placement
 import bim2fem.ifcplus.api.profile
@@ -13,6 +14,7 @@ import bim2fem.ifcplus.api.material
 from typing import cast
 import ifcopenshell.api.profile
 from pprint import pprint
+import numpy as np
 
 
 class TestWalls:
@@ -862,6 +864,183 @@ class TestFrameMembers:
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"curved_beams.ifc")
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+
+class TestCreateStructure:
+
+    def test_create_simple_structure(
+        self,
+    ):
+
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(
+            type="IfcProject",
+            include_subtypes=False,
+        )[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        bim2fem.ifcplus.api.placement.edit_object_placement(
+            product=site,
+            place_object_relative_to_parent=True,
+        )
+
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
+        )
+        concrete_material = cast(ifcopenshell.entity_instance, concrete_material)
+
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
+        )
+        steel_material = cast(ifcopenshell.entity_instance, steel_material)
+
+        profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
+            ifc4_file=ifc4_file,
+            profile_class="IfcIShapeProfileDef",
+            dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
+            profile_name=None,
+            check_for_duplicate=True,
+            calculate_mechanical_properties=True,
+        )
+
+        col1_bottom = (1.0, 1.0, 0.0)
+        col1_top = tuple((np.array(col1_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col1_orientation = tuple(
+            (np.array(col1_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        col2_bottom = (1.0 + 4.0, 1.0, 0.0)
+        col2_top = tuple((np.array(col2_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col2_orientation = tuple(
+            (np.array(col2_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        col3_bottom = (1.0 + 4.0, 1.0 + 5.0, 0.0)
+        col3_top = tuple((np.array(col3_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col3_orientation = tuple(
+            (np.array(col3_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        col4_bottom = (1.0, 1.0 + 5.0, 0.0)
+        col4_top = tuple((np.array(col4_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col4_orientation = tuple(
+            (np.array(col4_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            frame_member_class="IfcColumn",
+            start_point=col1_bottom,
+            end_point=col1_top,
+            orientation_point=col1_orientation,
+            profile=profile,
+            material=steel_material,
+            name="Column-01",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            frame_member_class="IfcColumn",
+            start_point=col2_bottom,
+            end_point=col2_top,
+            orientation_point=col2_orientation,
+            profile=profile,
+            material=steel_material,
+            name="Column-02",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            frame_member_class="IfcColumn",
+            start_point=col3_bottom,
+            end_point=col3_top,
+            orientation_point=col3_orientation,
+            profile=profile,
+            material=steel_material,
+            name="Column-03",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            frame_member_class="IfcColumn",
+            start_point=col4_bottom,
+            end_point=col4_top,
+            orientation_point=col4_orientation,
+            profile=profile,
+            material=steel_material,
+            name="Column-04",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        point_at_placement_of_slab_profile = tuple(
+            (np.array(col1_top) - np.array([0.0, 0.0, 0.2])).tolist()
+        )
+
+        bim2fem.ifcplus.api.built_element.create_slab(
+            profile=ifcopenshell.api.profile.add_arbitrary_profile(
+                file=ifc4_file,
+                profile=[
+                    (0.0, 0.0),
+                    (4.0, 0.0),
+                    (4.0, 5.0),
+                    (0.0, 5.0),
+                    (0.0, 0.0),
+                ],
+                name=None,
+            ),
+            point_at_placement_of_slab_profile=point_at_placement_of_slab_profile,
+            materials=[
+                concrete_material,
+                steel_material,
+                concrete_material,
+            ],
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+            name="Slab-01",
+            parent=site,
+            place_object_relative_to_parent=True,
+        )
+
+        output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "simple_structure_RV.ifc")
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
