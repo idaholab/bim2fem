@@ -166,10 +166,12 @@ def convert_linear_building_element_to_structural_curve_member(
             )
         }
     )
-    standard_material_name = ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
-        element=linear_building_element_from_source_file,
-        region=region,
-        other_material_names=material_names_from_destination_file,
+    standard_material_name = (
+        ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
+            element=linear_building_element_from_source_file,
+            region=region,
+            other_material_names=material_names_from_destination_file,
+        )
     )
     if standard_material_name is None:
         if region == "Europe":
@@ -190,16 +192,20 @@ def convert_linear_building_element_to_structural_curve_member(
             )
         }
     )
-    standard_profile_name = ifcplus.util.profile.get_best_matching_standard_profile_from_element_metadata(
-        element=linear_building_element_from_source_file,
-        region=region,
-        other_standard_profile_names=profile_names_from_destination_file,
+    standard_profile_name = (
+        ifcplus.util.profile.get_best_matching_standard_profile_from_element_metadata(
+            element=linear_building_element_from_source_file,
+            region=region,
+            other_standard_profile_names=profile_names_from_destination_file,
+        )
     )
     print(f"\tstandard_profile_name: {standard_profile_name}")
 
     # Get the IfcExtrudedAreaSolid, if it exists
-    extruded_area_solid = ifcplus.util.representation.get_single_extruded_area_solid_representation(
-        element=linear_building_element_from_source_file
+    extruded_area_solid = (
+        ifcplus.util.representation.get_single_extruded_area_solid_representation(
+            element=linear_building_element_from_source_file
+        )
     )
     print(f"\textruded_area_solid: {extruded_area_solid}")
 
@@ -288,13 +294,11 @@ def convert_frame_member_to_fem_for_case_1(
         element_type_class = "IfcPipeSegmentType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = (
-        ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
-            ifc_class=element_type_class,
-            material=material,
-            profile=profile_def,
-            check_for_duplicate=True,
-        )
+    element_type = ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
+        ifc_class=element_type_class,
+        material=material,
+        profile=profile_def,
+        check_for_duplicate=True,
     )
     ifcopenshell.api.type.assign_type(
         file=ifc4_destination_file,
@@ -490,10 +494,10 @@ def convert_frame_member_to_fem_for_case_1(
             start_point=p1,
             end_point=p2,
             orientation_point=p3,
-            profile_def=profile_def,
+            profile=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,
-            corresponding_product=frame_member_copied_to_destination_file,
+            product_to_be_assigned_to=frame_member_copied_to_destination_file,
         )
     )
 
@@ -613,9 +617,11 @@ def convert_frame_member_to_fem_for_case_2(
     )
 
     # Calculate extrusion direction
-    extrusion_direction_in_global_coordinates = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-        p1=origin_in_global_coordinates,
-        p2=terminus_in_global_coordinates,
+    extrusion_direction_in_global_coordinates = (
+        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=origin_in_global_coordinates,
+            p2=terminus_in_global_coordinates,
+        )
     )
 
     # Calculate length of frame member
@@ -739,13 +745,11 @@ def convert_frame_member_to_fem_for_case_2(
         element_type_class = "IfcPipeSegmentType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = (
-        ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
-            ifc_class=element_type_class,
-            material=material,
-            profile=profile_def,
-            check_for_duplicate=True,
-        )
+    element_type = ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
+        ifc_class=element_type_class,
+        material=material,
+        profile=profile_def,
+        check_for_duplicate=True,
     )
     ifcopenshell.api.type.assign_type(
         file=ifc4_destination_file,
@@ -793,10 +797,10 @@ def convert_frame_member_to_fem_for_case_2(
             start_point=p1,
             end_point=p2,
             orientation_point=p3,
-            profile_def=profile_def,
+            profile=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,
-            corresponding_product=frame_member_copied_to_destination_file,
+            product_to_be_assigned_to=frame_member_copied_to_destination_file,
         )
     )
 
