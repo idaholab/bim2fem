@@ -53,7 +53,6 @@ Convert Building Information Models (BIM) to Finite Element Models (FEM) for str
 |--------|-------------|
 | `bim2fem.core` | Core utility for converting IFC4 from ReferenceView/DesignTransferView to StructuralAnalysisView |
 | `bim2fem.ifcplus` | Extension of the IfcOpenShell-Python library for enhanced IFC manipulation of building and piping models      |
-| `bim2fem.bim2glb` | Extension of IfcConvert for improved IFC to GLB conversion for 3D visualization |
 
 
 ## Getting Started
