@@ -2,19 +2,19 @@
 
 import ifcopenshell
 import ifcopenshell.validate
-import ifcplus.api.project
-import ifcplus.api.placement
-import ifcplus.api.profile
-import ifcplus.util.geometry
+import bim2fem.ifcplus.api.project
+import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.profile
+import bim2fem.ifcplus.util.geometry
 from tests.conftest import OUTPUT_DIR_FOR_STRUCTURAL, INPUT_DIR
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import ifcplus.api.material
+import bim2fem.ifcplus.api.material
 from typing import cast
 from pprint import pprint
-import ifcplus.api.structural
+import bim2fem.ifcplus.api.structural
 import numpy as np
-import ifcplus.util.structural
+import bim2fem.ifcplus.util.structural
 
 
 class TestStructuralSurfaceMembers:
@@ -23,7 +23,7 @@ class TestStructuralSurfaceMembers:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
@@ -43,36 +43,40 @@ class TestStructuralSurfaceMembers:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
         structural_analysis_model = (
-            ifcplus.api.structural.add_structural_analysis_model(
+            bim2fem.ifcplus.api.structural.add_structural_analysis_model(
                 ifc4_file=ifc4_file,
                 name="SA Model - 1",
             )
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
         concrete_material = cast(ifcopenshell.entity_instance, concrete_material)
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
         steel_material = cast(ifcopenshell.entity_instance, steel_material)
 
-        ifcplus.api.structural.create_structural_surface_member(
+        bim2fem.ifcplus.api.structural.create_structural_surface_member(
             outer_profile=[
                 (3.0, 1.0, 0.2),
                 (11.0, 1.0, 0.2),
@@ -93,7 +97,7 @@ class TestStructuralSurfaceMembers:
         )
 
         output_path = str(OUTPUT_DIR_FOR_STRUCTURAL / "structural_surface_member.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -108,7 +112,7 @@ class TestStructuralSurfaceMembers:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
@@ -128,34 +132,38 @@ class TestStructuralSurfaceMembers:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
         structural_analysis_model = (
-            ifcplus.api.structural.add_structural_analysis_model(
+            bim2fem.ifcplus.api.structural.add_structural_analysis_model(
                 ifc4_file=ifc4_file,
                 name="SA Model - 1",
             )
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.structural.create_structural_surface_member(
+        bim2fem.ifcplus.api.structural.create_structural_surface_member(
             outer_profile=[
                 (3.0, 1.0, 0.2),
                 (11.0, 1.0, 0.2),
@@ -185,7 +193,7 @@ class TestStructuralSurfaceMembers:
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / "structural_surface_member_with_opening.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -203,7 +211,7 @@ class TestStructuralCurveMembers:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
@@ -223,30 +231,34 @@ class TestStructuralCurveMembers:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             place_object_relative_to_parent=True,
         )
 
         structural_analysis_model = (
-            ifcplus.api.structural.add_structural_analysis_model(
+            bim2fem.ifcplus.api.structural.add_structural_analysis_model(
                 ifc4_file=ifc4_file,
                 name="SA Model - 1",
             )
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
         x_shift = 0.0
@@ -263,7 +275,7 @@ class TestStructuralCurveMembers:
         ]:
 
             if parametrized_profile_def_class == "IfcRectangleProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.2, 0.3],
@@ -274,7 +286,7 @@ class TestStructuralCurveMembers:
                 material = concrete_material
 
             elif parametrized_profile_def_class == "IfcRectangleHollowProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.2, 0.3, 0.02, None, None],
@@ -285,7 +297,7 @@ class TestStructuralCurveMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcCircleProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.1],
@@ -296,7 +308,7 @@ class TestStructuralCurveMembers:
                 material = concrete_material
 
             elif parametrized_profile_def_class == "IfcCircleHollowProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.1, 0.02],
@@ -307,7 +319,7 @@ class TestStructuralCurveMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcIShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
@@ -318,7 +330,7 @@ class TestStructuralCurveMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcLShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.3, 0.2, 0.03, None, None, None],
@@ -329,7 +341,7 @@ class TestStructuralCurveMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcUShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None],
@@ -340,7 +352,7 @@ class TestStructuralCurveMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcTShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None, None, None],
@@ -354,7 +366,7 @@ class TestStructuralCurveMembers:
                 "ProfileDef", ""
             )
 
-            ifcplus.api.structural.create_linear_structural_curve_member(
+            bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
                 start_point=(1.0 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + x_shift, 1.0, 0.0),
                 orientation_point=(1.0 + x_shift, 6.0, 1.0),
@@ -365,7 +377,7 @@ class TestStructuralCurveMembers:
                 product_to_be_assigned_to=None,
             )
 
-            ifcplus.api.structural.create_linear_structural_curve_member(
+            bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
                 start_point=(1.0 + 1.0 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + 1.0 + x_shift, 1.0, 0.0),
                 orientation_point=(1.1 + 1.0 + x_shift, 6.0, 1.0),
@@ -376,7 +388,7 @@ class TestStructuralCurveMembers:
                 product_to_be_assigned_to=None,
             )
 
-            ifcplus.api.structural.create_linear_structural_curve_member(
+            bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
                 start_point=(1.0 + 1.0 * 2 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + 1.0 * 2 + x_shift, 1.0, 0.5),
                 orientation_point=(1.1 + 1.0 * 2 + x_shift, 6.0, 1.0),
@@ -392,7 +404,7 @@ class TestStructuralCurveMembers:
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / "linear_structural_curve_members.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -407,7 +419,7 @@ class TestStructuralCurveMembers:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
@@ -427,27 +439,29 @@ class TestStructuralCurveMembers:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
         structural_analysis_model = (
-            ifcplus.api.structural.add_structural_analysis_model(
+            bim2fem.ifcplus.api.structural.add_structural_analysis_model(
                 ifc4_file=ifc4_file,
                 name="SA Model - 1",
             )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        profile = ifcplus.api.profile.add_parameterized_profile(
+        profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcLShapeProfileDef",
             dimensions=[0.3, 0.2, 0.03, None, None, None],
@@ -456,7 +470,7 @@ class TestStructuralCurveMembers:
             calculate_mechanical_properties=True,
         )
 
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=(1.0, 6.0, 0.0),
             end_point=(1.0, 1.0, 0.0),
             orientation_point=(1.0, 6.0, 1.0),
@@ -467,7 +481,7 @@ class TestStructuralCurveMembers:
             product_to_be_assigned_to=None,
         )
 
-        ifcplus.api.structural.create_curved_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_curved_structural_curve_member(
             start_point=(2.0, 6.0, 0.0),
             end_point=(7.0, 1.0, 0.0),
             orientation_point=(2.0, 6.0, 0.0 + 1.0),
@@ -484,7 +498,7 @@ class TestStructuralCurveMembers:
             product_to_be_assigned_to=None,
         )
 
-        ifcplus.api.structural.create_curved_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_curved_structural_curve_member(
             start_point=(2.0, 6.0, 0.0),
             end_point=(2.0, 6.0 - 5.0, 0.0 + 5.0),
             orientation_point=(2.0, 6.0, 0.0 + 1.0),
@@ -504,7 +518,7 @@ class TestStructuralCurveMembers:
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / f"curved_structural_curve_members.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -522,7 +536,7 @@ class TestMergeStructuralPointConnections:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
@@ -542,35 +556,39 @@ class TestMergeStructuralPointConnections:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             place_object_relative_to_parent=True,
         )
 
         structural_analysis_model = (
-            ifcplus.api.structural.add_structural_analysis_model(
+            bim2fem.ifcplus.api.structural.add_structural_analysis_model(
                 ifc4_file=ifc4_file,
                 name="SA Model - 1",
             )
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
         concrete_material = cast(ifcopenshell.entity_instance, concrete_material)
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
         steel_material = cast(ifcopenshell.entity_instance, steel_material)
 
-        profile = ifcplus.api.profile.add_parameterized_profile(
+        profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcIShapeProfileDef",
             dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
@@ -603,7 +621,7 @@ class TestMergeStructuralPointConnections:
             (np.array(col4_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
         )
 
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=col1_bottom,
             end_point=col1_top,
             orientation_point=col1_orientation,
@@ -614,7 +632,7 @@ class TestMergeStructuralPointConnections:
             product_to_be_assigned_to=None,
         )
 
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=col2_bottom,
             end_point=col2_top,
             orientation_point=col2_orientation,
@@ -625,7 +643,7 @@ class TestMergeStructuralPointConnections:
             product_to_be_assigned_to=None,
         )
 
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=col3_bottom,
             end_point=col3_top,
             orientation_point=col3_orientation,
@@ -636,7 +654,7 @@ class TestMergeStructuralPointConnections:
             product_to_be_assigned_to=None,
         )
 
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=col4_bottom,
             end_point=col4_top,
             orientation_point=col4_orientation,
@@ -647,7 +665,7 @@ class TestMergeStructuralPointConnections:
             product_to_be_assigned_to=None,
         )
 
-        ifcplus.api.structural.create_structural_surface_member(
+        bim2fem.ifcplus.api.structural.create_structural_surface_member(
             outer_profile=[
                 col1_top,
                 col2_top,
@@ -667,7 +685,7 @@ class TestMergeStructuralPointConnections:
             name="Slab-01",
         )
 
-        ifcplus.api.structural.create_structural_surface_member(
+        bim2fem.ifcplus.api.structural.create_structural_surface_member(
             outer_profile=[
                 col2_top,
                 col3_top,
@@ -687,7 +705,7 @@ class TestMergeStructuralPointConnections:
             name="Slab-02",
         )
 
-        ifcplus.api.structural.merge_all_coincident_structural_point_connections(
+        bim2fem.ifcplus.api.structural.merge_all_coincident_structural_point_connections(
             ifc4sav_file=ifc4_file,
         )
 
@@ -703,7 +721,7 @@ class TestMergeStructuralPointConnections:
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_merged_nodes.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -726,16 +744,18 @@ class TestTranslateStructuralPointConnections:
         )
         ifc4_file = cast(ifcopenshell.file, ifc4_file)
 
-        selected_nodes = ifcplus.util.structural.select_structural_point_connections(
-            ifc4_sav_file=ifc4_file,
-            bbox=ifcplus.util.geometry.BoundingBox.from_points(
-                points=np.array([[1.0, 1.0, 3.0]])
-            ),
+        selected_nodes = (
+            bim2fem.ifcplus.util.structural.select_structural_point_connections(
+                ifc4_sav_file=ifc4_file,
+                bbox=bim2fem.ifcplus.util.geometry.BoundingBox.from_points(
+                    points=np.array([[1.0, 1.0, 3.0]])
+                ),
+            )
         )
 
         selected_node_at_top_of_column_1 = selected_nodes[0]
 
-        ifcplus.api.structural.translate_structural_point_connection(
+        bim2fem.ifcplus.api.structural.translate_structural_point_connection(
             structural_point_connection=selected_node_at_top_of_column_1,
             translation=(-1.0, -1.0, 1.0),
         )
@@ -743,7 +763,7 @@ class TestTranslateStructuralPointConnections:
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_translated_node.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -779,34 +799,34 @@ class TestDivideStructuralCurveMembers:
 
         column_4 = all_structural_curve_members[3]
 
-        ifcplus.api.structural.divide_structural_curve_member(
+        bim2fem.ifcplus.api.structural.divide_structural_curve_member(
             structural_curve_member=column_1,
             division_locations_as_proportions_of_length=[],
         )
 
-        ifcplus.api.structural.divide_structural_curve_member(
+        bim2fem.ifcplus.api.structural.divide_structural_curve_member(
             structural_curve_member=column_2,
             division_locations_as_proportions_of_length=[0.4],
         )
 
-        ifcplus.api.structural.divide_structural_curve_member(
+        bim2fem.ifcplus.api.structural.divide_structural_curve_member(
             structural_curve_member=column_3,
             division_locations_as_proportions_of_length=[0.2, 0.8],
         )
 
-        ifcplus.api.structural.divide_structural_curve_member(
+        bim2fem.ifcplus.api.structural.divide_structural_curve_member(
             structural_curve_member=column_4,
             division_locations_as_proportions_of_length=[0.2, 0.4, 0.8],
         )
 
-        ifcplus.api.structural.merge_all_coincident_structural_point_connections(
+        bim2fem.ifcplus.api.structural.merge_all_coincident_structural_point_connections(
             ifc4sav_file=ifc4_file,
         )
 
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_divided_members.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,

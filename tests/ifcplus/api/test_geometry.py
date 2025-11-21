@@ -4,11 +4,11 @@ import ifcopenshell
 import ifcopenshell.api.geometry
 import ifcopenshell.validate
 import ifcopenshell.util.representation
-import ifcplus.api.project
-import ifcplus.api.geometry
-import ifcplus.api.placement
+import bim2fem.ifcplus.api.project
+import bim2fem.ifcplus.api.geometry
+import bim2fem.ifcplus.api.placement
 import numpy as np
-import ifcplus.api.profile
+import bim2fem.ifcplus.api.profile
 from tests.conftest import OUTPUT_DIR_FOR_GEOMETRY
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
@@ -23,7 +23,7 @@ class TestCsgSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -40,7 +40,7 @@ class TestCsgSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -53,18 +53,18 @@ class TestCsgSolids:
             predefined_type=None,
         )
 
-        block = ifcplus.api.geometry.add_block(
+        block = bim2fem.ifcplus.api.geometry.add_block(
             ifc4_file=ifc4_file,
             length=1.0,
             width=2.0,
             height=3.0,
         )
 
-        csg_solid = ifcplus.api.geometry.add_csg_solid(
+        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=block,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -89,13 +89,13 @@ class TestCsgSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "block.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -110,7 +110,7 @@ class TestCsgSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -127,7 +127,7 @@ class TestCsgSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -140,14 +140,14 @@ class TestCsgSolids:
             predefined_type=None,
         )
 
-        block_1 = ifcplus.api.geometry.add_block(
+        block_1 = bim2fem.ifcplus.api.geometry.add_block(
             ifc4_file=ifc4_file,
             length=0.5,
             width=1.0,
             height=4.0,
         )
 
-        block_2 = ifcplus.api.geometry.add_block(
+        block_2 = bim2fem.ifcplus.api.geometry.add_block(
             ifc4_file=ifc4_file,
             length=3.5,
             width=1.0,
@@ -155,7 +155,7 @@ class TestCsgSolids:
             repositioned_origin=(0.5, 0.0, 3.5),
         )
 
-        block_3 = ifcplus.api.geometry.add_block(
+        block_3 = bim2fem.ifcplus.api.geometry.add_block(
             ifc4_file=ifc4_file,
             length=0.5,
             width=1.0,
@@ -170,11 +170,11 @@ class TestCsgSolids:
             operator="UNION",
         )
 
-        csg_solid = ifcplus.api.geometry.add_csg_solid(
+        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=boolean_results[-1],
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -199,13 +199,13 @@ class TestCsgSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "csg_of_blocks.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -220,7 +220,7 @@ class TestCsgSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -237,7 +237,7 @@ class TestCsgSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -250,18 +250,18 @@ class TestCsgSolids:
             predefined_type=None,
         )
 
-        rectangular_pyramid = ifcplus.api.geometry.add_rectangular_pyramid(
+        rectangular_pyramid = bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
             ifc4_file=ifc4_file,
             length=1.0,
             width=2.0,
             height=3.0,
         )
 
-        csg_solid = ifcplus.api.geometry.add_csg_solid(
+        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=rectangular_pyramid,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -286,13 +286,13 @@ class TestCsgSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "rectangular_pyramid.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -307,7 +307,7 @@ class TestCsgSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -324,7 +324,7 @@ class TestCsgSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -337,14 +337,14 @@ class TestCsgSolids:
             predefined_type=None,
         )
 
-        block = ifcplus.api.geometry.add_block(
+        block = bim2fem.ifcplus.api.geometry.add_block(
             ifc4_file=ifc4_file,
             length=1.0,
             width=1.0,
             height=4.0,
         )
 
-        rect_pyramid = ifcplus.api.geometry.add_rectangular_pyramid(
+        rect_pyramid = bim2fem.ifcplus.api.geometry.add_rectangular_pyramid(
             ifc4_file=ifc4_file,
             length=1.0,
             width=1.0,
@@ -359,11 +359,11 @@ class TestCsgSolids:
             operator="UNION",
         )
 
-        csg_solid = ifcplus.api.geometry.add_csg_solid(
+        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=boolean_results[-1],
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -388,13 +388,13 @@ class TestCsgSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "csg_of_block_and_pyramid.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -409,7 +409,7 @@ class TestCsgSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -426,7 +426,7 @@ class TestCsgSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -440,7 +440,7 @@ class TestCsgSolids:
         )
 
         cylindrical_extruded_area_solid = (
-            ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
                 ifc4_file=ifc4_file,
                 radius=0.5,
                 extrusion_depth=4.0,
@@ -448,7 +448,7 @@ class TestCsgSolids:
             )
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -475,13 +475,13 @@ class TestCsgSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "right_circular_cylinder.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -496,7 +496,7 @@ class TestCsgSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -513,7 +513,7 @@ class TestCsgSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -526,17 +526,17 @@ class TestCsgSolids:
             predefined_type=None,
         )
 
-        sphere = ifcplus.api.geometry.add_sphere(
+        sphere = bim2fem.ifcplus.api.geometry.add_sphere(
             ifc4_file=ifc4_file,
             radius=0.5,
             repositioned_origin=(0.5, 0.5, 0.5),
         )
 
-        csg_solid = ifcplus.api.geometry.add_csg_solid(
+        csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
             boolean_result_or_primitive=sphere,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -561,13 +561,13 @@ class TestCsgSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "sphere.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -585,7 +585,7 @@ class TestSweptAreaSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -602,7 +602,7 @@ class TestSweptAreaSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -620,20 +620,20 @@ class TestSweptAreaSolids:
         thickness = 0.2
         length = 8.0
 
-        profile = ifcplus.api.profile.add_parameterized_profile(
+        profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcLShapeProfileDef",
             dimensions=[depth, width, thickness, None, None, None],
             check_for_duplicate=True,
         )
 
-        extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+        extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
             ifc4_file=ifc4_file,
             swept_area=profile,
             depth=length,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -660,7 +660,7 @@ class TestSweptAreaSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             repositioned_origin=(0.0, 8.0, 0.0),
             repositioned_x_axis=(1.0, 0.0, 0.0),
@@ -669,7 +669,7 @@ class TestSweptAreaSolids:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "extruded_area_solid.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -684,7 +684,7 @@ class TestSweptAreaSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -701,7 +701,7 @@ class TestSweptAreaSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -719,14 +719,14 @@ class TestSweptAreaSolids:
         thickness = 0.2
         length = 8.0
 
-        starting_profile = ifcplus.api.profile.add_parameterized_profile(
+        starting_profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcLShapeProfileDef",
             dimensions=[depth, width, thickness, None, None, None],
             check_for_duplicate=True,
         )
 
-        ending_profile = ifcplus.api.profile.add_parameterized_profile(
+        ending_profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcLShapeProfileDef",
             dimensions=[
@@ -741,7 +741,7 @@ class TestSweptAreaSolids:
         )
 
         extruded_area_solid_tapered = (
-            ifcplus.api.geometry.add_extruded_area_solid_tapered(
+            bim2fem.ifcplus.api.geometry.add_extruded_area_solid_tapered(
                 ifc4_file=ifc4_file,
                 swept_area=starting_profile,
                 end_swept_area=ending_profile,
@@ -749,7 +749,7 @@ class TestSweptAreaSolids:
             )
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -776,7 +776,7 @@ class TestSweptAreaSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             repositioned_origin=(0.0, 8.0, 0.0),
             repositioned_x_axis=(1.0, 0.0, 0.0),
@@ -785,7 +785,7 @@ class TestSweptAreaSolids:
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "extruded_area_solid_tapered.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -800,7 +800,7 @@ class TestSweptAreaSolids:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -817,7 +817,7 @@ class TestSweptAreaSolids:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -834,9 +834,9 @@ class TestSweptAreaSolids:
         width = 1.0
         thickness = 0.2
 
-        revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
+        revolved_area_solid = bim2fem.ifcplus.api.geometry.add_revolved_area_solid(
             ifc4_file=ifc4_file,
-            swept_area=ifcplus.api.profile.add_parameterized_profile(
+            swept_area=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcLShapeProfileDef",
                 dimensions=[depth, width, thickness, None, None, None],
@@ -847,7 +847,7 @@ class TestSweptAreaSolids:
             repositioned_origin=(0.0, 0.0, 0.0),
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -874,13 +874,13 @@ class TestSweptAreaSolids:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "revolved_area_solid.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -898,7 +898,7 @@ class TestBoundingBox:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -915,7 +915,7 @@ class TestBoundingBox:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -928,7 +928,7 @@ class TestBoundingBox:
             predefined_type=None,
         )
 
-        bounding_box = ifcplus.api.geometry.add_bounding_box(
+        bounding_box = bim2fem.ifcplus.api.geometry.add_bounding_box(
             ifc4_file=ifc4_file,
             length=4.0,
             width=2.0,
@@ -936,7 +936,7 @@ class TestBoundingBox:
             corner_coordinates=(0.0, 0.0, 0.0),
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Box",
@@ -961,13 +961,13 @@ class TestBoundingBox:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "bounding_box.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -985,7 +985,7 @@ class TestFacetedBrep:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -1002,7 +1002,7 @@ class TestFacetedBrep:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -1041,13 +1041,13 @@ class TestFacetedBrep:
             [6, 4, 7],
         ]
 
-        faceted_brep = ifcplus.api.geometry.add_faceted_brep(
+        faceted_brep = bim2fem.ifcplus.api.geometry.add_faceted_brep(
             ifc4_file=ifc4_file,
             points=points,
             triangles=triangles,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -1072,13 +1072,13 @@ class TestFacetedBrep:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "faceted_brep.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -1096,7 +1096,7 @@ class TestTopologicalRepresentationItems:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -1113,7 +1113,7 @@ class TestTopologicalRepresentationItems:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -1126,18 +1126,18 @@ class TestTopologicalRepresentationItems:
             predefined_type=None,
         )
 
-        edge = ifcplus.api.geometry.add_edge(
-            edge_start_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
+        edge = bim2fem.ifcplus.api.geometry.add_edge(
+            edge_start_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=(0.0, 0.0, 1.0),
             ),
-            edge_end_as_vertex_point=ifcplus.api.geometry.add_vertex_point(
+            edge_end_as_vertex_point=bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=(4.0, 0.0, 1.0),
             ),
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -1162,13 +1162,13 @@ class TestTopologicalRepresentationItems:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "edge.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -1183,7 +1183,7 @@ class TestTopologicalRepresentationItems:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -1200,7 +1200,7 @@ class TestTopologicalRepresentationItems:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -1213,36 +1213,36 @@ class TestTopologicalRepresentationItems:
             predefined_type=None,
         )
 
-        vertex_point_1 = ifcplus.api.geometry.add_vertex_point(
+        vertex_point_1 = bim2fem.ifcplus.api.geometry.add_vertex_point(
             ifc4_file=ifc4_file,
             point_coordinates=(2.0, 6.0, 0.0),
         )
 
-        vertex_point_2 = ifcplus.api.geometry.add_vertex_point(
+        vertex_point_2 = bim2fem.ifcplus.api.geometry.add_vertex_point(
             ifc4_file=ifc4_file,
             point_coordinates=(7.0, 1.0, 0.0),
         )
 
-        vertex_point_3 = ifcplus.api.geometry.add_vertex_point(
+        vertex_point_3 = bim2fem.ifcplus.api.geometry.add_vertex_point(
             ifc4_file=ifc4_file,
             point_coordinates=(2.0, 6.0 - 5.0, 0.0 + 5.0),
         )
 
-        edge_curve_1 = ifcplus.api.geometry.add_edge_curve(
+        edge_curve_1 = bim2fem.ifcplus.api.geometry.add_edge_curve(
             point_of_curvature_as_vertex_point=vertex_point_1,
             point_of_tangency_as_vertex_point=vertex_point_2,
             point_defining_plane_of_arc_and_center_of_curvature_side=(7.0, 6.0, 0.0),
             radius_of_curvature=5.0,
         )
 
-        edge_curve_2 = ifcplus.api.geometry.add_edge_curve(
+        edge_curve_2 = bim2fem.ifcplus.api.geometry.add_edge_curve(
             point_of_curvature_as_vertex_point=vertex_point_1,
             point_of_tangency_as_vertex_point=vertex_point_3,
             point_defining_plane_of_arc_and_center_of_curvature_side=(2.0, 6.0, 1.0),
             radius_of_curvature=5.0,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -1269,13 +1269,13 @@ class TestTopologicalRepresentationItems:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "edge_curve.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -1290,7 +1290,7 @@ class TestTopologicalRepresentationItems:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -1307,7 +1307,7 @@ class TestTopologicalRepresentationItems:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -1328,19 +1328,19 @@ class TestTopologicalRepresentationItems:
         ]
 
         vertex_points_of_outer_bound = [
-            ifcplus.api.geometry.add_vertex_point(
+            bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=point_of_outer_bound,
             )
             for point_of_outer_bound in points_of_outer_bound
         ]
 
-        face_surface = ifcplus.api.geometry.add_face_surface(
+        face_surface = bim2fem.ifcplus.api.geometry.add_face_surface(
             vertex_points_of_outer_bound=vertex_points_of_outer_bound,
             vertex_points_of_inner_bounds=[],
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -1365,13 +1365,13 @@ class TestTopologicalRepresentationItems:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "face_surface.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -1386,7 +1386,7 @@ class TestTopologicalRepresentationItems:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -1403,7 +1403,7 @@ class TestTopologicalRepresentationItems:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -1437,7 +1437,7 @@ class TestTopologicalRepresentationItems:
         ]
 
         vertex_points_of_outer_bound = [
-            ifcplus.api.geometry.add_vertex_point(
+            bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=point_of_outer_bound,
             )
@@ -1448,7 +1448,7 @@ class TestTopologicalRepresentationItems:
         for points_of_inner_bound in points_of_inner_bounds:
             vertex_points_of_inner_bounds.append(
                 [
-                    ifcplus.api.geometry.add_vertex_point(
+                    bim2fem.ifcplus.api.geometry.add_vertex_point(
                         ifc4_file=ifc4_file,
                         point_coordinates=point_of_inner_bound,
                     )
@@ -1456,12 +1456,12 @@ class TestTopologicalRepresentationItems:
                 ]
             )
 
-        face_surface = ifcplus.api.geometry.add_face_surface(
+        face_surface = bim2fem.ifcplus.api.geometry.add_face_surface(
             vertex_points_of_outer_bound=vertex_points_of_outer_bound,
             vertex_points_of_inner_bounds=vertex_points_of_inner_bounds,
         )
 
-        shape_representation = ifcplus.api.geometry.add_shape_model(
+        shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcTopologyRepresentation",
             representation_identifier="Reference",
@@ -1486,13 +1486,13 @@ class TestTopologicalRepresentationItems:
             relating_structure=site,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=element,
             place_object_relative_to_parent=True,
         )
 
         output_path = str(OUTPUT_DIR_FOR_GEOMETRY / "face_surface_with_voids.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
