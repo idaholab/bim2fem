@@ -273,12 +273,7 @@ def get_structural_point_connection_of_vertex_point(
 
 def select_structural_point_connections(
     ifc4_sav_file: ifcopenshell.file,
-    x_min: float,
-    x_max: float,
-    y_min: float,
-    y_max: float,
-    z_min: float,
-    z_max: float,
+    bbox: ifcplus.util.geometry.BoundingBox,
 ) -> list[ifcopenshell.entity_instance]:
 
     selected_structural_point_connections = []
@@ -293,11 +288,11 @@ def select_structural_point_connections(
             )
         )
         x_val, y_val, z_val = coordinates_of_structural_point_connection
-        if not x_min <= x_val <= x_max:
+        if not bbox.xmin <= x_val <= bbox.xmax:
             continue
-        if not y_min <= y_val <= y_max:
+        if not bbox.ymin <= y_val <= bbox.ymax:
             continue
-        if not z_min <= z_val <= z_max:
+        if not bbox.zmin <= z_val <= bbox.zmax:
             continue
         selected_structural_point_connections.append(structural_point_connection)
 

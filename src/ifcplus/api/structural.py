@@ -872,22 +872,7 @@ def divide_structural_curve_member(
 
         if index == 0:
 
-            translation_from_original_end_point_to_end_point_of_first_new_segment = (
-                tuple((np.array(new_end_point) - np.array(original_end_point)).tolist())
-            )
-
-            _, end_node_of_original_structural_curve_member = (
-                ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
-                    linear_structural_curve_member=structural_curve_member
-                )
-            )
-
-            translate_structural_point_connection(
-                structural_point_connection=end_node_of_original_structural_curve_member,
-                translation=translation_from_original_end_point_to_end_point_of_first_new_segment,
-            )
-
-            new_structural_curve_members.append(structural_curve_member)
+            pass
 
         else:
 
@@ -906,5 +891,40 @@ def divide_structural_curve_member(
             new_structural_curve_members.append(new_structural_curve_member)
 
         new_start_point = new_end_point
+
+    _, original_end_node_of_whole_member = (
+        ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+            linear_structural_curve_member=structural_curve_member,
+        )
+    )
+
+    segment_1 = structural_curve_member
+
+    edge_1 = segment_1.Representation.Representations[0].Items[0]
+
+    segment_2 = new_structural_curve_members[0]
+
+    edge_2 = segment_2.Representation.Representations[0].Items[0]
+
+    edge_1.EdgeEnd = edge_2.EdgeStart
+
+    start_node_of_segment_2 = (
+        ifcplus.util.structural.get_structural_point_connection_of_vertex_point(
+            vertex_point=edge_2.EdgeStart,
+        )
+    )
+
+    for connection_relationship in segment_1.ConnectedBy:
+        if not connection_relationship.is_a("IfcRelConnectsStructuralMember"):
+            continue
+        if (
+            connection_relationship.RelatedStructuralConnection
+            == original_end_node_of_whole_member
+        ):
+            connection_relationship.RelatedStructuralConnection = (
+                start_node_of_segment_2
+            )
+
+    new_structural_curve_members = [segment_1] + new_structural_curve_members
 
     return new_structural_curve_members

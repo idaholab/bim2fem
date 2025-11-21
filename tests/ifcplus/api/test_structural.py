@@ -5,7 +5,8 @@ import ifcopenshell.validate
 import ifcplus.api.project
 import ifcplus.api.placement
 import ifcplus.api.profile
-from tests.conftest import OUTPUT_DIR_FOR_STRUCTURAL
+import ifcplus.util.geometry
+from tests.conftest import OUTPUT_DIR_FOR_STRUCTURAL, INPUT_DIR
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
 import ifcplus.api.material
@@ -13,6 +14,7 @@ from typing import cast
 from pprint import pprint
 import ifcplus.api.structural
 import numpy as np
+import ifcplus.util.structural
 
 
 class TestStructuralSurfaceMembers:
@@ -699,7 +701,110 @@ class TestMergeStructuralPointConnections:
         assert total_node_count == 8
 
         output_path = str(
-            OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_with_merged_nodes.ifc"
+            OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_merged_nodes.ifc"
+        )
+        ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+
+class TestTranslateStructuralPointConnections:
+
+    def test_translate_structural_point_connection_of_simple_structure(
+        self,
+    ):
+
+        ifc4_file = ifcopenshell.open(
+            path=str(INPUT_DIR / "simple_structure_SAV.ifc"),
+        )
+        ifc4_file = cast(ifcopenshell.file, ifc4_file)
+
+        selected_nodes = ifcplus.util.structural.select_structural_point_connections(
+            ifc4_sav_file=ifc4_file,
+            bbox=ifcplus.util.geometry.BoundingBox.from_points(
+                points=np.array([[1.0, 1.0, 3.0]])
+            ),
+        )
+
+        selected_node_at_top_of_column_1 = selected_nodes[0]
+
+        ifcplus.api.structural.translate_structural_point_connection(
+            structural_point_connection=selected_node_at_top_of_column_1,
+            translation=(-1.0, -1.0, 1.0),
+        )
+
+        output_path = str(
+            OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_translated_node.ifc"
+        )
+        ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+
+class TestDivideStructuralCurveMembers:
+
+    def test_divide_structural_curve_members_of_simple_structure(
+        self,
+    ):
+
+        ifc4_file = ifcopenshell.open(
+            path=str(INPUT_DIR / "simple_structure_SAV.ifc"),
+        )
+        ifc4_file = cast(ifcopenshell.file, ifc4_file)
+
+        all_structural_curve_members = ifc4_file.by_type(
+            type="IfcStructuralCurveMember",
+            include_subtypes=False,
+        )
+
+        column_1 = all_structural_curve_members[0]
+
+        column_2 = all_structural_curve_members[1]
+
+        column_3 = all_structural_curve_members[2]
+
+        column_4 = all_structural_curve_members[3]
+
+        ifcplus.api.structural.divide_structural_curve_member(
+            structural_curve_member=column_1,
+            division_locations_as_proportions_of_length=[],
+        )
+
+        ifcplus.api.structural.divide_structural_curve_member(
+            structural_curve_member=column_2,
+            division_locations_as_proportions_of_length=[0.4],
+        )
+
+        ifcplus.api.structural.divide_structural_curve_member(
+            structural_curve_member=column_3,
+            division_locations_as_proportions_of_length=[0.2, 0.8],
+        )
+
+        ifcplus.api.structural.divide_structural_curve_member(
+            structural_curve_member=column_4,
+            division_locations_as_proportions_of_length=[0.2, 0.4, 0.8],
+        )
+
+        ifcplus.api.structural.merge_all_coincident_structural_point_connections(
+            ifc4sav_file=ifc4_file,
+        )
+
+        output_path = str(
+            OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_divided_members.ifc"
         )
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
