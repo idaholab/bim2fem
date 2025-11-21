@@ -14,7 +14,7 @@ import json
 import ifcopenshell
 import bim2fem.ifcplus.api.project
 import bim2fem.core.convert_ifc_to_fem
-from bim2fem.core.adjust_element_connectivity_of_building_fem import (
+from bim2fem.core.snap.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 from flask import (
