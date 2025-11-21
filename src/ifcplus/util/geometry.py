@@ -19,8 +19,6 @@ def get_coordinates_of_vertex_point(
     vertex_point: ifcopenshell.entity_instance,
 ) -> tuple[float, float, float]:
 
-    assert isinstance(vertex_point.VertexGeometry, ifcopenshell.entity_instance)
-    assert isinstance(vertex_point.VertexGeometry.Coordinates, tuple)
     coordinates_of_vertex_point = vertex_point.VertexGeometry.Coordinates
 
     return coordinates_of_vertex_point

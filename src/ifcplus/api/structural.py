@@ -15,7 +15,6 @@ import math
 import numpy as np
 import ifcplus.api.structural
 import ifcopenshell.util.element
-from ifcplus.util.geometry import HorizontalCurve
 import ifcopenshell.util.representation
 from typing import cast
 import ifcopenshell
@@ -570,14 +569,12 @@ def create_structural_point_connection(
 
 def merge_all_coincident_structural_point_connections(
     ifc4sav_file: ifcopenshell.file,
-):
+) -> ifcopenshell.file:
 
-    # Get Model Precision
     model_precision = ifcplus.util.project.get_precision_of_project(
         ifc4_file=ifc4sav_file
     )
 
-    # Set up node groups
     node_groups = {}
     num_x_divisions = 8
     num_y_divisions = 8
@@ -591,7 +588,6 @@ def merge_all_coincident_structural_point_connections(
         type="IfcStructuralPointConnection", include_subtypes=False
     )
 
-    # Get parameters for equations used to group nodes
     x_vals = set()
     y_vals = set()
     z_vals = set()
@@ -614,7 +610,6 @@ def merge_all_coincident_structural_point_connections(
     z_val_max = max(z_vals) + 1
     slope_for_z = num_z_divisions / (z_val_max - z_val_min)
 
-    # Sort the nodes into groups
     for node in all_nodes:
         coordinates_of_node = (
             ifcplus.util.structural.get_coordinates_of_structural_point_connection(
@@ -630,14 +625,12 @@ def merge_all_coincident_structural_point_connections(
         group_key = f"{x_group_num}{y_group_num}{z_group_num}"
         node_groups[group_key].append(node)
 
-    # Sanity Check
     count_of_nodes_in_groups = 0
     for node_group in node_groups.values():
         count_of_nodes_in_groups += len(node_group)
     if count_of_nodes_in_groups != len(all_nodes):
-        exit("Not all nodes accounted for. Aborting.")
+        return ifc4sav_file
 
-    # Merge Nodes
     all_merged_nodes = []
     for node_group in node_groups.values():
         trial_nodes = node_group
@@ -669,13 +662,8 @@ def merge_two_structural_point_connections_together(
     replaced_structural_point_connection: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance:
 
-    # Get IFC File
     ifc4sav_file = replacing_structural_point_connection.file
 
-    # Replace structural connections
-    assert isinstance(
-        replaced_structural_point_connection.ConnectsStructuralMembers, tuple
-    )
     for (
         rel_connects_structural_member
     ) in replaced_structural_point_connection.ConnectsStructuralMembers:
@@ -683,22 +671,22 @@ def merge_two_structural_point_connections_together(
             replacing_structural_point_connection
         )
 
-    # Replace VertexPoint
     replacing_vertex_point = (
         ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replacing_structural_point_connection,
         )
     )
+
     replaced_vertex_point = (
         ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replaced_structural_point_connection,
         )
     )
-    assert isinstance(replaced_vertex_point, ifcopenshell.entity_instance)
-    entities_refercing_replaced_vertex_point = ifc4sav_file.get_inverse(
+
+    entities_referencing_replaced_vertex_point = ifc4sav_file.get_inverse(
         inst=replaced_vertex_point
     )
-    for entity in entities_refercing_replaced_vertex_point:
+    for entity in entities_referencing_replaced_vertex_point:
         if not isinstance(entity, ifcopenshell.entity_instance):
             continue
         elif entity.is_a() == "IfcEdge":
@@ -716,22 +704,16 @@ def merge_two_structural_point_connections_together(
                 entity.EdgeEnd = replacing_vertex_point
                 continue
 
-    # Get replaced CartesianPoint
     replaced_cartesian_point = replaced_vertex_point.VertexGeometry
 
-    # Get replaced ProductDefinitionShape
     replaced_product_definition_shape = (
         replaced_structural_point_connection.Representation
     )
 
-    # Get replaced Topologyrepresentation
-    assert isinstance(replaced_product_definition_shape, ifcopenshell.entity_instance)
-    assert isinstance(replaced_product_definition_shape.Representations, tuple)
     replaced_topology_representation = (
         replaced_product_definition_shape.Representations[0]
     )
 
-    # Get replaced OwnerHistory
     ifc4_file = replaced_structural_point_connection.file
     owner_history_of_replaced_structural_point_connection = (
         replaced_structural_point_connection.OwnerHistory
@@ -746,7 +728,6 @@ def merge_two_structural_point_connections_together(
     else:
         replaced_owner_history = None
 
-    # Remove replaced entities
     for replaced_entity in [
         replaced_cartesian_point,
         replaced_vertex_point,
@@ -807,13 +788,10 @@ def divide_structural_curve_member(
     division_locations_as_proportions_of_length: list[float],
 ) -> list[ifcopenshell.entity_instance]:
 
-    # Check number of divisions
     if len(division_locations_as_proportions_of_length) == 0:
         return [structural_curve_member]
 
-    # Validate the input list to ensure all division locations are between 0.0 and 1.0 (exclusive)
     if all(0.0 < num < 1.0 for num in division_locations_as_proportions_of_length):
-        # Sort the list in ascending order
         division_locations_as_proportions_of_length = sorted(
             division_locations_as_proportions_of_length
         )
@@ -822,39 +800,41 @@ def divide_structural_curve_member(
             "All elements in the list must be between 0.0 and 1.0 (exclusive)"
         )
 
-    # Get various parameters
     original_start_point, original_end_point, original_orientation_point = (
         ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=structural_curve_member
         )
     )
+
     length_of_original_member = float(
         np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
     )
-    direction_vector = (
+
+    original_x_axis = (
         ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
             p1=original_start_point,
             p2=original_end_point,
         )
     )
-    local_orientation_axis_in_global_coordinates = (
+
+    original_z_axis = (
         ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
             p1=original_start_point,
             p2=original_orientation_point,
         )
     )
 
-    # Get assigned product
-    assigned_product = ifcplus.util.structural.get_assigned_product_of_structural_item(
-        structural_item=structural_curve_member
+    product_assigned_to = (
+        ifcplus.util.structural.get_assigned_product_of_structural_item(
+            structural_item=structural_curve_member
+        )
     )
 
-    # Get ProfileDef and Material
     material_profile_set = ifcopenshell.util.element.get_material(
         element=structural_curve_member,
         should_skip_usage=True,
     )
-    assert isinstance(material_profile_set, ifcopenshell.entity_instance)
+    material_profile_set = cast(ifcopenshell.entity_instance, material_profile_set)
     profile_def = material_profile_set.MaterialProfiles[0].Profile
     material = material_profile_set.MaterialProfiles[0].Material
 
@@ -863,55 +843,54 @@ def divide_structural_curve_member(
             structural_item=structural_curve_member
         )
     )
-    assert structural_analysis_model
+
+    structural_analysis_model = cast(
+        ifcopenshell.entity_instance, structural_analysis_model
+    )
 
     new_end_points = []
     for (
         division_location_as_proportion_of_length
     ) in division_locations_as_proportions_of_length + [1.0]:
         new_end_point = tuple(
-            float(val)
-            for val in (
+            (
                 np.array(original_start_point)
-                + np.array(direction_vector)
+                + np.array(original_x_axis)
                 * division_location_as_proportion_of_length
                 * length_of_original_member
             ).tolist()
         )
-        assert len(new_end_point) == 3
         new_end_points.append(new_end_point)
 
     new_structural_curve_members = []
     new_start_point = original_start_point
     for index, new_end_point in enumerate(new_end_points):
+
         new_orientation_point = tuple(
-            float(val)
-            for val in (
-                np.array(new_start_point)
-                + np.array(local_orientation_axis_in_global_coordinates) * 1.0
-            ).tolist()
+            (np.array(new_start_point) + np.array(original_z_axis) * 1.0).tolist()
         )
-        assert len(new_orientation_point) == 3
 
         if index == 0:
-            translation = tuple(
-                float(val)
-                for val in (
-                    np.array(new_end_point) - np.array(original_end_point)
-                ).tolist()
+
+            translation_from_original_end_point_to_end_point_of_first_new_segment = (
+                tuple((np.array(new_end_point) - np.array(original_end_point)).tolist())
             )
-            assert len(translation) == 3
-            second_node_of_structural_curve_member = ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
-                linear_structural_curve_member=structural_curve_member
-            )[
-                1
-            ]
+
+            _, end_node_of_original_structural_curve_member = (
+                ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+                    linear_structural_curve_member=structural_curve_member
+                )
+            )
+
             translate_structural_point_connection(
-                structural_point_connection=second_node_of_structural_curve_member,
-                translation=translation,
+                structural_point_connection=end_node_of_original_structural_curve_member,
+                translation=translation_from_original_end_point_to_end_point_of_first_new_segment,
             )
+
             new_structural_curve_members.append(structural_curve_member)
+
         else:
+
             new_structural_curve_member = (
                 ifcplus.api.structural.create_linear_structural_curve_member(
                     start_point=new_start_point,
@@ -920,9 +899,10 @@ def divide_structural_curve_member(
                     profile=profile_def,
                     material=material,
                     structural_analysis_model=structural_analysis_model,
-                    product_to_be_assigned_to=assigned_product,
+                    product_to_be_assigned_to=product_assigned_to,
                 )
             )
+
             new_structural_curve_members.append(new_structural_curve_member)
 
         new_start_point = new_end_point

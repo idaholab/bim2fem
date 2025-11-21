@@ -12,6 +12,7 @@ import ifcplus.api.material
 from typing import cast
 from pprint import pprint
 import ifcplus.api.structural
+import numpy as np
 
 
 class TestStructuralSurfaceMembers:
@@ -21,7 +22,7 @@ class TestStructuralSurfaceMembers:
     ):
 
         ifc4_file = ifcplus.api.project.create_ifc4_file(
-            model_view_definition="ReferenceView_V1.2",
+            model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
 
@@ -59,6 +60,7 @@ class TestStructuralSurfaceMembers:
             material_name="C35/45",
             check_for_duplicate=True,
         )
+        concrete_material = cast(ifcopenshell.entity_instance, concrete_material)
 
         steel_material = ifcplus.api.material.add_material_from_standard_library(
             ifc4_file=ifc4_file,
@@ -66,6 +68,7 @@ class TestStructuralSurfaceMembers:
             material_name="S355",
             check_for_duplicate=True,
         )
+        steel_material = cast(ifcopenshell.entity_instance, steel_material)
 
         ifcplus.api.structural.create_structural_surface_member(
             outer_profile=[
@@ -74,9 +77,9 @@ class TestStructuralSurfaceMembers:
                 (3.0, 9.0, 0.2),
             ],
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
             thicknesses=[
                 0.10,
@@ -104,7 +107,7 @@ class TestStructuralSurfaceMembers:
     ):
 
         ifc4_file = ifcplus.api.project.create_ifc4_file(
-            model_view_definition="ReferenceView_V1.2",
+            model_view_definition="StructuralAnalysisView",
             precision=1e-4,
         )
 
@@ -498,6 +501,205 @@ class TestStructuralCurveMembers:
 
         output_path = str(
             OUTPUT_DIR_FOR_STRUCTURAL / f"curved_structural_curve_members.ifc"
+        )
+        ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+
+class TestMergeStructuralPointConnections:
+
+    def test_create_simple_structure_with_merged_nodes(
+        self,
+    ):
+
+        ifc4_file = ifcplus.api.project.create_ifc4_file(
+            model_view_definition="StructuralAnalysisView",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(
+            type="IfcProject",
+            include_subtypes=False,
+        )[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        ifcplus.api.placement.edit_object_placement(
+            product=site,
+            place_object_relative_to_parent=True,
+        )
+
+        structural_analysis_model = (
+            ifcplus.api.structural.add_structural_analysis_model(
+                ifc4_file=ifc4_file,
+                name="SA Model - 1",
+            )
+        )
+
+        concrete_material = ifcplus.api.material.add_material_from_standard_library(
+            ifc4_file=ifc4_file,
+            region="Europe",
+            material_name="C35/45",
+            check_for_duplicate=True,
+        )
+        concrete_material = cast(ifcopenshell.entity_instance, concrete_material)
+
+        steel_material = ifcplus.api.material.add_material_from_standard_library(
+            ifc4_file=ifc4_file,
+            region="Europe",
+            material_name="S355",
+            check_for_duplicate=True,
+        )
+        steel_material = cast(ifcopenshell.entity_instance, steel_material)
+
+        profile = ifcplus.api.profile.add_parameterized_profile(
+            ifc4_file=ifc4_file,
+            profile_class="IfcIShapeProfileDef",
+            dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
+            profile_name=None,
+            check_for_duplicate=True,
+            calculate_mechanical_properties=True,
+        )
+
+        col1_bottom = (1.0, 1.0, 0.0)
+        col1_top = tuple((np.array(col1_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col1_orientation = tuple(
+            (np.array(col1_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        col2_bottom = (1.0 + 4.0, 1.0, 0.0)
+        col2_top = tuple((np.array(col2_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col2_orientation = tuple(
+            (np.array(col2_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        col3_bottom = (1.0 + 4.0, 1.0 + 5.0, 0.0)
+        col3_top = tuple((np.array(col3_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col3_orientation = tuple(
+            (np.array(col3_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        col4_bottom = (1.0, 1.0 + 5.0, 0.0)
+        col4_top = tuple((np.array(col4_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
+        col4_orientation = tuple(
+            (np.array(col4_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
+        )
+
+        ifcplus.api.structural.create_linear_structural_curve_member(
+            start_point=col1_bottom,
+            end_point=col1_top,
+            orientation_point=col1_orientation,
+            profile=profile,
+            material=steel_material,
+            structural_analysis_model=structural_analysis_model,
+            name="Column-01",
+            product_to_be_assigned_to=None,
+        )
+
+        ifcplus.api.structural.create_linear_structural_curve_member(
+            start_point=col2_bottom,
+            end_point=col2_top,
+            orientation_point=col2_orientation,
+            profile=profile,
+            material=steel_material,
+            structural_analysis_model=structural_analysis_model,
+            name="Column-02",
+            product_to_be_assigned_to=None,
+        )
+
+        ifcplus.api.structural.create_linear_structural_curve_member(
+            start_point=col3_bottom,
+            end_point=col3_top,
+            orientation_point=col3_orientation,
+            profile=profile,
+            material=steel_material,
+            structural_analysis_model=structural_analysis_model,
+            name="Column-03",
+            product_to_be_assigned_to=None,
+        )
+
+        ifcplus.api.structural.create_linear_structural_curve_member(
+            start_point=col4_bottom,
+            end_point=col4_top,
+            orientation_point=col4_orientation,
+            profile=profile,
+            material=steel_material,
+            structural_analysis_model=structural_analysis_model,
+            name="Column-04",
+            product_to_be_assigned_to=None,
+        )
+
+        ifcplus.api.structural.create_structural_surface_member(
+            outer_profile=[
+                col1_top,
+                col2_top,
+                col4_top,
+            ],
+            materials=[
+                concrete_material,
+                steel_material,
+                concrete_material,
+            ],
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+            structural_analysis_model=structural_analysis_model,
+            name="Slab-01",
+        )
+
+        ifcplus.api.structural.create_structural_surface_member(
+            outer_profile=[
+                col2_top,
+                col3_top,
+                col4_top,
+            ],
+            materials=[
+                concrete_material,
+                steel_material,
+                concrete_material,
+            ],
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+            structural_analysis_model=structural_analysis_model,
+            name="Slab-02",
+        )
+
+        ifcplus.api.structural.merge_all_coincident_structural_point_connections(
+            ifc4sav_file=ifc4_file,
+        )
+
+        all_nodes = ifc4_file.by_type(
+            type="IfcStructuralPointConnection",
+            include_subtypes=False,
+        )
+
+        total_node_count = len(all_nodes)
+
+        assert total_node_count == 8
+
+        output_path = str(
+            OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_with_merged_nodes.ifc"
         )
         ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,

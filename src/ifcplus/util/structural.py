@@ -4,6 +4,7 @@ import ifcopenshell
 import ifcplus.util.geometry
 import numpy as np
 import ifcopenshell.util.representation
+from typing import cast
 
 
 def get_structural_items_assigned_to_specified_element_class(
@@ -73,12 +74,6 @@ def get_structural_analysis_model_of_structural_item(
 def get_vertex_point_of_structural_point_connection(
     structural_point_connection: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance:
-    """Get VertexPoint of StructuralPointConnection
-
-    Args:
-        structural_point_connection (ifcopenshell.entity_instance):
-        IfcStructuralPointConnection
-    """
 
     vertex_point = structural_point_connection.Representation.Representations[0].Items[
         0
@@ -91,16 +86,12 @@ def get_coordinates_of_structural_point_connection(
     structural_point_connection: ifcopenshell.entity_instance,
 ) -> tuple[float, float, float]:
 
-    # Get VertexPoint of StructuralPointConnection
     vertex_point = get_vertex_point_of_structural_point_connection(
         structural_point_connection=structural_point_connection,
     )
 
-    # Get coordinates of VertexPoint of StructuralPointConnection
-    coordinates_of_vertex_point = (
-        ifcplus.util.geometry.get_coordinates_of_vertex_point(
-            vertex_point=vertex_point,
-        )
+    coordinates_of_vertex_point = ifcplus.util.geometry.get_coordinates_of_vertex_point(
+        vertex_point=vertex_point,
     )
 
     return coordinates_of_vertex_point
@@ -168,24 +159,22 @@ def get_coordinates_of_points_of_linear_structural_curve_member(
         subcontext="Reference",
         target_view="MODEL_VIEW",
     )
-    assert topology_representation
 
-    edge = topology_representation.Items[0]
+    edge = cast(ifcopenshell.entity_instance, topology_representation).Items[0]
 
     axis = linear_structural_curve_member.Axis.DirectionRatios
 
-    p1 = edge.EdgeStart.VertexGeometry.Coordinates
-    p2 = edge.EdgeEnd.VertexGeometry.Coordinates
+    start_point = edge.EdgeStart.VertexGeometry.Coordinates
+    end_point = edge.EdgeEnd.VertexGeometry.Coordinates
 
-    p3 = tuple(float(val) for val in (np.array(p1) + np.array(axis) * 1.0).tolist())
-    assert len(p3) == 3
+    orientation_point = tuple((np.array(start_point) + np.array(axis)).tolist())
 
-    return p1, p2, p3
+    return start_point, end_point, orientation_point
 
 
-def get_ordered_structural_point_connections_of_linear_structural_curve_member(
+def get_structural_point_connections_of_linear_structural_curve_member(
     linear_structural_curve_member: ifcopenshell.entity_instance,
-) -> list[ifcopenshell.entity_instance]:
+) -> tuple[ifcopenshell.entity_instance, ifcopenshell.entity_instance]:
 
     topology_representation = ifcopenshell.util.representation.get_representation(
         element=linear_structural_curve_member,
@@ -193,33 +182,31 @@ def get_ordered_structural_point_connections_of_linear_structural_curve_member(
         subcontext="Reference",
         target_view="MODEL_VIEW",
     )
-    assert topology_representation
+
+    topology_representation = cast(
+        ifcopenshell.entity_instance, topology_representation
+    )
 
     edge = topology_representation.Items[0]
-    vertex_points = [edge.EdgeStart, edge.EdgeEnd]
 
-    # ifc4_sav_file = linear_structural_curve_member.file
-    structural_points_connections = []
-    for vertex_point in vertex_points:
-        # references = ifc4_sav_file.get_inverse(inst=vertex_point)
-        # topology_representation = None
-        # for reference in references:
-        #     if reference.is_a("IfcTopologyRepresentation"):
-        #         topology_representation = reference
-        # assert isinstance(topology_representation, ifcopenshell.entity_instance)
-        # product_definition_shape = topology_representation.OfProductRepresentation[0]
-        # structural_point_connection = product_definition_shape.ShapeOfProduct[0]
-        structural_point_connection = get_structural_point_connection_of_vertex_point(
-            vertex_point=vertex_point
-        )
-        structural_points_connections.append(structural_point_connection)
+    start_node = get_structural_point_connection_of_vertex_point(
+        vertex_point=edge.EdgeStart
+    )
 
-    return structural_points_connections
+    end_node = get_structural_point_connection_of_vertex_point(
+        vertex_point=edge.EdgeEnd
+    )
+
+    return start_node, end_node
 
 
-def get_ordered_structural_point_connections_of_triangular_structural_surface_member(
+def get_structural_point_connections_of_triangular_structural_surface_member(
     triangular_structural_surface_member: ifcopenshell.entity_instance,
-) -> list[ifcopenshell.entity_instance]:
+) -> tuple[
+    ifcopenshell.entity_instance,
+    ifcopenshell.entity_instance,
+    ifcopenshell.entity_instance,
+]:
 
     topology_representation = ifcopenshell.util.representation.get_representation(
         element=triangular_structural_surface_member,
@@ -227,46 +214,58 @@ def get_ordered_structural_point_connections_of_triangular_structural_surface_me
         subcontext="Reference",
         target_view="MODEL_VIEW",
     )
-    assert topology_representation
+
+    topology_representation = cast(
+        ifcopenshell.entity_instance, topology_representation
+    )
 
     face_surface = topology_representation.Items[0]
+
     face_outer_bound = face_surface.Bounds[0]
+
     edge_list = face_outer_bound.Bound.EdgeList
+
     vertex_points = []
     for oriented_edge in edge_list:
         vertex_point = oriented_edge.EdgeStart
         vertex_points.append(vertex_point)
 
-    # ifc4_sav_file = triangular_structural_surface_member.file
     structural_points_connections = []
     for vertex_point in vertex_points:
-        # references = ifc4_sav_file.get_inverse(inst=vertex_point)
-        # topology_representation = None
-        # for reference in references:
-        #     if reference.is_a("IfcTopologyRepresentation"):
-        #         topology_representation = reference
-        # assert isinstance(topology_representation, ifcopenshell.entity_instance)
-        # product_definition_shape = topology_representation.OfProductRepresentation[0]
-        # structural_point_connection = product_definition_shape.ShapeOfProduct[0]
         structural_point_connection = get_structural_point_connection_of_vertex_point(
             vertex_point=vertex_point
         )
         structural_points_connections.append(structural_point_connection)
 
-    return structural_points_connections
+    node_1, node_2, node_3 = (
+        structural_points_connections[0],
+        structural_points_connections[1],
+        structural_points_connections[2],
+    )
+
+    return node_1, node_2, node_3
 
 
 def get_structural_point_connection_of_vertex_point(
     vertex_point: ifcopenshell.entity_instance,
 ) -> ifcopenshell.entity_instance:
+
     ifc4_sav_file = vertex_point.file
+
     references = ifc4_sav_file.get_inverse(inst=vertex_point)
+
     topology_representation = None
+
     for reference in references:
         if reference.is_a("IfcTopologyRepresentation"):
             topology_representation = reference
-    assert isinstance(topology_representation, ifcopenshell.entity_instance)
+
+    topology_representation = cast(
+        ifcopenshell.entity_instance, topology_representation
+    )
+
     product_definition_shape = topology_representation.OfProductRepresentation[0]
+
     structural_point_connection = product_definition_shape.ShapeOfProduct[0]
 
     return structural_point_connection

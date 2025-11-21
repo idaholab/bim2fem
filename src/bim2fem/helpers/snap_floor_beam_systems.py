@@ -54,7 +54,7 @@ def snap_floor_beam_systems(
     for frame_member in beams + columns + members:
 
         # Get Nodes
-        nodes = ifcplus.util.structural.get_ordered_structural_point_connections_of_linear_structural_curve_member(
+        nodes = ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
             linear_structural_curve_member=frame_member
         )
         all_frame_member_nodes += nodes
@@ -68,8 +68,10 @@ def snap_floor_beam_systems(
         profile_def = material_profile_set.MaterialProfiles[0].Profile
 
         # Get largest dimension
-        largest_dimension = ifcplus.util.profile.get_large_dimension_of_parameterized_profile_def(
-            parameterized_profile_def=profile_def
+        largest_dimension = (
+            ifcplus.util.profile.get_large_dimension_of_parameterized_profile_def(
+                parameterized_profile_def=profile_def
+            )
         )
 
         # Assign largest profile dimension information to nodes
@@ -117,8 +119,10 @@ def snap_floor_beam_systems(
             )
 
             # Get beam coordinates
-            beam_node_coordinates = ifcplus.util.structural.get_coordinates_of_structural_point_connection(
-                structural_point_connection=beam_node
+            beam_node_coordinates = (
+                ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+                    structural_point_connection=beam_node
+                )
             )
 
             # Get slab coordinates
