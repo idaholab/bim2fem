@@ -2,15 +2,15 @@
 
 import ifcopenshell
 from typing import Literal
-import ifcplus.util.project
+import bim2fem.ifcplus.util.project
 import ifcopenshell.api.attribute
 import ifcopenshell.api.profile
 import numpy as np
 import pickle
 import os
 import ifcopenshell.api.pset
-import ifcplus.util.unit
-from ifcplus import REGION
+import bim2fem.ifcplus.util.unit
+from bim2fem.ifcplus import REGION
 
 PARAMETERIZED_PROFILE_CLASSES = Literal[
     "IfcRectangleProfileDef",
@@ -50,9 +50,11 @@ def add_parameterized_profile(
     calculate_mechanical_properties: bool = False,
 ) -> ifcopenshell.entity_instance:
 
-    precision = ifcplus.util.project.get_precision_of_project(ifc4_file=ifc4_file)
+    precision = bim2fem.ifcplus.util.project.get_precision_of_project(
+        ifc4_file=ifc4_file
+    )
 
-    numeric_scale = ifcplus.util.project.get_numeric_scale_of_project(
+    numeric_scale = bim2fem.ifcplus.util.project.get_numeric_scale_of_project(
         ifc4_file=ifc4_file
     )
 
@@ -379,14 +381,18 @@ def add_profile_from_standard_library(
         iyy = matching_section_data_dictionary["MomentOfInertiaY"]
         xdim = iyy * 12 / ydim**3
         if region == "Europe":
-            conversion_factor = ifcplus.util.unit.get_conversion_factor_to_meters(
-                given_unit="meter"
+            conversion_factor = (
+                bim2fem.ifcplus.util.unit.get_conversion_factor_to_meters(
+                    given_unit="meter"
+                )
             )
         else:
-            conversion_factor = ifcplus.util.unit.get_conversion_factor_to_meters(
-                given_unit="inch"
+            conversion_factor = (
+                bim2fem.ifcplus.util.unit.get_conversion_factor_to_meters(
+                    given_unit="inch"
+                )
             )
-        xdim = ifcplus.util.unit.convert_unit_of_value(
+        xdim = bim2fem.ifcplus.util.unit.convert_unit_of_value(
             value=xdim,
             conversion_factor=conversion_factor,
         )

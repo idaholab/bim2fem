@@ -2,14 +2,14 @@
 
 import ifcopenshell
 import ifcopenshell.validate
-import ifcplus.api.project
-import ifcplus.api.placement
-import ifcplus.api.profile
+import bim2fem.ifcplus.api.project
+import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.profile
 from tests.conftest import OUTPUT_DIR_FOR_BUILT_ELEMENT
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import ifcplus.api.built_element
-import ifcplus.api.material
+import bim2fem.ifcplus.api.built_element
+import bim2fem.ifcplus.api.material
 from typing import cast
 import ifcopenshell.api.profile
 from pprint import pprint
@@ -21,7 +21,7 @@ class TestWalls:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -41,27 +41,31 @@ class TestWalls:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.built_element.create_linear_wall(
+        bim2fem.ifcplus.api.built_element.create_linear_wall(
             start_point_2d=(1.0, 1.0),
             end_point_2d=(7.0, 1.0),
             elevation=0.0,
@@ -77,7 +81,7 @@ class TestWalls:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.built_element.create_linear_wall(
+        bim2fem.ifcplus.api.built_element.create_linear_wall(
             start_point_2d=(1.0 + 8.0, 1.0),
             end_point_2d=(7.0 + 8.0, 1.0 + 2.0),
             elevation=1.0,
@@ -94,7 +98,7 @@ class TestWalls:
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "straight_walls.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -109,7 +113,7 @@ class TestWalls:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -129,27 +133,31 @@ class TestWalls:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        wall_1 = ifcplus.api.built_element.create_linear_wall(
+        wall_1 = bim2fem.ifcplus.api.built_element.create_linear_wall(
             start_point_2d=(1.0, 1.0),
             end_point_2d=(7.0, 1.0),
             elevation=0.0,
@@ -167,9 +175,9 @@ class TestWalls:
 
         opening_depth = 0.10 + 0.10 + 0.20
 
-        ifcplus.api.built_element.create_opening_element(
+        bim2fem.ifcplus.api.built_element.create_opening_element(
             voided_element=wall_1,
-            profile=ifcplus.api.profile.add_parameterized_profile(
+            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcRectangleProfileDef",
                 dimensions=[2.0, 1.0],
@@ -183,9 +191,9 @@ class TestWalls:
             x_axis_relative_to_voided_element=(-1.0, 0.0, 0.0),
         )
 
-        ifcplus.api.built_element.create_opening_element(
+        bim2fem.ifcplus.api.built_element.create_opening_element(
             voided_element=wall_1,
-            profile=ifcplus.api.profile.add_parameterized_profile(
+            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcCircleProfileDef",
                 dimensions=[0.5],
@@ -199,7 +207,7 @@ class TestWalls:
             x_axis_relative_to_voided_element=(-1.0, 0.0, 0.0),
         )
 
-        wall_2 = ifcplus.api.built_element.create_linear_wall(
+        wall_2 = bim2fem.ifcplus.api.built_element.create_linear_wall(
             start_point_2d=(1.0 + 8.0, 1.0),
             end_point_2d=(7.0 + 8.0, 1.0 + 2.0),
             elevation=1.0,
@@ -215,9 +223,9 @@ class TestWalls:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.built_element.create_opening_element(
+        bim2fem.ifcplus.api.built_element.create_opening_element(
             voided_element=wall_2,
-            profile=ifcplus.api.profile.add_parameterized_profile(
+            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcRectangleProfileDef",
                 dimensions=[2.0, 1.0],
@@ -234,7 +242,7 @@ class TestWalls:
         output_path = str(
             OUTPUT_DIR_FOR_BUILT_ELEMENT / "straight_walls_with_openings.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -249,7 +257,7 @@ class TestWalls:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -269,27 +277,31 @@ class TestWalls:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.built_element.create_curved_wall(
+        bim2fem.ifcplus.api.built_element.create_curved_wall(
             point_of_curvature_2d=(1.0, 1.0),
             point_on_center_of_curvature_side_2d=(1.0, 1.2),
             point_of_tangency_2d=(7.0, 7.0),
@@ -307,7 +319,7 @@ class TestWalls:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.built_element.create_curved_wall(
+        bim2fem.ifcplus.api.built_element.create_curved_wall(
             point_of_curvature_2d=(1.0 + 10.0, 1.0),
             point_on_center_of_curvature_side_2d=(1.0 + 10.0, 1.8),
             point_of_tangency_2d=(7.0 + 10.0, 7.0),
@@ -326,7 +338,7 @@ class TestWalls:
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "curved_walls.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -344,7 +356,7 @@ class TestSlabs:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -364,27 +376,31 @@ class TestSlabs:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.built_element.create_slab(
+        bim2fem.ifcplus.api.built_element.create_slab(
             profile=ifcopenshell.api.profile.add_arbitrary_profile(
                 file=ifc4_file,
                 profile=[
@@ -408,8 +424,8 @@ class TestSlabs:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.built_element.create_slab(
-            profile=ifcplus.api.profile.add_parameterized_profile(
+        bim2fem.ifcplus.api.built_element.create_slab(
+            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcRectangleProfileDef",
                 dimensions=[4.0, 2.0],
@@ -430,7 +446,7 @@ class TestSlabs:
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "slabs.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -445,7 +461,7 @@ class TestSlabs:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -465,27 +481,31 @@ class TestSlabs:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        slab_1 = ifcplus.api.built_element.create_slab(
+        slab_1 = bim2fem.ifcplus.api.built_element.create_slab(
             profile=ifcopenshell.api.profile.add_arbitrary_profile(
                 file=ifc4_file,
                 profile=[
@@ -511,9 +531,9 @@ class TestSlabs:
 
         opening_depth = 0.10 + 0.10 + 0.20
 
-        ifcplus.api.built_element.create_opening_element(
+        bim2fem.ifcplus.api.built_element.create_opening_element(
             voided_element=slab_1,
-            profile=ifcplus.api.profile.add_parameterized_profile(
+            profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcRectangleProfileDef",
                 dimensions=[2.0, 1.0],
@@ -528,7 +548,7 @@ class TestSlabs:
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "slab_with_opening.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -546,7 +566,7 @@ class TestFrameMembers:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -566,24 +586,28 @@ class TestFrameMembers:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
         x_shift = 0.0
@@ -600,7 +624,7 @@ class TestFrameMembers:
         ]:
 
             if parametrized_profile_def_class == "IfcRectangleProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.2, 0.3],
@@ -611,7 +635,7 @@ class TestFrameMembers:
                 material = concrete_material
 
             elif parametrized_profile_def_class == "IfcRectangleHollowProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.2, 0.3, 0.02, None, None],
@@ -622,7 +646,7 @@ class TestFrameMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcCircleProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.1],
@@ -633,7 +657,7 @@ class TestFrameMembers:
                 material = concrete_material
 
             elif parametrized_profile_def_class == "IfcCircleHollowProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.1, 0.02],
@@ -644,7 +668,7 @@ class TestFrameMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcIShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
@@ -655,7 +679,7 @@ class TestFrameMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcLShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.3, 0.2, 0.03, None, None, None],
@@ -666,7 +690,7 @@ class TestFrameMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcUShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None],
@@ -677,7 +701,7 @@ class TestFrameMembers:
                 material = steel_material
 
             elif parametrized_profile_def_class == "IfcTShapeProfileDef":
-                profile = ifcplus.api.profile.add_parameterized_profile(
+                profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
                     ifc4_file=ifc4_file,
                     profile_class=parametrized_profile_def_class,
                     dimensions=[0.3, 0.2, 0.02, 0.02, None, None, None, None, None],
@@ -691,7 +715,7 @@ class TestFrameMembers:
                 "ProfileDef", ""
             )
 
-            ifcplus.api.built_element.create_linear_frame_member(
+            bim2fem.ifcplus.api.built_element.create_linear_frame_member(
                 frame_member_class="IfcBeam",
                 start_point=(1.0 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + x_shift, 1.0, 0.0),
@@ -703,7 +727,7 @@ class TestFrameMembers:
                 place_object_relative_to_parent=True,
             )
 
-            ifcplus.api.built_element.create_linear_frame_member(
+            bim2fem.ifcplus.api.built_element.create_linear_frame_member(
                 frame_member_class="IfcBeam",
                 start_point=(1.0 + 1.0 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + 1.0 + x_shift, 1.0, 0.0),
@@ -715,7 +739,7 @@ class TestFrameMembers:
                 place_object_relative_to_parent=True,
             )
 
-            ifcplus.api.built_element.create_linear_frame_member(
+            bim2fem.ifcplus.api.built_element.create_linear_frame_member(
                 frame_member_class="IfcBeam",
                 start_point=(1.0 + 1.0 * 2 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + 1.0 * 2 + x_shift, 1.0, 0.5),
@@ -730,7 +754,7 @@ class TestFrameMembers:
             x_shift += 3.0
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"custom_beams.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -745,7 +769,7 @@ class TestFrameMembers:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -765,20 +789,22 @@ class TestFrameMembers:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
 
-        steel_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="S355",
-            check_for_duplicate=True,
+        steel_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="S355",
+                check_for_duplicate=True,
+            )
         )
 
-        profile = ifcplus.api.profile.add_parameterized_profile(
+        profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_file,
             profile_class="IfcLShapeProfileDef",
             dimensions=[0.3, 0.2, 0.03, None, None, None],
@@ -787,7 +813,7 @@ class TestFrameMembers:
             calculate_mechanical_properties=True,
         )
 
-        ifcplus.api.built_element.create_linear_frame_member(
+        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
             frame_member_class="IfcBeam",
             start_point=(1.0, 6.0, 0.0),
             end_point=(1.0, 1.0, 0.0),
@@ -799,7 +825,7 @@ class TestFrameMembers:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.built_element.create_curved_frame_member(
+        bim2fem.ifcplus.api.built_element.create_curved_frame_member(
             frame_member_class="IfcBeam",
             start_point=(2.0, 6.0, 0.0),
             end_point=(7.0, 1.0, 0.0),
@@ -817,7 +843,7 @@ class TestFrameMembers:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.built_element.create_curved_frame_member(
+        bim2fem.ifcplus.api.built_element.create_curved_frame_member(
             frame_member_class="IfcBeam",
             start_point=(2.0, 6.0, 0.0),
             end_point=(2.0, 6.0 - 5.0, 0.0 + 5.0),
@@ -836,7 +862,7 @@ class TestFrameMembers:
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"curved_beams.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,

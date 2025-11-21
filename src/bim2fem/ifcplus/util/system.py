@@ -2,7 +2,7 @@
 
 
 import ifcopenshell.util.placement
-import ifcplus.util.geometry
+import bim2fem.ifcplus.util.geometry
 
 
 def get_port_location(
@@ -36,7 +36,7 @@ def get_port_z_axis(
     val_2 = float(port_local_placement_in_global_coordinates[1][2])
     val_3 = float(port_local_placement_in_global_coordinates[2][2])
 
-    port_z_axis = ifcplus.util.geometry.unit_normalize_vector(
+    port_z_axis = bim2fem.ifcplus.util.geometry.unit_normalize_vector(
         vector=(val_1, val_2, val_3)
     )
 

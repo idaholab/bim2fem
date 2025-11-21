@@ -5,15 +5,15 @@ import ifcopenshell.api.geometry
 import ifcopenshell.api.root
 import ifcopenshell.api.material
 import ifcopenshell.api.structural
-import ifcplus.api.geometry
-import ifcplus.util.geometry
-import ifcplus.util.structural
-import ifcplus.util.project
+import bim2fem.ifcplus.api.geometry
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.structural
+import bim2fem.ifcplus.util.project
 import ifcopenshell.api.project
-import ifcplus.api.material
+import bim2fem.ifcplus.api.material
 import math
 import numpy as np
-import ifcplus.api.structural
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import ifcopenshell.util.representation
 from typing import cast
@@ -138,12 +138,10 @@ def create_linear_structural_curve_member(
 
     structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
-    material_profile_set = (
-        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-            material=material,
-            profile=profile,
-            check_for_duplicate=True,
-        )
+    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+        material=material,
+        profile=profile,
+        check_for_duplicate=True,
     )
 
     material_profile_set_usage = ifc4_file.create_entity(
@@ -170,7 +168,7 @@ def create_linear_structural_curve_member(
         ).tolist()
     )
 
-    z_axis = ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+    z_axis = bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
         vector1=x_axis,
         vector2=y_axis,
         unit_normalize=True,
@@ -181,18 +179,18 @@ def create_linear_structural_curve_member(
     vertex_points = []
     for point in [start_point, end_point]:
         vertex_points.append(
-            ifcplus.api.geometry.add_vertex_point(
+            bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=point,
             )
         )
 
-    edge = ifcplus.api.geometry.add_edge(
+    edge = bim2fem.ifcplus.api.geometry.add_edge(
         edge_start_as_vertex_point=vertex_points[0],
         edge_end_as_vertex_point=vertex_points[1],
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -271,12 +269,10 @@ def create_curved_structural_curve_member(
 
     structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
-    material_profile_set = (
-        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-            material=material,
-            profile=profile,
-            check_for_duplicate=True,
-        )
+    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+        material=material,
+        profile=profile,
+        check_for_duplicate=True,
     )
 
     material_profile_set_usage = ifc4_file.create_entity(
@@ -290,7 +286,7 @@ def create_curved_structural_curve_member(
         material=material_profile_set_usage,
     )
 
-    horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+    horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
         point_of_curvature=start_point,
         point_of_tangency=end_point,
@@ -310,7 +306,7 @@ def create_curved_structural_curve_member(
         ).tolist()
     )
 
-    z_axis = ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+    z_axis = bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
         vector1=x_axis,
         vector2=y_axis,
         unit_normalize=True,
@@ -324,19 +320,19 @@ def create_curved_structural_curve_member(
         horizontal_curve.point_of_tangency,
     ]:
         vertex_points.append(
-            ifcplus.api.geometry.add_vertex_point(
+            bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file, point_coordinates=point
             )
         )
 
-    edge_curve = ifcplus.api.geometry.add_edge_curve(
+    edge_curve = bim2fem.ifcplus.api.geometry.add_edge_curve(
         point_of_curvature_as_vertex_point=vertex_points[0],
         point_of_tangency_as_vertex_point=vertex_points[1],
         point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve.center_of_curvature,
         radius_of_curvature=horizontal_curve.radius_of_curvature,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -412,7 +408,7 @@ def create_structural_surface_member(
         structural_analysis_model.SharedPlacement
     )
 
-    material_layer_set = ifcplus.api.material.add_material_layer_set(
+    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
         materials=materials,
         thicknesses=thicknesses,
         check_for_duplicate=True,
@@ -441,7 +437,7 @@ def create_structural_surface_member(
     vertex_points_of_outer_profile = []
     for point in outer_profile:
         vertex_points_of_outer_profile.append(
-            ifcplus.api.geometry.add_vertex_point(
+            bim2fem.ifcplus.api.geometry.add_vertex_point(
                 ifc4_file=ifc4_file,
                 point_coordinates=point,
             )
@@ -452,19 +448,19 @@ def create_structural_surface_member(
         vertex_points_of_inner_profile = []
         for point in inner_profile:
             vertex_points_of_inner_profile.append(
-                ifcplus.api.geometry.add_vertex_point(
+                bim2fem.ifcplus.api.geometry.add_vertex_point(
                     ifc4_file=ifc4_file,
                     point_coordinates=point,
                 )
             )
         vertex_points_of_inner_profiles.append(vertex_points_of_inner_profile)
 
-    face_surface = ifcplus.api.geometry.add_face_surface(
+    face_surface = bim2fem.ifcplus.api.geometry.add_face_surface(
         vertex_points_of_outer_bound=vertex_points_of_outer_profile,
         vertex_points_of_inner_bounds=vertex_points_of_inner_profiles,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -545,7 +541,7 @@ def create_structural_point_connection(
         structural_analysis_model.SharedPlacement
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcTopologyRepresentation",
         representation_identifier="Reference",
@@ -571,7 +567,7 @@ def merge_all_coincident_structural_point_connections(
     ifc4sav_file: ifcopenshell.file,
 ) -> ifcopenshell.file:
 
-    model_precision = ifcplus.util.project.get_precision_of_project(
+    model_precision = bim2fem.ifcplus.util.project.get_precision_of_project(
         ifc4_file=ifc4sav_file
     )
 
@@ -592,10 +588,8 @@ def merge_all_coincident_structural_point_connections(
     y_vals = set()
     z_vals = set()
     for node in all_nodes:
-        coordinates_of_node = (
-            ifcplus.util.structural.get_coordinates_of_structural_point_connection(
-                structural_point_connection=node,
-            )
+        coordinates_of_node = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+            structural_point_connection=node,
         )
         x_vals.add(coordinates_of_node[0])
         y_vals.add(coordinates_of_node[1])
@@ -611,10 +605,8 @@ def merge_all_coincident_structural_point_connections(
     slope_for_z = num_z_divisions / (z_val_max - z_val_min)
 
     for node in all_nodes:
-        coordinates_of_node = (
-            ifcplus.util.structural.get_coordinates_of_structural_point_connection(
-                structural_point_connection=node,
-            )
+        coordinates_of_node = bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+            structural_point_connection=node,
         )
         x_val = coordinates_of_node[0]
         x_group_num = math.floor(slope_for_x * x_val + -slope_for_x * x_val_min)
@@ -638,7 +630,7 @@ def merge_all_coincident_structural_point_connections(
         for trial_node in trial_nodes:
             trial_node_is_unique = True
             for merged_node in merged_nodes:
-                nodes_are_coincident = ifcplus.util.structural.two_structural_point_connections_are_coincident(
+                nodes_are_coincident = bim2fem.ifcplus.util.structural.two_structural_point_connections_are_coincident(
                     structural_point_connection_1=merged_node,
                     structural_point_connection_2=trial_node,
                     tolerance=model_precision,
@@ -672,13 +664,13 @@ def merge_two_structural_point_connections_together(
         )
 
     replacing_vertex_point = (
-        ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
+        bim2fem.ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replacing_structural_point_connection,
         )
     )
 
     replaced_vertex_point = (
-        ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
+        bim2fem.ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=replaced_structural_point_connection,
         )
     )
@@ -748,13 +740,13 @@ def translate_structural_point_connection(
 ):
 
     vertex_point = (
-        ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
+        bim2fem.ifcplus.util.structural.get_vertex_point_of_structural_point_connection(
             structural_point_connection=structural_point_connection
         )
     )
 
     old_coordinates = (
-        ifcplus.util.structural.get_coordinates_of_structural_point_connection(
+        bim2fem.ifcplus.util.structural.get_coordinates_of_structural_point_connection(
             structural_point_connection=structural_point_connection
         )
     )
@@ -801,7 +793,7 @@ def divide_structural_curve_member(
         )
 
     original_start_point, original_end_point, original_orientation_point = (
-        ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+        bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=structural_curve_member
         )
     )
@@ -810,22 +802,18 @@ def divide_structural_curve_member(
         np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
     )
 
-    original_x_axis = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=original_start_point,
-            p2=original_end_point,
-        )
+    original_x_axis = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=original_start_point,
+        p2=original_end_point,
     )
 
-    original_z_axis = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=original_start_point,
-            p2=original_orientation_point,
-        )
+    original_z_axis = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=original_start_point,
+        p2=original_orientation_point,
     )
 
     product_assigned_to = (
-        ifcplus.util.structural.get_assigned_product_of_structural_item(
+        bim2fem.ifcplus.util.structural.get_assigned_product_of_structural_item(
             structural_item=structural_curve_member
         )
     )
@@ -838,10 +826,8 @@ def divide_structural_curve_member(
     profile_def = material_profile_set.MaterialProfiles[0].Profile
     material = material_profile_set.MaterialProfiles[0].Material
 
-    structural_analysis_model = (
-        ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
-            structural_item=structural_curve_member
-        )
+    structural_analysis_model = bim2fem.ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
+        structural_item=structural_curve_member
     )
 
     structural_analysis_model = cast(
@@ -877,7 +863,7 @@ def divide_structural_curve_member(
         else:
 
             new_structural_curve_member = (
-                ifcplus.api.structural.create_linear_structural_curve_member(
+                bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
                     start_point=new_start_point,
                     end_point=new_end_point,
                     orientation_point=new_orientation_point,
@@ -893,7 +879,7 @@ def divide_structural_curve_member(
         new_start_point = new_end_point
 
     _, original_end_node_of_whole_member = (
-        ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+        bim2fem.ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
             linear_structural_curve_member=structural_curve_member,
         )
     )
@@ -909,7 +895,7 @@ def divide_structural_curve_member(
     edge_1.EdgeEnd = edge_2.EdgeStart
 
     start_node_of_segment_2 = (
-        ifcplus.util.structural.get_structural_point_connection_of_vertex_point(
+        bim2fem.ifcplus.util.structural.get_structural_point_connection_of_vertex_point(
             vertex_point=edge_2.EdgeStart,
         )
     )

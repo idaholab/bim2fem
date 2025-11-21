@@ -1,13 +1,13 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
-import ifcplus.api.project
+import bim2fem.ifcplus.api.project
 from tests.conftest import OUTPUT_DIR_FOR_NUCLEAR
-import ifcplus.api.nuclear
+import bim2fem.ifcplus.api.nuclear
 import ifcopenshell.validate
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import ifcplus.api.placement
-import ifcplus.api.material
+import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.material
 from typing import cast
 import ifcopenshell
 from pprint import pprint
@@ -19,7 +19,7 @@ class TestCreateNuclearPowerPlant:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -36,19 +36,21 @@ class TestCreateNuclearPowerPlant:
             products=[building],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=building,
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.nuclear.create_nuclear_reactor_containment_structure(
+        bim2fem.ifcplus.api.nuclear.create_nuclear_reactor_containment_structure(
             ifc4_file=ifc4_file,
             material=cast(ifcopenshell.entity_instance, concrete_material),
             name="Nuclear Reactor Containment Structure",
@@ -59,7 +61,7 @@ class TestCreateNuclearPowerPlant:
         output_path = str(
             OUTPUT_DIR_FOR_NUCLEAR / "nuclear_reactor_containment_structure.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -74,7 +76,7 @@ class TestCreateNuclearPowerPlant:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -91,19 +93,21 @@ class TestCreateNuclearPowerPlant:
             products=[building],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=building,
             place_object_relative_to_parent=True,
         )
 
-        concrete_material = ifcplus.api.material.add_material_from_standard_library(
-            ifc4_file=ifc4_file,
-            region="Europe",
-            material_name="C35/45",
-            check_for_duplicate=True,
+        concrete_material = (
+            bim2fem.ifcplus.api.material.add_material_from_standard_library(
+                ifc4_file=ifc4_file,
+                region="Europe",
+                material_name="C35/45",
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.nuclear.create_nuclear_reactor_containment_structure(
+        bim2fem.ifcplus.api.nuclear.create_nuclear_reactor_containment_structure(
             ifc4_file=ifc4_file,
             material=cast(ifcopenshell.entity_instance, concrete_material),
             name="Nuclear Reactor Containment Structure",
@@ -115,7 +119,7 @@ class TestCreateNuclearPowerPlant:
         reactor_box_width = 19.0
         reactor_box_height = 14.0
 
-        reactor_box = ifcplus.api.nuclear.create_reactor_box(
+        reactor_box = bim2fem.ifcplus.api.nuclear.create_reactor_box(
             ifc4_file=ifc4_file,
             length=reactor_box_length,
             width=reactor_box_width,
@@ -125,7 +129,7 @@ class TestCreateNuclearPowerPlant:
             place_object_relative_to_parent=True,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=reactor_box,
             repositioned_origin=(
                 -reactor_box_length / 2.0,
@@ -141,7 +145,7 @@ class TestCreateNuclearPowerPlant:
             OUTPUT_DIR_FOR_NUCLEAR
             / "reactor_containment_structure_with_reactor_box.ifc"
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,

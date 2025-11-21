@@ -3,8 +3,8 @@
 import ifcopenshell
 import os
 import pickle
-from ifcplus.util.profile import best_fuzzy_match
-from ifcplus import REGION
+from bim2fem.ifcplus.util.profile import best_fuzzy_match
+from bim2fem.ifcplus import REGION
 import ifcopenshell.util.element
 
 

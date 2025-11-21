@@ -5,23 +5,23 @@ StructuralAnalysisView MVD"""
 
 
 import ifcopenshell
-import ifcplus.api.project
+import bim2fem.ifcplus.api.project
 import ifcopenshell.util.selector
-from bim2fem.helpers.convert_linear_building_element import (
+from bim2fem.core.helpers.convert_linear_building_element import (
     convert_linear_beam_to_structural_curve_member,
     convert_linear_column_to_structural_curve_member,
     convert_linear_member_to_structural_curve_member,
 )
-from bim2fem.helpers.convert_planar_building_element import (
+from bim2fem.core.helpers.convert_planar_building_element import (
     convert_planar_slab_to_structural_surface_members,
     convert_planar_wall_to_structural_surface_members,
 )
-from ifcplus import REGION
+from bim2fem.ifcplus import REGION
 import ifcopenshell.util.element
-import ifcplus.api.structural
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import ifcplus.api.placement
+import bim2fem.ifcplus.api.placement
 
 
 def convert_building_from_reference_view_to_structural_analysis_view(
@@ -35,7 +35,7 @@ def convert_building_from_reference_view_to_structural_analysis_view(
     element_selection_query = "IfcColumn, IfcSlab, IfcWall, IfcBeam, IfcMember"
 
     # Create empty IFC4 StructuralAnalysisView File
-    ifc4_destination_file = ifcplus.api.project.create_ifc4_file(
+    ifc4_destination_file = bim2fem.ifcplus.api.project.create_ifc4_file(
         model_view_definition="StructuralAnalysisView",
         precision=1e-4,
     )
@@ -56,7 +56,7 @@ def convert_building_from_reference_view_to_structural_analysis_view(
         products=[site],
         relating_object=project,
     )
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
     )
@@ -134,9 +134,11 @@ def convert_building_from_reference_view_to_structural_analysis_view(
     print(f"IfcWalls: {len(walls_from_source_file)}")
 
     # Add StructuralAnalysisModel
-    structural_analysis_model = ifcplus.api.structural.add_structural_analysis_model(
-        ifc4_file=ifc4_destination_file,
-        name=None,
+    structural_analysis_model = (
+        bim2fem.ifcplus.api.structural.add_structural_analysis_model(
+            ifc4_file=ifc4_destination_file,
+            name=None,
+        )
     )
 
     # Track conversion results
@@ -247,7 +249,7 @@ def convert_building_from_reference_view_to_structural_analysis_view(
         print(f"\t{key.GlobalId} {key.is_a()}: {result}")
 
     # Merge Nodes
-    ifcplus.api.structural.merge_all_coincident_structural_point_connections(
+    bim2fem.ifcplus.api.structural.merge_all_coincident_structural_point_connections(
         ifc4sav_file=ifc4_destination_file
     )
 

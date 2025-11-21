@@ -3,28 +3,28 @@
 from re import T
 import ifcopenshell
 import ifcopenshell.util.element
-import ifcplus.util.geometry
-import ifcplus.util.material
-import ifcplus.api.material
-from ifcplus import REGION
-import ifcplus.util.profile
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.material
+import bim2fem.ifcplus.api.material
+from bim2fem.ifcplus import REGION
+import bim2fem.ifcplus.util.profile
 import ifcopenshell.api.root
-import ifcplus.api.profile
-import ifcplus.api.structural
+import bim2fem.ifcplus.api.profile
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.representation
 import ifcopenshell.util.placement
 import numpy as np
-import ifcplus.util.representation
-from ifcplus.util.geometry import TriangularMesh
-import bim2fem.helpers.classify_beam_shape
+import bim2fem.ifcplus.util.representation
+from bim2fem.ifcplus.util.geometry import TriangularMesh
+import bim2fem.core.helpers.classify_beam_shape
 import ifcopenshell.util.unit
-import ifcplus.api.element_type
+import bim2fem.ifcplus.api.element_type
 import ifcopenshell.api.type
 import ifcopenshell.api.spatial
-import ifcplus.util.project
+import bim2fem.ifcplus.util.project
 import ifcopenshell.api.project
 import ifcopenshell.util.system
-import ifcplus.util.structural
+import bim2fem.ifcplus.util.structural
 import math
 
 
@@ -82,12 +82,10 @@ def convert_pipe_fitting_to_structural_items(
             )
         }
     )
-    standard_material_name = (
-        ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
-            element=pipe_fitting_from_source_file,
-            region=region,
-            other_material_names=material_names_from_destination_file,
-        )
+    standard_material_name = bim2fem.ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
+        element=pipe_fitting_from_source_file,
+        region=region,
+        other_material_names=material_names_from_destination_file,
     )
     if standard_material_name is None:
         if region == "Europe":
@@ -113,39 +111,35 @@ def convert_pipe_fitting_to_structural_items(
             guid=connected_from[0].GlobalId
         )
         first_pipe_as_analytical_element = (
-            ifcplus.util.structural.get_structural_items_of_assigned_product(
+            bim2fem.ifcplus.util.structural.get_structural_items_of_assigned_product(
                 assigned_product=first_pipe_as_architectural_element
             )
         )[0]
-        first_pipe_endpoint_coordinates = ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+        first_pipe_endpoint_coordinates = bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=first_pipe_as_analytical_element
         )
-        first_pipe_vector = (
-            ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-                p1=first_pipe_endpoint_coordinates[0],
-                p2=first_pipe_endpoint_coordinates[1],
-            )
+        first_pipe_vector = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=first_pipe_endpoint_coordinates[0],
+            p2=first_pipe_endpoint_coordinates[1],
         )
 
         second_pipe_as_architectural_element = ifc4_destination_file.by_guid(
             guid=connected_to[0].GlobalId
         )
         second_pipe_as_analytical_element = (
-            ifcplus.util.structural.get_structural_items_of_assigned_product(
+            bim2fem.ifcplus.util.structural.get_structural_items_of_assigned_product(
                 assigned_product=second_pipe_as_architectural_element
             )
         )[0]
-        second_pipe_endpoint_coordinates = ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+        second_pipe_endpoint_coordinates = bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
             linear_structural_curve_member=second_pipe_as_analytical_element
         )
-        second_pipe_vector = (
-            ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-                p1=second_pipe_endpoint_coordinates[0],
-                p2=second_pipe_endpoint_coordinates[1],
-            )
+        second_pipe_vector = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            p1=second_pipe_endpoint_coordinates[0],
+            p2=second_pipe_endpoint_coordinates[1],
         )
 
-        angle = ifcplus.util.geometry.calculate_angle_between_two_vectors(
+        angle = bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
             vector1=first_pipe_vector,
             vector2=second_pipe_vector,
         )
@@ -169,7 +163,7 @@ def convert_pipe_fitting_to_structural_items(
                 outgoing_segment=second_pipe_endpoint_coordinates[0:2],
             )
 
-            connecting_segment_of_inf_lines = ifcplus.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
+            connecting_segment_of_inf_lines = bim2fem.ifcplus.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
                 coordinates_of_start_of_line_1=incoming_segment[0],
                 coordinates_of_end_of_line_1=incoming_segment[1],
                 coordinates_of_start_of_line_2=outgoing_segment[0],
@@ -193,7 +187,7 @@ def convert_pipe_fitting_to_structural_items(
             radius_of_curvature_assuming_short_elbow = 1.0 * nominal_diameter
 
             horizontal_curve_assuming_long_elbow = (
-                ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+                bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
                     first_point=incoming_segment[1],
                     second_point=connecting_segment_of_inf_lines[0],
                     third_point=outgoing_segment[0],
@@ -202,7 +196,7 @@ def convert_pipe_fitting_to_structural_items(
             )
 
             horizontal_curve_assuming_short_elbow = (
-                ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
+                bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
                     first_point=incoming_segment[1],
                     second_point=connecting_segment_of_inf_lines[0],
                     third_point=outgoing_segment[0],
@@ -251,7 +245,7 @@ def convert_pipe_fitting_to_structural_items(
             )
 
             # Create the standard material
-            material = ifcplus.api.material.add_material_from_standard_library(
+            material = bim2fem.ifcplus.api.material.add_material_from_standard_library(
                 ifc4_file=ifc4_destination_file,
                 region=region,
                 material_name=standard_material_name,
@@ -259,16 +253,16 @@ def convert_pipe_fitting_to_structural_items(
             )
             assert isinstance(material, ifcopenshell.entity_instance)
 
-            incoming_segment_vector = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            incoming_segment_vector = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
                 p1=incoming_segment[0],
                 p2=incoming_segment[1],
             )
-            outgoing_segment_vector = ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+            outgoing_segment_vector = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
                 p1=outgoing_segment[0],
                 p2=outgoing_segment[1],
             )
             local_z_axis_in_global_coordinates = (
-                ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+                bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                     vector1=incoming_segment_vector, vector2=outgoing_segment_vector
                 )
             )
@@ -280,7 +274,7 @@ def convert_pipe_fitting_to_structural_items(
 
             # Create StructuralItem
             structural_curve_member = (
-                ifcplus.api.structural.create_curved_structural_curve_member(
+                bim2fem.ifcplus.api.structural.create_curved_structural_curve_member(
                     horizontal_curve,
                     orientation_point=orientation_point,
                     profile=profile_def,

@@ -24,18 +24,18 @@ from typing import Literal
 import numpy as np
 import ifcopenshell.api.type
 import ifcopenshell.api.material
-import ifcplus.api.element_type
+import bim2fem.ifcplus.api.element_type
 import ifcopenshell
 import ifcopenshell.api.geometry
-import ifcplus.api.placement
+import bim2fem.ifcplus.api.placement
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
-import ifcplus.api.geometry
-import ifcplus.api.material
+import bim2fem.ifcplus.api.geometry
+import bim2fem.ifcplus.api.material
 import ifcopenshell.util.representation
 from typing import cast
-import ifcplus.util.geometry
-import ifcplus.util.project
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.project
 import ifcopenshell.api.profile
 import ifcopenshell.util.placement
 
@@ -75,13 +75,11 @@ def create_linear_frame_member(
 
     ifc4_file = profile.file
 
-    material_profile_set = (
-        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-            material=material,
-            profile=profile,
-            name=None,
-            check_for_duplicate=True,
-        )
+    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+        material=material,
+        profile=profile,
+        name=None,
+        check_for_duplicate=True,
     )
 
     if frame_member_class == "IfcBeam":
@@ -91,11 +89,13 @@ def create_linear_frame_member(
     else:
         element_type_class = "IfcMemberType"
 
-    element_type = ifcplus.api.element_type.add_element_type_for_material_profile_set(
-        ifc_class=element_type_class,
-        material_profile_set=material_profile_set,
-        name=material_profile_set.Name,
-        check_for_duplicate=True,
+    element_type = (
+        bim2fem.ifcplus.api.element_type.add_element_type_for_material_profile_set(
+            ifc_class=element_type_class,
+            material_profile_set=material_profile_set,
+            name=material_profile_set.Name,
+            check_for_duplicate=True,
+        )
     )
 
     if frame_member is None:
@@ -136,13 +136,13 @@ def create_linear_frame_member(
         np.linalg.norm(np.array(end_point) - np.array(start_point))
     )
 
-    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+    extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         swept_area=profile,
         depth=frame_member_length,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -168,7 +168,7 @@ def create_linear_frame_member(
             relating_structure=parent,
         )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=frame_member,
         repositioned_origin=start_point,
         repositioned_z_axis=z_axis,
@@ -211,13 +211,11 @@ def create_curved_frame_member(
 
     ifc4_file = profile.file
 
-    material_profile_set = (
-        ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-            material=material,
-            profile=profile,
-            name=None,
-            check_for_duplicate=True,
-        )
+    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+        material=material,
+        profile=profile,
+        name=None,
+        check_for_duplicate=True,
     )
 
     if frame_member_class == "IfcBeam":
@@ -227,11 +225,13 @@ def create_curved_frame_member(
     else:
         element_type_class = "IfcMemberType"
 
-    element_type = ifcplus.api.element_type.add_element_type_for_material_profile_set(
-        ifc_class=element_type_class,
-        material_profile_set=material_profile_set,
-        name=material_profile_set.Name,
-        check_for_duplicate=True,
+    element_type = (
+        bim2fem.ifcplus.api.element_type.add_element_type_for_material_profile_set(
+            ifc_class=element_type_class,
+            material_profile_set=material_profile_set,
+            name=material_profile_set.Name,
+            check_for_duplicate=True,
+        )
     )
 
     if frame_member is None:
@@ -255,7 +255,7 @@ def create_curved_frame_member(
         material=None,  # inferred from assigned IfcElementType
     )
 
-    horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+    horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
         point_of_curvature=start_point,
         point_of_tangency=end_point,
@@ -292,21 +292,21 @@ def create_curved_frame_member(
         transformation_matrix_from_local_to_global
     )
 
-    center_of_curvature_in_local_coords = ifcplus.util.geometry.transform_point(
+    center_of_curvature_in_local_coords = bim2fem.ifcplus.util.geometry.transform_point(
         four_by_four_transformation_matrix=transformation_matrix_from_global_to_local,
         point=horizontal_curve.center_of_curvature,
     )
 
     center_of_curvature_in_object_xy_plane = center_of_curvature_in_local_coords[0:2]
 
-    revolved_area_solid = ifcplus.api.geometry.add_revolved_area_solid(
+    revolved_area_solid = bim2fem.ifcplus.api.geometry.add_revolved_area_solid(
         ifc4_file=ifc4_file,
         swept_area=profile,
         central_angle_of_curvature=central_angle_of_curvature,
         center_of_curvature_in_object_xy_plane=center_of_curvature_in_object_xy_plane,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -332,7 +332,7 @@ def create_curved_frame_member(
             relating_structure=parent,
         )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=frame_member,
         repositioned_origin=start_point,
         repositioned_z_axis=z_axis,
@@ -361,7 +361,7 @@ def create_opening_element(
         predefined_type=None,
     )
 
-    representation_item = ifcplus.api.geometry.add_extruded_area_solid(
+    representation_item = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         swept_area=profile,
         depth=depth,
@@ -371,7 +371,7 @@ def create_opening_element(
         items=[representation_item]
     )
 
-    shape_model = ifcplus.api.geometry.add_shape_model(
+    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -394,7 +394,7 @@ def create_opening_element(
     rel_voids_element.RelatingBuildingElement = voided_element
     rel_voids_element.RelatedOpeningElement = opening_element
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=opening_element,
         place_object_relative_to_parent=False,
     )
@@ -427,18 +427,20 @@ def create_linear_wall(
 
     ifc4_file = materials[0].file
 
-    material_layer_set = ifcplus.api.material.add_material_layer_set(
+    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
         materials=materials,
         thicknesses=thicknesses,
         name=None,
         check_for_duplicate=True,
     )
 
-    wall_type = ifcplus.api.element_type.add_element_type_for_material_layer_set(
-        ifc_class="IfcWallType",
-        material_layer_set=material_layer_set,
-        name=material_layer_set.LayerSetName,
-        check_for_duplicate=True,
+    wall_type = (
+        bim2fem.ifcplus.api.element_type.add_element_type_for_material_layer_set(
+            ifc_class="IfcWallType",
+            material_layer_set=material_layer_set,
+            name=material_layer_set.LayerSetName,
+            check_for_duplicate=True,
+        )
     )
 
     if wall is None:
@@ -489,13 +491,13 @@ def create_linear_wall(
         name=None,
     )
 
-    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+    extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         swept_area=arbitrary_closed_profile_def,
         depth=height,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -521,7 +523,7 @@ def create_linear_wall(
             relating_structure=parent,
         )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=wall,
         repositioned_origin=start_point_3d,
         repositioned_x_axis=tuple(vector_from_start_point_to_end_point.tolist()),
@@ -550,22 +552,24 @@ def create_curved_wall(
 
     ifc4_file = materials[0].file
 
-    numeric_scale = ifcplus.util.project.get_numeric_scale_of_project(
+    numeric_scale = bim2fem.ifcplus.util.project.get_numeric_scale_of_project(
         ifc4_file=ifc4_file,
     )
 
-    material_layer_set = ifcplus.api.material.add_material_layer_set(
+    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
         materials=materials,
         thicknesses=thicknesses,
         name=None,
         check_for_duplicate=True,
     )
 
-    wall_type = ifcplus.api.element_type.add_element_type_for_material_layer_set(
-        ifc_class="IfcWallType",
-        material_layer_set=material_layer_set,
-        name=material_layer_set.LayerSetName,
-        check_for_duplicate=True,
+    wall_type = (
+        bim2fem.ifcplus.api.element_type.add_element_type_for_material_layer_set(
+            ifc_class="IfcWallType",
+            material_layer_set=material_layer_set,
+            name=material_layer_set.LayerSetName,
+            check_for_duplicate=True,
+        )
     )
 
     if wall is None:
@@ -614,7 +618,7 @@ def create_curved_wall(
         elevation,
     )
 
-    middle_horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+    middle_horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_of_curvature=point_of_curvature_3d_for_middle_curve,
         point_on_center_of_curvature_side=point_on_center_of_curvature_side_3d_for_middle_curve,
         point_of_tangency=point_of_tangency_3d_for_middle_curve,
@@ -625,17 +629,13 @@ def create_curved_wall(
         middle_horizontal_curve.center_of_curvature
     )
 
-    unit_vector_from_CC_to_PC = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=point_of_center_of_curvature_3d_for_all_curves,
-            p2=point_of_curvature_3d_for_middle_curve,
-        )
+    unit_vector_from_CC_to_PC = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=point_of_center_of_curvature_3d_for_all_curves,
+        p2=point_of_curvature_3d_for_middle_curve,
     )
-    unit_vector_from_CC_to_PT = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=point_of_center_of_curvature_3d_for_all_curves,
-            p2=point_of_tangency_3d_for_middle_curve,
-        )
+    unit_vector_from_CC_to_PT = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=point_of_center_of_curvature_3d_for_all_curves,
+        p2=point_of_tangency_3d_for_middle_curve,
     )
 
     radius_of_curvature_for_inner_curve = (
@@ -653,7 +653,7 @@ def create_curved_wall(
             + np.array(unit_vector_from_CC_to_PT) * radius_of_curvature_for_inner_curve
         ).tolist()
     )
-    inner_horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+    inner_horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_of_curvature=point_of_curvature_3d_for_inner_curve,
         point_on_center_of_curvature_side=point_of_center_of_curvature_3d_for_all_curves,
         point_of_tangency=point_of_tangency_3d_for_inner_curve,
@@ -675,7 +675,7 @@ def create_curved_wall(
             + np.array(unit_vector_from_CC_to_PT) * radius_of_curvature_for_outer_curve
         ).tolist()
     )
-    outer_horizontal_curve = ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
+    outer_horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_of_curvature=point_of_curvature_3d_for_outer_curve,
         point_on_center_of_curvature_side=point_of_center_of_curvature_3d_for_all_curves,
         point_of_tangency=point_of_tangency_3d_for_outer_curve,
@@ -728,13 +728,13 @@ def create_curved_wall(
         OuterCurve=indexed_polycurve,
     )
 
-    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+    extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         swept_area=arbitrary_closed_profile_def,
         depth=height,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -760,13 +760,11 @@ def create_curved_wall(
             relating_structure=parent,
         )
 
-    unit_vector_from_PC_to_PI = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=middle_horizontal_curve.point_of_curvature,
-            p2=middle_horizontal_curve.point_of_intersection,
-        )
+    unit_vector_from_PC_to_PI = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=middle_horizontal_curve.point_of_curvature,
+        p2=middle_horizontal_curve.point_of_intersection,
     )
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=wall,
         repositioned_origin=middle_horizontal_curve.point_of_curvature,
         repositioned_x_axis=unit_vector_from_PC_to_PI,
@@ -790,18 +788,20 @@ def create_slab(
 
     ifc4_file = materials[0].file
 
-    material_layer_set = ifcplus.api.material.add_material_layer_set(
+    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
         materials=materials,
         thicknesses=thicknesses,
         name=None,
         check_for_duplicate=True,
     )
 
-    slab_type = ifcplus.api.element_type.add_element_type_for_material_layer_set(
-        ifc_class="IfcSlabType",
-        material_layer_set=material_layer_set,
-        name=material_layer_set.LayerSetName,
-        check_for_duplicate=True,
+    slab_type = (
+        bim2fem.ifcplus.api.element_type.add_element_type_for_material_layer_set(
+            ifc_class="IfcSlabType",
+            material_layer_set=material_layer_set,
+            name=material_layer_set.LayerSetName,
+            check_for_duplicate=True,
+        )
     )
 
     if slab is None:
@@ -829,13 +829,13 @@ def create_slab(
         material=None,  # inferred from assigned IfcElementType
     )
 
-    extruded_area_solid = ifcplus.api.geometry.add_extruded_area_solid(
+    extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         swept_area=profile,
         depth=total_thickness,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -861,7 +861,7 @@ def create_slab(
             relating_structure=parent,
         )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=slab,
         repositioned_origin=point_at_placement_of_slab_profile,
         repositioned_x_axis=(1.0, 0.0, 0.0),

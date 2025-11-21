@@ -1,7 +1,7 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell
-import ifcplus.util.geometry
+import bim2fem.ifcplus.util.geometry
 import numpy as np
 import ifcopenshell.util.representation
 from typing import cast
@@ -90,8 +90,10 @@ def get_coordinates_of_structural_point_connection(
         structural_point_connection=structural_point_connection,
     )
 
-    coordinates_of_vertex_point = ifcplus.util.geometry.get_coordinates_of_vertex_point(
-        vertex_point=vertex_point,
+    coordinates_of_vertex_point = (
+        bim2fem.ifcplus.util.geometry.get_coordinates_of_vertex_point(
+            vertex_point=vertex_point,
+        )
     )
 
     return coordinates_of_vertex_point
@@ -273,7 +275,7 @@ def get_structural_point_connection_of_vertex_point(
 
 def select_structural_point_connections(
     ifc4_sav_file: ifcopenshell.file,
-    bbox: ifcplus.util.geometry.BoundingBox,
+    bbox: bim2fem.ifcplus.util.geometry.BoundingBox,
 ) -> list[ifcopenshell.entity_instance]:
 
     selected_structural_point_connections = []

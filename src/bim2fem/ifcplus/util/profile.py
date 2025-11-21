@@ -3,7 +3,7 @@
 import ifcopenshell
 import pickle
 import os
-from ifcplus import REGION
+from bim2fem.ifcplus import REGION
 from collections import Counter
 import re
 from difflib import SequenceMatcher

@@ -12,9 +12,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 import json
 import ifcopenshell
-import ifcplus.api.project
-import bim2fem.convert_ifc_to_fem
-from bim2fem.adjust_element_connectivity_of_building_fem import (
+import bim2fem.ifcplus.api.project
+import bim2fem.core.convert_ifc_to_fem
+from bim2fem.core.adjust_element_connectivity_of_building_fem import (
     adjust_element_connectivity_of_ifc4_sav_file,
 )
 from flask import (
@@ -136,7 +136,7 @@ def convert_to_fem():
         ifc_source_file = ifcopenshell.open(input_ifc_file_path)
         assert isinstance(ifc_source_file, ifcopenshell.file)
         assert region == "Europe" or region == "UnitedStates"
-        ifc4_sav_file = bim2fem.convert_ifc_to_fem.convert_ifc_to_fem(
+        ifc4_sav_file = bim2fem.core.convert_ifc_to_fem.convert_ifc_to_fem(
             ifc4_source_file=ifc_source_file,
             element_selection_query=element_selection_query,
             element_deselection_query=element_deselection_query,
@@ -163,7 +163,7 @@ def convert_to_fem():
             PATH_TO_OUTPUT_DIRECTORY,
             output_ifc_filename,
         )
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_sav_file,
             file_path=output_ifc_file_path,
             add_annotations=False,

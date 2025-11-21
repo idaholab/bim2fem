@@ -1,25 +1,25 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell
-import ifcplus.util.geometry
-import ifcplus.util.material
-import ifcplus.api.material
-from ifcplus import REGION
-import ifcplus.util.profile
+import bim2fem.ifcplus.util.geometry
+import bim2fem.ifcplus.util.material
+import bim2fem.ifcplus.api.material
+from bim2fem.ifcplus import REGION
+import bim2fem.ifcplus.util.profile
 import ifcopenshell.api.root
-import ifcplus.api.profile
-import ifcplus.api.structural
+import bim2fem.ifcplus.api.profile
+import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.representation
 import ifcopenshell.util.placement
 import numpy as np
-import ifcplus.util.representation
-from ifcplus.util.geometry import TriangularMesh
-import bim2fem.helpers.classify_beam_shape
+import bim2fem.ifcplus.util.representation
+from bim2fem.ifcplus.util.geometry import TriangularMesh
+import bim2fem.core.helpers.classify_beam_shape
 import ifcopenshell.util.unit
-import ifcplus.api.element_type
+import bim2fem.ifcplus.api.element_type
 import ifcopenshell.api.type
 import ifcopenshell.api.spatial
-import ifcplus.util.project
+import bim2fem.ifcplus.util.project
 import ifcopenshell.api.project
 
 
@@ -166,12 +166,10 @@ def convert_linear_building_element_to_structural_curve_member(
             )
         }
     )
-    standard_material_name = (
-        ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
-            element=linear_building_element_from_source_file,
-            region=region,
-            other_material_names=material_names_from_destination_file,
-        )
+    standard_material_name = bim2fem.ifcplus.util.material.get_best_matching_standard_material_from_element_metadata(
+        element=linear_building_element_from_source_file,
+        region=region,
+        other_material_names=material_names_from_destination_file,
     )
     if standard_material_name is None:
         if region == "Europe":
@@ -192,20 +190,16 @@ def convert_linear_building_element_to_structural_curve_member(
             )
         }
     )
-    standard_profile_name = (
-        ifcplus.util.profile.get_best_matching_standard_profile_from_element_metadata(
-            element=linear_building_element_from_source_file,
-            region=region,
-            other_standard_profile_names=profile_names_from_destination_file,
-        )
+    standard_profile_name = bim2fem.ifcplus.util.profile.get_best_matching_standard_profile_from_element_metadata(
+        element=linear_building_element_from_source_file,
+        region=region,
+        other_standard_profile_names=profile_names_from_destination_file,
     )
     print(f"\tstandard_profile_name: {standard_profile_name}")
 
     # Get the IfcExtrudedAreaSolid, if it exists
-    extruded_area_solid = (
-        ifcplus.util.representation.get_single_extruded_area_solid_representation(
-            element=linear_building_element_from_source_file
-        )
+    extruded_area_solid = bim2fem.ifcplus.util.representation.get_single_extruded_area_solid_representation(
+        element=linear_building_element_from_source_file
     )
     print(f"\textruded_area_solid: {extruded_area_solid}")
 
@@ -266,7 +260,7 @@ def convert_frame_member_to_fem_for_case_1(
     )
 
     # Create the standard material
-    material = ifcplus.api.material.add_material_from_standard_library(
+    material = bim2fem.ifcplus.api.material.add_material_from_standard_library(
         ifc4_file=ifc4_destination_file,
         region=region,
         material_name=standard_material_name,
@@ -275,7 +269,7 @@ def convert_frame_member_to_fem_for_case_1(
     assert isinstance(material, ifcopenshell.entity_instance)
 
     # Create the profile
-    profile_def = ifcplus.api.profile.add_profile_from_standard_library(
+    profile_def = bim2fem.ifcplus.api.profile.add_profile_from_standard_library(
         ifc4_file=ifc4_destination_file,
         region=region,
         profile_name=standard_profile_name,
@@ -294,11 +288,13 @@ def convert_frame_member_to_fem_for_case_1(
         element_type_class = "IfcPipeSegmentType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
-        ifc_class=element_type_class,
-        material=material,
-        profile=profile_def,
-        check_for_duplicate=True,
+    element_type = (
+        bim2fem.ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
+            ifc_class=element_type_class,
+            material=material,
+            profile=profile_def,
+            check_for_duplicate=True,
+        )
     )
     ifcopenshell.api.type.assign_type(
         file=ifc4_destination_file,
@@ -344,7 +340,7 @@ def convert_frame_member_to_fem_for_case_1(
         local_origin_of_extruded_area_solid,
         local_z_axis_of_extruded_area_solid,
         local_x_axis_of_extruded_area_solid,
-    ) = ifcplus.util.representation.get_local_origin_and_axes_of_extruded_area_solid(
+    ) = bim2fem.ifcplus.util.representation.get_local_origin_and_axes_of_extruded_area_solid(
         extruded_area_solid=extruded_area_solid
     )
     extruded_area_solid_transformation_matrix = ifcopenshell.util.placement.a2p(
@@ -369,7 +365,7 @@ def convert_frame_member_to_fem_for_case_1(
     if extruded_area_solid.SweptArea.is_a("IfcParameterizedProfileDef"):
         print("\tCase 1a: SweptArea is an IfcParameterizedProfileDef")
         local_origin_of_swept_area, local_x_axis_of_swept_area = (
-            ifcplus.util.profile.get_local_origin_and_x_axis_of_parameterized_profile_def(
+            bim2fem.ifcplus.util.profile.get_local_origin_and_x_axis_of_parameterized_profile_def(
                 parameterized_profile_def=extruded_area_solid.SweptArea
             )
         )
@@ -382,7 +378,7 @@ def convert_frame_member_to_fem_for_case_1(
             @ np.array(list(local_x_axis_of_swept_area) + [0.0])
         )
         local_y_axis_in_global_coordinates = np.array(
-            ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+            bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                 vector1=extrusion_direction_in_global_coordinates,
                 vector2=local_x_axis_in_global_coordinates,
             )
@@ -401,7 +397,7 @@ def convert_frame_member_to_fem_for_case_1(
             face_normal_vector = triangular_mesh.calculate_normal_vector_of_face(
                 face_index=index_of_face
             )
-            angle = ifcplus.util.geometry.calculate_angle_between_two_vectors(
+            angle = bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
                 vector1=extrusion_direction_in_global_coordinates,
                 vector2=face_normal_vector,
             )
@@ -432,7 +428,7 @@ def convert_frame_member_to_fem_for_case_1(
             and assumed_local_y_axis_is_global_negative_z_direction
         ):
             assumed_local_y_axis_in_global_coordinates = (0.0, 0.0, 1.0)
-        result = bim2fem.helpers.classify_beam_shape.classify_shape_and_determine_orientation_of_faces(
+        result = bim2fem.core.helpers.classify_beam_shape.classify_shape_and_determine_orientation_of_faces(
             local_z_axis_in_global_coordinates=extrusion_direction_in_global_coordinates,
             assumed_local_y_axis_in_global_coordinates=assumed_local_y_axis_in_global_coordinates,
             faces_defined_by_vertex_coordinates=triangular_mesh.get_coordinates_of_faces(
@@ -458,7 +454,7 @@ def convert_frame_member_to_fem_for_case_1(
             [float(val) for val in transformation_matrix[:3, 3]]
         )
         local_y_axis_in_global_coordinates = (
-            ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+            bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                 vector1=extrusion_direction_in_global_coordinates,
                 vector2=local_x_axis_in_global_coordinates,
             )
@@ -490,7 +486,7 @@ def convert_frame_member_to_fem_for_case_1(
 
     # Create StructuralItem
     structural_curve_member = (
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=p1,
             end_point=p2,
             orientation_point=p3,
@@ -520,7 +516,7 @@ def convert_frame_member_to_fem_for_case_2(
     print("\tCase 2: RepresentationItem is not a single IfcExtrudedAreaSolid")
 
     # Create the standard material
-    material = ifcplus.api.material.add_material_from_standard_library(
+    material = bim2fem.ifcplus.api.material.add_material_from_standard_library(
         ifc4_file=ifc4_destination_file,
         region=region,
         material_name=standard_material_name,
@@ -617,11 +613,9 @@ def convert_frame_member_to_fem_for_case_2(
     )
 
     # Calculate extrusion direction
-    extrusion_direction_in_global_coordinates = (
-        ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
-            p1=origin_in_global_coordinates,
-            p2=terminus_in_global_coordinates,
-        )
+    extrusion_direction_in_global_coordinates = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=origin_in_global_coordinates,
+        p2=terminus_in_global_coordinates,
     )
 
     # Calculate length of frame member
@@ -658,7 +652,7 @@ def convert_frame_member_to_fem_for_case_2(
         and assumed_local_y_axis_is_global_negative_z_direction
     ):
         assumed_local_y_axis_in_global_coordinates = (0.0, 0.0, 1.0)
-    result_for_beam_shape_classification = bim2fem.helpers.classify_beam_shape.classify_shape_and_determine_orientation_of_faces(
+    result_for_beam_shape_classification = bim2fem.core.helpers.classify_beam_shape.classify_shape_and_determine_orientation_of_faces(
         local_z_axis_in_global_coordinates=extrusion_direction_in_global_coordinates,
         assumed_local_y_axis_in_global_coordinates=assumed_local_y_axis_in_global_coordinates,
         faces_defined_by_vertex_coordinates=triangular_mesh.get_coordinates_of_faces(
@@ -681,7 +675,7 @@ def convert_frame_member_to_fem_for_case_2(
         )
         return None
     local_y_axis_in_global_coordinates = (
-        ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
+        bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
             vector1=extrusion_direction_in_global_coordinates,
             vector2=local_x_axis_in_global_coordinates,
         )
@@ -689,10 +683,10 @@ def convert_frame_member_to_fem_for_case_2(
 
     if not standard_profile_name:
         print("\tCase 2a: Standard Profile Name is not Known from Metadata")
-        numeric_scale = ifcplus.util.project.get_numeric_scale_of_project(
+        numeric_scale = bim2fem.ifcplus.util.project.get_numeric_scale_of_project(
             ifc4_file=ifc4_destination_file
         )
-        result_for_beam_shape_measurement = bim2fem.helpers.classify_beam_shape.measure_dimensions_of_classified_shape_of_faces(
+        result_for_beam_shape_measurement = bim2fem.core.helpers.classify_beam_shape.measure_dimensions_of_classified_shape_of_faces(
             local_z_axis_in_global_coordinates=extrusion_direction_in_global_coordinates,
             local_x_axis_in_global_coordinates=local_x_axis_in_global_coordinates,
             faces_defined_by_vertex_coordinates=triangular_mesh.get_coordinates_of_faces(
@@ -716,7 +710,7 @@ def convert_frame_member_to_fem_for_case_2(
                 )
             )
             return None
-        profile_def = ifcplus.api.profile.add_parameterized_profile(
+        profile_def = bim2fem.ifcplus.api.profile.add_parameterized_profile(
             ifc4_file=ifc4_destination_file,
             profile_class=parameterized_profile_class,
             dimensions=dimensions,
@@ -726,7 +720,7 @@ def convert_frame_member_to_fem_for_case_2(
 
     else:
         print("\tCase 2b: Standard Profile Name is Known from Metadata")
-        profile_def = ifcplus.api.profile.add_profile_from_standard_library(
+        profile_def = bim2fem.ifcplus.api.profile.add_profile_from_standard_library(
             ifc4_file=ifc4_destination_file,
             region=region,
             profile_name=standard_profile_name,
@@ -745,11 +739,13 @@ def convert_frame_member_to_fem_for_case_2(
         element_type_class = "IfcPipeSegmentType"
     else:
         element_type_class = "IfcMemberType"
-    element_type = ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
-        ifc_class=element_type_class,
-        material=material,
-        profile=profile_def,
-        check_for_duplicate=True,
+    element_type = (
+        bim2fem.ifcplus.api.element_type.add_prismatic_homogenous_linear_elment_type(
+            ifc_class=element_type_class,
+            material=material,
+            profile=profile_def,
+            check_for_duplicate=True,
+        )
     )
     ifcopenshell.api.type.assign_type(
         file=ifc4_destination_file,
@@ -793,7 +789,7 @@ def convert_frame_member_to_fem_for_case_2(
 
     # Create StructuralItem
     structural_curve_member = (
-        ifcplus.api.structural.create_linear_structural_curve_member(
+        bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
             start_point=p1,
             end_point=p2,
             orientation_point=p3,

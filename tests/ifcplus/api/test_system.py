@@ -2,12 +2,12 @@
 
 import ifcopenshell
 import ifcopenshell.validate
-import ifcplus.api.project
-import ifcplus.api.system
-import ifcplus.api.placement
-import ifcplus.api.distribution_element
+import bim2fem.ifcplus.api.project
+import bim2fem.ifcplus.api.system
+import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.distribution_element
 import ifcopenshell.util.system
-import ifcplus.api.material
+import bim2fem.ifcplus.api.material
 from tests.conftest import OUTPUT_DIR_FOR_SYSTEM
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
@@ -21,7 +21,7 @@ class TestCreatePipingSystem:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -38,7 +38,7 @@ class TestCreatePipingSystem:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -49,15 +49,17 @@ class TestCreatePipingSystem:
         distribution_system.LongName = "Central Ventilation System"
         distribution_system.PredefinedType = "VENTILATION"
 
-        galvanized_steel = ifcplus.api.material.add_material_with_structural_properties(
-            ifc4_file=ifc4_file,
-            name="Galvanized Steel",
-            category="steel",
-            mass_density=7850.0,
-            young_modulus=200.0e9,
-            poisson_ratio=0.3,
-            thermal_expansion_coefficient=1.2e-6,
-            check_for_duplicate=True,
+        galvanized_steel = (
+            bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+                ifc4_file=ifc4_file,
+                name="Galvanized Steel",
+                category="steel",
+                mass_density=7850.0,
+                young_modulus=200.0e9,
+                poisson_ratio=0.3,
+                thermal_expansion_coefficient=1.2e-6,
+                check_for_duplicate=True,
+            )
         )
 
         pipe_run_polyline = [
@@ -69,7 +71,7 @@ class TestCreatePipingSystem:
             (20.0, 15.0, 10.0),
         ]
 
-        ifcplus.api.system.create_pipe_run_from_polyline(
+        bim2fem.ifcplus.api.system.create_pipe_run_from_polyline(
             ifc4_file=ifc4_file,
             polyline=pipe_run_polyline,
             nominal_diameter=0.5,
@@ -83,7 +85,7 @@ class TestCreatePipingSystem:
         )
 
         output_path = str(OUTPUT_DIR_FOR_SYSTEM / "pipe_run.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,
@@ -101,7 +103,7 @@ class TestConnectEquipment:
         self,
     ):
 
-        ifc4_file = ifcplus.api.project.create_ifc4_file(
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
             model_view_definition="ReferenceView_V1.2",
             precision=1e-4,
         )
@@ -118,7 +120,7 @@ class TestConnectEquipment:
             products=[site],
             relating_object=project,
         )
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=site,
             repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
@@ -129,7 +131,7 @@ class TestConnectEquipment:
         distribution_system.LongName = "Central Ventilation System"
         distribution_system.PredefinedType = "VENTILATION"
 
-        mau = ifcplus.api.distribution_element.create_make_up_air_unit(
+        mau = bim2fem.ifcplus.api.distribution_element.create_make_up_air_unit(
             ifc4_file=ifc4_file,
             name="MAU",
             parent=site,
@@ -137,7 +139,7 @@ class TestConnectEquipment:
             place_object_relative_to_parent=False,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=mau,
             repositioned_origin=(4.0, 2.0, 0.0),
             repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -145,7 +147,7 @@ class TestConnectEquipment:
             place_object_relative_to_parent=True,
         )
 
-        hepa = ifcplus.api.distribution_element.create_hepa_containment_housing(
+        hepa = bim2fem.ifcplus.api.distribution_element.create_hepa_containment_housing(
             ifc4_file=ifc4_file,
             name="HEPA",
             parent=site,
@@ -153,7 +155,7 @@ class TestConnectEquipment:
             place_object_relative_to_parent=False,
         )
 
-        ifcplus.api.placement.edit_object_placement(
+        bim2fem.ifcplus.api.placement.edit_object_placement(
             product=hepa,
             repositioned_origin=(4.0 + 10.0, 2.0 + 5.0, 0.0 + 6.0),
             repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -171,18 +173,20 @@ class TestConnectEquipment:
             flow_direction="SINK",
         )[0]
 
-        galvanized_steel = ifcplus.api.material.add_material_with_structural_properties(
-            ifc4_file=ifc4_file,
-            name="Galvanized Steel",
-            category="steel",
-            mass_density=7850.0,
-            young_modulus=200.0e9,
-            poisson_ratio=0.3,
-            thermal_expansion_coefficient=1.2e-6,
-            check_for_duplicate=True,
+        galvanized_steel = (
+            bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+                ifc4_file=ifc4_file,
+                name="Galvanized Steel",
+                category="steel",
+                mass_density=7850.0,
+                young_modulus=200.0e9,
+                poisson_ratio=0.3,
+                thermal_expansion_coefficient=1.2e-6,
+                check_for_duplicate=True,
+            )
         )
 
-        ifcplus.api.system.connect_two_distribution_ports_via_pipe_run(
+        bim2fem.ifcplus.api.system.connect_two_distribution_ports_via_pipe_run(
             ifc4_file=ifc4_file,
             source_port=mau_source_port,
             sink_port=hepa_sink_port,
@@ -196,7 +200,7 @@ class TestConnectEquipment:
         )
 
         output_path = str(OUTPUT_DIR_FOR_SYSTEM / "mau_connected_to_hepa.ifc")
-        ifcplus.api.project.write_to_ifc_spf(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
             add_annotations=True,

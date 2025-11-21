@@ -1,8 +1,8 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell
-from ifcplus import REGION
-from bim2fem.helpers.convert_linear_building_element import (
+from bim2fem.ifcplus import REGION
+from bim2fem.core.helpers.convert_linear_building_element import (
     convert_linear_building_element_to_structural_curve_member,
 )
 

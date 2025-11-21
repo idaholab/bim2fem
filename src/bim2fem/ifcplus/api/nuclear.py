@@ -3,16 +3,16 @@
 import ifcopenshell
 import ifcopenshell.api.aggregate
 import ifcopenshell.api.root
-import ifcplus.api.geometry
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.geometry
 import ifcopenshell.api.spatial
-import ifcplus.api.placement
+import bim2fem.ifcplus.api.placement
 import ifcopenshell.util.representation
 from typing import cast
 import ifcopenshell.api.root
 import ifcopenshell.api.spatial
-import ifcplus.api.placement
-import ifcplus.api.geometry
+import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.geometry
 import ifcopenshell.api.material
 import ifcopenshell.util.representation
@@ -49,7 +49,7 @@ def create_nuclear_reactor_containment_structure(
     )
 
     base_slab_representation_item = (
-        ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
             radius=slab_outer_radius,
             extrusion_depth=slab_thickness,
@@ -60,7 +60,7 @@ def create_nuclear_reactor_containment_structure(
     )
 
     base_slab_representation_shape_representation = (
-        ifcplus.api.geometry.add_shape_model(
+        bim2fem.ifcplus.api.geometry.add_shape_model(
             ifc4_file=ifc4_file,
             shape_model_class="IfcShapeRepresentation",
             representation_identifier="Body",
@@ -88,7 +88,7 @@ def create_nuclear_reactor_containment_structure(
         relating_object=nuclear_reactor_containment_structure,
     )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=base_slab,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -104,7 +104,7 @@ def create_nuclear_reactor_containment_structure(
     )
 
     hollow_cylindrical_wall_representation_item = (
-        ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
+        bim2fem.ifcplus.api.geometry.add_hollow_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
             radius=cylinder_outer_radius,
             extrusion_depth=cylinder_height,
@@ -115,19 +115,21 @@ def create_nuclear_reactor_containment_structure(
         )
     )
 
-    hollow_cylindrical_wall_shape_representation = ifcplus.api.geometry.add_shape_model(
-        ifc4_file=ifc4_file,
-        shape_model_class="IfcShapeRepresentation",
-        representation_identifier="Body",
-        representation_type=cast(
-            str,
-            ifcopenshell.util.representation.guess_type(
-                items=[hollow_cylindrical_wall_representation_item]
+    hollow_cylindrical_wall_shape_representation = (
+        bim2fem.ifcplus.api.geometry.add_shape_model(
+            ifc4_file=ifc4_file,
+            shape_model_class="IfcShapeRepresentation",
+            representation_identifier="Body",
+            representation_type=cast(
+                str,
+                ifcopenshell.util.representation.guess_type(
+                    items=[hollow_cylindrical_wall_representation_item]
+                ),
             ),
-        ),
-        context_type="Model",
-        target_view="MODEL_VIEW",
-        items=[hollow_cylindrical_wall_representation_item],
+            context_type="Model",
+            target_view="MODEL_VIEW",
+            items=[hollow_cylindrical_wall_representation_item],
+        )
     )
 
     ifcopenshell.api.geometry.assign_representation(
@@ -142,7 +144,7 @@ def create_nuclear_reactor_containment_structure(
         relating_object=nuclear_reactor_containment_structure,
     )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=hollow_cylindrical_wall,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -154,23 +156,25 @@ def create_nuclear_reactor_containment_structure(
         file=ifc4_file, ifc_class="IfcSlab", predefined_type="ROOF", name="Dome"
     )
 
-    outer_sphere = ifcplus.api.geometry.add_sphere(
+    outer_sphere = bim2fem.ifcplus.api.geometry.add_sphere(
         ifc4_file=ifc4_file,
         radius=cylinder_outer_radius,
     )
 
-    inner_sphere = ifcplus.api.geometry.add_sphere(
+    inner_sphere = bim2fem.ifcplus.api.geometry.add_sphere(
         ifc4_file=ifc4_file,
         radius=cylinder_outer_radius - cylinder_wall_thickness,
     )
 
-    subtracting_cylinder = ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
-        ifc4_file=ifc4_file,
-        radius=cylinder_outer_radius * 2.0,
-        extrusion_depth=cylinder_height,
-        repositioned_origin=(0.0, 0.0, -cylinder_height),
-        repositioned_z_axis=(0.0, 0.0, 1.0),
-        repositioned_x_axis=(1.0, 0.0, 0.0),
+    subtracting_cylinder = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=cylinder_outer_radius * 2.0,
+            extrusion_depth=cylinder_height,
+            repositioned_origin=(0.0, 0.0, -cylinder_height),
+            repositioned_z_axis=(0.0, 0.0, 1.0),
+            repositioned_x_axis=(1.0, 0.0, 0.0),
+        )
     )
 
     hollow_sphere = ifcopenshell.api.geometry.add_boolean(
@@ -180,11 +184,11 @@ def create_nuclear_reactor_containment_structure(
         operator="DIFFERENCE",
     )[-1]
 
-    dome_representation_item = ifcplus.api.geometry.add_csg_solid(
+    dome_representation_item = bim2fem.ifcplus.api.geometry.add_csg_solid(
         boolean_result_or_primitive=hollow_sphere,
     )
 
-    dome_shape_representation = ifcplus.api.geometry.add_shape_model(
+    dome_shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -211,7 +215,7 @@ def create_nuclear_reactor_containment_structure(
         relating_object=nuclear_reactor_containment_structure,
     )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=dome,
         repositioned_origin=(0.0, 0.0, cylinder_height),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -232,7 +236,7 @@ def create_nuclear_reactor_containment_structure(
             relating_structure=parent,
         )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=nuclear_reactor_containment_structure,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
@@ -261,14 +265,14 @@ def create_reactor_box(
             name=name,
         )
 
-    block = ifcplus.api.geometry.add_block(
+    block = bim2fem.ifcplus.api.geometry.add_block(
         ifc4_file=ifc4_file,
         length=length,
         width=width,
         height=height,
     )
 
-    shape_representation = ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
@@ -294,7 +298,7 @@ def create_reactor_box(
             relating_structure=parent,
         )
 
-    ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.placement.edit_object_placement(
         product=reactor_box,
         repositioned_origin=(0.0, 0.0, 0.0),
         repositioned_z_axis=(0.0, 0.0, 1.0),
