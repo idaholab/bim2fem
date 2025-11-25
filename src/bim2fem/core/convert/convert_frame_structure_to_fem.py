@@ -34,20 +34,23 @@ def convert_frame_structure_to_fem(
         precision=1e-4,
     )
 
-    project = ifc4_destination_file.by_type(type="IfcProject", include_subtypes=False)[
-        0
-    ]
+    project = ifc4_destination_file.by_type(
+        type="IfcProject",
+        include_subtypes=False,
+    )[0]
 
     site = ifcopenshell.api.root.create_entity(
         file=ifc4_destination_file,
         ifc_class="IfcSite",
-        name="Placeholder Spatial Container",
+        name="Spatial Container for Elements",
     )
+
     ifcopenshell.api.aggregate.assign_object(
         file=ifc4_destination_file,
         products=[site],
         relating_object=project,
     )
+
     bim2fem.ifcplus.api.placement.edit_object_placement(
         product=site,
         place_object_relative_to_parent=True,
@@ -58,6 +61,7 @@ def convert_frame_structure_to_fem(
         query="IfcElement",
         elements=None,
     )
+
     selected_elements_from_source_file = ifcopenshell.util.selector.filter_elements(
         ifc_file=ifc4_source_file,
         query=element_selection_query,
@@ -120,7 +124,7 @@ def convert_frame_structure_to_fem(
 
     conversion_success_tracker = {}
 
-    for index, beam_from_source_file in enumerate(list(beams_from_source_file)):
+    for beam_from_source_file in beams_from_source_file:
         structural_curve_member = (
             convert_linear_frame_member_to_linear_structural_curve_member(
                 linear_frame_member_from_source_file=beam_from_source_file,
@@ -134,7 +138,7 @@ def convert_frame_structure_to_fem(
         else:
             conversion_success_tracker[beam_from_source_file] = False
 
-    for index, column_from_source_file in enumerate(list(columns_from_source_file)):
+    for column_from_source_file in columns_from_source_file:
         structural_curve_member = (
             convert_linear_frame_member_to_linear_structural_curve_member(
                 linear_frame_member_from_source_file=column_from_source_file,
@@ -148,7 +152,7 @@ def convert_frame_structure_to_fem(
         else:
             conversion_success_tracker[column_from_source_file] = False
 
-    for index, member_from_source_file in enumerate(list(members_from_source_file)):
+    for member_from_source_file in members_from_source_file:
         structural_curve_member = (
             convert_linear_frame_member_to_linear_structural_curve_member(
                 linear_frame_member_from_source_file=member_from_source_file,
@@ -162,7 +166,7 @@ def convert_frame_structure_to_fem(
         else:
             conversion_success_tracker[member_from_source_file] = False
 
-    for index, slab_from_source_file in enumerate(list(slabs_from_source_file)):
+    for slab_from_source_file in slabs_from_source_file:
         structural_surface_members = (
             convert_planar_wall_or_slab_to_structural_surface_members(
                 planar_wall_or_slab_from_source_file=slab_from_source_file,
@@ -176,7 +180,7 @@ def convert_frame_structure_to_fem(
         else:
             conversion_success_tracker[slab_from_source_file] = False
 
-    for index, wall_from_source_file in enumerate(list(walls_from_source_file)):
+    for wall_from_source_file in walls_from_source_file:
         structural_surface_members = (
             convert_planar_wall_or_slab_to_structural_surface_members(
                 planar_wall_or_slab_from_source_file=wall_from_source_file,

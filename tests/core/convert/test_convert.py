@@ -3,26 +3,17 @@
 import ifcopenshell
 import ifcopenshell.validate
 import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.api.placement
-import bim2fem.ifcplus.api.profile
-import bim2fem.ifcplus.util.geometry
 from tests.conftest import OUTPUT_DIR_FOR_CONVERT, INPUT_DIR
-import ifcopenshell.api.root
-import ifcopenshell.api.aggregate
-import bim2fem.ifcplus.api.material
 from typing import cast
 from pprint import pprint
-import bim2fem.ifcplus.api.structural
-import numpy as np
-import bim2fem.ifcplus.util.structural
 from bim2fem.core.convert.convert_frame_structure_to_fem import (
     convert_frame_structure_to_fem,
 )
 
 
-class TestConvertFrameStructure:
+class TestConvertFrameStructureToFEM:
 
-    def test_convert_simple_structure(
+    def test_convert_simple_structure_to_fem(
         self,
     ):
 
