@@ -2,7 +2,6 @@
 
 import ifcopenshell
 import ifcopenshell.validate
-from bim2fem import ifcplus
 import bim2fem.ifcplus.api.project
 import bim2fem.ifcplus.api.placement
 import bim2fem.ifcplus.api.profile
