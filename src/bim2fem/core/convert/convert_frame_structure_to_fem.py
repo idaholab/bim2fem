@@ -76,6 +76,7 @@ def convert_frame_structure_to_fem(
                 elements=all_elements_from_source_file,
             )
         )
+        print("debug")
     else:
         deselected_elements_from_source_file = set()
 
