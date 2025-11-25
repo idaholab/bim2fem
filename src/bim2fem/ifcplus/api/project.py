@@ -38,17 +38,19 @@ def create_ifc4_file(
 
     ifc4_file = ifcopenshell.api.project.create_file(version="IFC4")
 
-    ifc4_file.wrapped_data.header.file_description.description = (
-        f"ViewDefinition [{model_view_definition}]",
+    ifc4_file.header.file_description.description = (
+        f"ViewDefinition[{model_view_definition}]",
     )
-    ifc4_file.wrapped_data.header.file_name.author = (
-        f"{given_name_of_user} {family_name_of_user}",
-    )
-    ifc4_file.wrapped_data.header.file_name.organization = (name_of_organisation,)
-    ifc4_file.wrapped_data.header.file_name.originating_system = (
+
+    ifc4_file.header.file_name.author = (f"{given_name_of_user} {family_name_of_user}",)
+
+    ifc4_file.header.file_name.organization = (name_of_organisation,)
+
+    ifc4_file.header.file_name.originating_system = (
         f"IfcOpenShell - IfcOpenShell - {ifcopenshell.version}"
     )
-    ifc4_file.wrapped_data.header.file_name.authorization = "none"
+
+    ifc4_file.header.file_name.authorization = "none"
 
     person = ifcopenshell.api.owner.add_person(
         file=ifc4_file,
@@ -202,17 +204,13 @@ def annotate_ifc_spf(
             elif "FILE_DESCRIPTION((" in line:
                 f.write(f"\n{line}")
             elif "FILE_NAME(" in line:
-                name = ifc4_file.wrapped_data.header.file_name.name
-                time_stamp = ifc4_file.wrapped_data.header.file_name.time_stamp
-                author = ifc4_file.wrapped_data.header.file_name.author
-                organization = ifc4_file.wrapped_data.header.file_name.organization
-                preprocessor_ver = (
-                    ifc4_file.wrapped_data.header.file_name.preprocessor_version
-                )
-                originating_system = (
-                    ifc4_file.wrapped_data.header.file_name.originating_system
-                )
-                authorization = ifc4_file.wrapped_data.header.file_name.authorization
+                name = ifc4_file.header.file_name.name
+                time_stamp = ifc4_file.header.file_name.time_stamp
+                author = ifc4_file.header.file_name.author
+                organization = ifc4_file.header.file_name.organization
+                preprocessor_ver = ifc4_file.header.file_name.preprocessor_version
+                originating_system = ifc4_file.header.file_name.originating_system
+                authorization = ifc4_file.header.file_name.authorization
                 f.write(
                     "".join(
                         [
@@ -313,11 +311,9 @@ def write_to_ifc_spf(
 
     filename = os.path.basename(file_path)
 
-    ifc4_file.wrapped_data.header.file_name.name = filename
+    ifc4_file.header.file_name.name = filename
 
     ifc4_file.write(file_path)
-
-    ifcopenshell.open
 
     if add_annotations:
         annotate_ifc_spf(file_path=file_path)
