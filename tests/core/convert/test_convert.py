@@ -37,6 +37,22 @@ class TestConvertFrameStructureToFEM:
             add_annotations=True,
         )
 
+        num_structural_curve_members = len(
+            ifc4sav_file.by_type(
+                type="IfcStructuralCurveMember",
+                include_subtypes=False,
+            )
+        )
+        assert num_structural_curve_members == 4
+
+        num_structural_surface_members = len(
+            ifc4sav_file.by_type(
+                type="IfcStructuralSurfaceMember",
+                include_subtypes=False,
+            )
+        )
+        assert num_structural_surface_members == 2
+
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
         pprint(logger.statements)
@@ -66,6 +82,22 @@ class TestConvertFrameStructureToFEM:
             add_annotations=True,
         )
 
+        num_structural_curve_members = len(
+            ifc4sav_file.by_type(
+                type="IfcStructuralCurveMember",
+                include_subtypes=False,
+            )
+        )
+        assert num_structural_curve_members == 47
+
+        num_structural_surface_members = len(
+            ifc4sav_file.by_type(
+                type="IfcStructuralSurfaceMember",
+                include_subtypes=False,
+            )
+        )
+        assert num_structural_surface_members == 20
+
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)
         pprint(logger.statements)
@@ -94,6 +126,22 @@ class TestConvertFrameStructureToFEM:
             file_path=output_path,
             add_annotations=True,
         )
+
+        num_structural_curve_members = len(
+            ifc4sav_file.by_type(
+                type="IfcStructuralCurveMember",
+                include_subtypes=False,
+            )
+        )
+        assert num_structural_curve_members == 47
+
+        num_structural_surface_members = len(
+            ifc4sav_file.by_type(
+                type="IfcStructuralSurfaceMember",
+                include_subtypes=False,
+            )
+        )
+        assert num_structural_surface_members == 20
 
         logger = ifcopenshell.validate.json_logger()
         ifcopenshell.validate.validate(output_path, logger, express_rules=True)

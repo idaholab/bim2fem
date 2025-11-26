@@ -8,6 +8,18 @@ import bim2fem.ifcplus.api.style
 import bim2fem.ifcplus.util.project
 from bim2fem.ifcplus import REGION, RGB_STEEL, RGB_CONCRETE
 import numpy as np
+from typing import Literal
+
+LAYER_SET_DIRECTION = Literal[
+    "AXIS1",
+    "AXIS2",
+    "AXIS3",
+]
+
+DIRECTION_SENSE = Literal[
+    "NEGATIVE",
+    "POSITIVE",
+]
 
 
 def add_material_with_structural_properties(
@@ -172,7 +184,7 @@ def add_material_profile_set_with_single_material_profile(
     name: str | None = None,
     check_for_duplicate: bool = False,
 ) -> ifcopenshell.entity_instance:
-    """Crean an IfcMaterialProfileSet for with a single IfcMaterialProfile. Suitable
+    """Create an IfcMaterialProfileSet for with a single IfcMaterialProfile. Suitable
     for prismatic and homogenous frame members (i.e., IfcBeam, IfcColumn, and
     IfcMember)"""
 
@@ -201,6 +213,37 @@ def add_material_profile_set_with_single_material_profile(
     )
 
     return material_profile_set
+
+
+def add_material_profile_set_usage(
+    profile_set: ifcopenshell.entity_instance,  # IfcMaterialProfileSet
+    cardinal_point: int | None = None,
+    check_for_duplicate: bool = False,
+) -> ifcopenshell.entity_instance:
+    """Create an IfcMaterialProfileSetUsage"""
+
+    ifc4_file = profile_set.file
+
+    if check_for_duplicate:
+        for old_material_profile_set_usage in ifc4_file.by_type(
+            type="IfcMaterialProfileSetUsage",
+            include_subtypes=False,
+        ):
+            old_material_profile_set = old_material_profile_set_usage.ForProfileSet
+            old_cardinal_point = old_material_profile_set_usage.CardinalPoint
+            if (
+                old_material_profile_set == profile_set
+                and old_cardinal_point == cardinal_point
+            ):
+                return old_material_profile_set_usage
+
+    material_profile_set_usage = ifc4_file.create_entity(
+        type="IfcMaterialProfileSetUsage",
+        ForProfileSet=profile_set,
+        CardinalPoint=cardinal_point,
+    )
+
+    return material_profile_set_usage
 
 
 def add_material_layer_set(
@@ -270,3 +313,45 @@ def add_material_layer_set(
         )
 
     return material_layer_set
+
+
+def add_material_layer_set_usage(
+    layer_set: ifcopenshell.entity_instance,  # IfcMaterialProfileSet
+    layer_set_direction: LAYER_SET_DIRECTION,
+    direction_sense: DIRECTION_SENSE,
+    offset_from_reference_line: float,
+    check_for_duplicate: bool = False,
+) -> ifcopenshell.entity_instance:
+    """Create an IfcMaterialLayerSetUsage"""
+
+    ifc4_file = layer_set.file
+
+    if check_for_duplicate:
+        for old_material_layer_set_usage in ifc4_file.by_type(
+            type="IfcMaterialLayerSetUsage",
+            include_subtypes=False,
+        ):
+            old_material_layer_set = old_material_layer_set_usage.ForLayerSet
+            old_layer_set_direction = old_material_layer_set_usage.LayerSetDirection
+            old_direction_sense = old_material_layer_set_usage.DirectionSense
+            old_offset_from_reference_line = (
+                old_material_layer_set_usage.OffsetFromReferenceLine
+            )
+            if (
+                old_material_layer_set == layer_set
+                and old_layer_set_direction == layer_set_direction
+                and old_direction_sense == direction_sense
+                and old_offset_from_reference_line == offset_from_reference_line
+            ):
+                return old_material_layer_set_usage
+
+    material_layer_set_usage = ifc4_file.create_entity(
+        type="IfcMaterialLayerSetUsage",
+        ForLayerSet=layer_set,
+        LayerSetDirection=layer_set_direction,
+        DirectionSense=direction_sense,
+        OffsetFromReferenceLine=offset_from_reference_line,
+        ReferenceExtent=None,
+    )
+
+    return material_layer_set_usage
