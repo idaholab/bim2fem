@@ -40,3 +40,6 @@ OUTPUT_DIR_FOR_CORE.mkdir(exist_ok=True)
 
 OUTPUT_DIR_FOR_CONVERT = OUTPUT_DIR_FOR_CORE / "convert"
 OUTPUT_DIR_FOR_CONVERT.mkdir(exist_ok=True)
+
+OUTPUT_DIR_FOR_SNAP = OUTPUT_DIR_FOR_CORE / "adjust_element_connectivity"
+OUTPUT_DIR_FOR_SNAP.mkdir(exist_ok=True)

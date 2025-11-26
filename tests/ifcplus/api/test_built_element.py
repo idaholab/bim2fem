@@ -926,14 +926,13 @@ class TestCreateStructure:
         )
         steel_material = cast(ifcopenshell.entity_instance, steel_material)
 
-        profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
+        profile = bim2fem.ifcplus.api.profile.add_profile_from_standard_library(
             ifc4_file=ifc4_file,
-            profile_class="IfcIShapeProfileDef",
-            dimensions=[0.2, 0.3, 0.02, 0.02, None, None, None],
-            profile_name=None,
+            region="Europe",
+            profile_name="HE340A",
             check_for_duplicate=True,
-            calculate_mechanical_properties=True,
         )
+        profile = cast(ifcopenshell.entity_instance, profile)
 
         col1_bottom = (1.0, 1.0, 0.0)
         col1_top = tuple((np.array(col1_bottom) + np.array([0.0, 0.0, 3.0])).tolist())

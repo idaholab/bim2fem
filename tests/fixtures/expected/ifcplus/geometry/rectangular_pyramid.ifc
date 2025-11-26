@@ -3,15 +3,15 @@ ISO-10303-21;
 /* NOTE standard header information according to ISO 10303-21 ----------------- */
 HEADER;
 
-FILE_DESCRIPTION(('ViewDefinition [ReferenceView_V1.2]'),'2;1');
+FILE_DESCRIPTION(('ViewDefinition[ReferenceView_V1.2]'),'2;1');
 
 FILE_NAME(
 	/* name */ 'rectangular_pyramid.ifc',
-	/* time_stamp */ '2025-11-21T08:36:44-05:00',
+	/* time_stamp */ '2025-11-26T14:52:09-05:00',
 	/* author */ ('Leeable Partee'),
 	/* organization */ ('Architects Without Ballpens'),
-	/* preprocessor_version */ 'IfcOpenShell 0.8.3.post2',
-	/* originating_system */ 'IfcOpenShell - IfcOpenShell - 0.8.3.post2',
+	/* preprocessor_version */ 'IfcOpenShell 0.8.4',
+	/* originating_system */ 'IfcOpenShell - IfcOpenShell - 0.8.4',
 	/* authorization */ 'none');
 
 FILE_SCHEMA(('IFC4'));
@@ -27,11 +27,11 @@ DATA;
 #4=IFCACTORROLE(.USERDEFINED.,'CONTRIBUTOR',$);
 #5=IFCORGANIZATION('IfcOpenShell','IfcOpenShell','IfcOpenShell is an open source software library that helps users and software developers to work with IFC data.',(#4),(#6));
 #6=IFCTELECOMADDRESS(.USERDEFINED.,$,'WEBPAGE',$,$,$,$,'https://ifcopenshell.org',$);
-#7=IFCAPPLICATION(#5,'0.8.3.post2','IfcOpenShell','IfcOpenShell');
-#8=IFCOWNERHISTORY(#3,#7,.READWRITE.,.ADDED.,1763732204,#3,#7,1763732204);
+#7=IFCAPPLICATION(#5,'0.8.4','IfcOpenShell','IfcOpenShell');
+#8=IFCOWNERHISTORY(#3,#7,.READWRITE.,.ADDED.,1764186729,#3,#7,1764186729);
 
 /* Project, representation contexts, and Units */
-#9=IFCPROJECT('3iWgj85XT10O5NXS5$gIZS',#8,'My Project',$,$,$,$,(#14),#29);
+#9=IFCPROJECT('20KRyS$N14CfvVoplB_Ol3',#8,'My Project',$,$,$,$,(#14),#29);
 #10=IFCCARTESIANPOINT((0.,0.,0.));
 #11=IFCDIRECTION((0.,0.,1.));
 #12=IFCDIRECTION((1.,0.,0.));
@@ -51,24 +51,24 @@ DATA;
 #26=IFCDERIVEDUNITELEMENT(#20,1);
 #27=IFCDERIVEDUNITELEMENT(#16,-2);
 #28=IFCDERIVEDUNIT((#26,#27),.MODULUSOFELASTICITYUNIT.,$);
-#29=IFCUNITASSIGNMENT((#22,#25,#21,#16,#17,#28,#18,#19,#20));
-#30=IFCOWNERHISTORY(#3,#7,.READWRITE.,.MODIFIED.,1763732204,#3,#7,1763732204);
+#29=IFCUNITASSIGNMENT((#25,#21,#16,#17,#28,#18,#19,#20,#22));
+#30=IFCOWNERHISTORY(#3,#7,.READWRITE.,.MODIFIED.,1764186729,#3,#7,1764186729);
 
 /* IfcSite */
-#31=IFCSITE('309mexKMn5XxE0lzF1GXWd',#30,'Site-01',$,$,#38,$,$,$,$,$,$,$,$);
-#32=IFCOWNERHISTORY(#3,#7,.READWRITE.,.ADDED.,1763732204,#3,#7,1763732204);
+#31=IFCSITE('3by5Nmpc17awh7lv_KzIfC',#30,'Site-01',$,$,#38,$,$,$,$,$,$,$,$);
+#32=IFCOWNERHISTORY(#3,#7,.READWRITE.,.ADDED.,1764186729,#3,#7,1764186729);
 
 /* Aggregation Relationship */
-#33=IFCRELAGGREGATES('0gfd0X6wfA4hZ400Ps_03q',#32,$,$,#9,(#31));
+#33=IFCRELAGGREGATES('0LP$6JDDz8w9CGk6NckDME',#32,$,$,#9,(#31));
 #34=IFCCARTESIANPOINT((1.,1.,0.));
 #35=IFCDIRECTION((0.,0.,1.));
 #36=IFCDIRECTION((1.,0.,0.));
 #37=IFCAXIS2PLACEMENT3D(#34,#35,#36);
 #38=IFCLOCALPLACEMENT($,#37);
-#39=IFCOWNERHISTORY(#3,#7,.READWRITE.,.MODIFIED.,1763732204,#3,#7,1763732204);
+#39=IFCOWNERHISTORY(#3,#7,.READWRITE.,.MODIFIED.,1764186729,#3,#7,1764186729);
 
 /* IfcBuildingElementProxy */
-#40=IFCBUILDINGELEMENTPROXY('0jbeh5FLb3twngXlj1cUAq',#39,'Element-01',$,$,#55,#48,$,$);
+#40=IFCBUILDINGELEMENTPROXY('3yYCkqwqj3R9MbTjaMrlRL',#39,'Element-01',$,$,#55,#48,$,$);
 #41=IFCCARTESIANPOINT((0.,0.,0.));
 #42=IFCDIRECTION((0.,0.,1.));
 #43=IFCDIRECTION((1.,0.,0.));
@@ -77,10 +77,10 @@ DATA;
 #46=IFCCSGSOLID(#45);
 #47=IFCSHAPEREPRESENTATION(#15,'Body','SolidModel',(#46));
 #48=IFCPRODUCTDEFINITIONSHAPE($,$,(#47));
-#49=IFCOWNERHISTORY(#3,#7,.READWRITE.,.ADDED.,1763732204,#3,#7,1763732204);
+#49=IFCOWNERHISTORY(#3,#7,.READWRITE.,.ADDED.,1764186729,#3,#7,1764186729);
 
 /* Spatial Structure Containment */
-#50=IFCRELCONTAINEDINSPATIALSTRUCTURE('1KF9As6qPBXehhOrTwXpk6',#49,$,$,(#40),#31);
+#50=IFCRELCONTAINEDINSPATIALSTRUCTURE('2uo1$6dLvDwvg7jw2stGRM',#49,$,$,(#40),#31);
 #51=IFCCARTESIANPOINT((0.,0.,0.));
 #52=IFCDIRECTION((0.,0.,1.));
 #53=IFCDIRECTION((1.,0.,0.));

@@ -4,13 +4,13 @@
 
 Checklist for built element creation:
 - Add Material/MaterialLayerSet/MaterialProfileSet
-- Add Type
-- Declare Type on Project
+- Add ElementType
+- Declare ElementType on Project
 - Assign Material to Type
 - Add Element
-- Assign Type to Element
+- Assign ElementType to Element
 - Add MaterialLayerSetUsage/MaterialProfileSetUsage
-- Assign MaterialLayerSetUsage/MaterialProfileSetUsage to Wall
+- Assign MaterialLayerSetUsage/MaterialProfileSetUsage to Element
 - Add Representation
 - Assign Representation to Element
 - Place Element in Spatial Container
@@ -82,12 +82,7 @@ def create_linear_frame_member(
         check_for_duplicate=True,
     )
 
-    if frame_member_class == "IfcBeam":
-        element_type_class = "IfcBeamType"
-    elif frame_member_class == "IfcColumn":
-        element_type_class = "IfcColumnType"
-    else:
-        element_type_class = "IfcMemberType"
+    element_type_class = frame_member_class + "Type"
 
     element_type = (
         bim2fem.ifcplus.api.element_type.add_element_type_for_material_profile_set(
@@ -112,12 +107,17 @@ def create_linear_frame_member(
         relating_type=element_type,
     )
 
-    ifcopenshell.api.material.assign_material(
+    rel_associates_material = ifcopenshell.api.material.assign_material(
         file=ifc4_file,
         products=[frame_member],
         type="IfcMaterialProfileSetUsage",
-        material=None,  # inferred from assigned IfcElementType
     )
+    rel_associates_material = cast(
+        ifcopenshell.entity_instance, rel_associates_material
+    )
+
+    material_profile_set_usage = rel_associates_material.RelatingMaterial
+    material_profile_set_usage.CardinalPoint = 5
 
     z_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
 
@@ -218,12 +218,7 @@ def create_curved_frame_member(
         check_for_duplicate=True,
     )
 
-    if frame_member_class == "IfcBeam":
-        element_type_class = "IfcBeamType"
-    elif frame_member_class == "IfcColumn":
-        element_type_class = "IfcColumnType"
-    else:
-        element_type_class = "IfcMemberType"
+    element_type_class = frame_member_class + "Type"
 
     element_type = (
         bim2fem.ifcplus.api.element_type.add_element_type_for_material_profile_set(
@@ -248,12 +243,17 @@ def create_curved_frame_member(
         relating_type=element_type,
     )
 
-    ifcopenshell.api.material.assign_material(
+    rel_associates_material = ifcopenshell.api.material.assign_material(
         file=ifc4_file,
         products=[frame_member],
         type="IfcMaterialProfileSetUsage",
-        material=None,  # inferred from assigned IfcElementType
     )
+    rel_associates_material = cast(
+        ifcopenshell.entity_instance, rel_associates_material
+    )
+
+    material_profile_set_usage = rel_associates_material.RelatingMaterial
+    material_profile_set_usage.CardinalPoint = 5
 
     horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
@@ -361,30 +361,29 @@ def create_opening_element(
         predefined_type=None,
     )
 
-    representation_item = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
+    extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
         ifc4_file=ifc4_file,
         swept_area=profile,
         depth=depth,
     )
 
-    representation_type = ifcopenshell.util.representation.guess_type(
-        items=[representation_item]
-    )
-
-    shape_model = bim2fem.ifcplus.api.geometry.add_shape_model(
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
         ifc4_file=ifc4_file,
         shape_model_class="IfcShapeRepresentation",
         representation_identifier="Body",
-        representation_type=cast(str, representation_type),  # SweptSolid
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[extruded_area_solid]),
+        ),  # SweptSolid
         context_type="Model",
         target_view="MODEL_VIEW",
-        items=[representation_item],
+        items=[extruded_area_solid],
     )
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
         product=opening_element,
-        representation=shape_model,
+        representation=shape_representation,
     )
 
     rel_voids_element = ifcopenshell.api.root.create_entity(
@@ -465,11 +464,13 @@ def create_linear_wall(
         file=ifc4_file,
         products=[wall],
         type="IfcMaterialLayerSetUsage",
-        material=None,  # inferred from assigned IfcElementType
+        material=None,
     )
-    material_layer_set_usage = cast(
+    rel_associates_material = cast(
         ifcopenshell.entity_instance, rel_associates_material
-    ).RelatingMaterial
+    )
+
+    material_layer_set_usage = rel_associates_material.RelatingMaterial
     material_layer_set_usage.OffsetFromReferenceLine = -total_thickness / 2
 
     start_point_3d = (start_point_2d[0], start_point_2d[1], elevation)
@@ -594,11 +595,13 @@ def create_curved_wall(
         file=ifc4_file,
         products=[wall],
         type="IfcMaterialLayerSetUsage",
-        material=None,  # inferred from assigned IfcElementType
+        material=None,
     )
-    material_layer_set_usage = cast(
+    rel_associates_material = cast(
         ifcopenshell.entity_instance, rel_associates_material
-    ).RelatingMaterial
+    )
+
+    material_layer_set_usage = rel_associates_material.RelatingMaterial
     material_layer_set_usage.OffsetFromReferenceLine = -total_thickness / 2
 
     radius_of_curvature_for_middle_curve = radius_of_curvature

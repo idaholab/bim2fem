@@ -45,6 +45,7 @@ def add_element_type_for_material_layer_set(
     ifcopenshell.api.material.assign_material(
         file=ifc4_file,
         products=[element_type],
+        type="IfcMaterialLayerSet",
         material=material_layer_set,
     )
 
@@ -100,6 +101,7 @@ def add_element_type_for_material_profile_set(
     ifcopenshell.api.material.assign_material(
         file=ifc4_file,
         products=[element_type],
+        type="IfcMaterialProfileSet",
         material=material_profile_set,
     )
 

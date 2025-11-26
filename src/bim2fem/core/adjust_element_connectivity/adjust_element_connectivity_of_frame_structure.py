@@ -24,7 +24,7 @@ from bim2fem.core.adjust_element_connectivity.snap_walls_to_walls import (
 import bim2fem.ifcplus.api.structural
 
 
-def adjust_element_connectivity_of_ifc4_sav_file(
+def adjust_element_connectivity_of_frame_structure(
     ifc4_sav_file: ifcopenshell.file,
     execute_snap_frame_members: bool = False,
     execute_snap_floor_beam_systems: bool = False,

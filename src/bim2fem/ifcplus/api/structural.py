@@ -119,6 +119,12 @@ def create_linear_structural_curve_member(
 
     ifc4_file = profile.file
 
+    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+        material=material,
+        profile=profile,
+        check_for_duplicate=True,
+    )
+
     if structural_curve_member is None:
         structural_curve_member = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -130,23 +136,12 @@ def create_linear_structural_curve_member(
             name = f"StructuralCurveMember-{structural_curve_member.id()}"
             structural_curve_member.Name = name
 
-    ifcopenshell.api.structural.assign_structural_analysis_model(
-        file=structural_analysis_model.file,
-        products=[structural_curve_member],
-        structural_analysis_model=structural_analysis_model,
-    )
-
-    structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
-
-    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-        material=material,
-        profile=profile,
-        check_for_duplicate=True,
-    )
-
-    material_profile_set_usage = ifc4_file.create_entity(
-        type="IfcMaterialProfileSetUsage",
-        ForProfileSet=material_profile_set,
+    material_profile_set_usage = (
+        bim2fem.ifcplus.api.material.add_material_profile_set_usage(
+            profile_set=material_profile_set,
+            cardinal_point=10,
+            check_for_duplicate=True,
+        )
     )
 
     ifcopenshell.api.material.assign_material(
@@ -154,6 +149,14 @@ def create_linear_structural_curve_member(
         products=[structural_curve_member],
         material=material_profile_set_usage,
     )
+
+    ifcopenshell.api.structural.assign_structural_analysis_model(
+        file=structural_analysis_model.file,
+        products=[structural_curve_member],
+        structural_analysis_model=structural_analysis_model,
+    )
+
+    structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
     x_axis = tuple((np.array(end_point) - np.array(start_point)).tolist())
 
@@ -250,6 +253,12 @@ def create_curved_structural_curve_member(
 
     ifc4_file = profile.file
 
+    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
+        material=material,
+        profile=profile,
+        check_for_duplicate=True,
+    )
+
     if structural_curve_member is None:
         structural_curve_member = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -261,23 +270,12 @@ def create_curved_structural_curve_member(
             name = f"StructuralCurveMember-{structural_curve_member.id()}"
             structural_curve_member.Name = name
 
-    ifcopenshell.api.structural.assign_structural_analysis_model(
-        file=structural_analysis_model.file,
-        products=[structural_curve_member],
-        structural_analysis_model=structural_analysis_model,
-    )
-
-    structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
-
-    material_profile_set = bim2fem.ifcplus.api.material.add_material_profile_set_with_single_material_profile(
-        material=material,
-        profile=profile,
-        check_for_duplicate=True,
-    )
-
-    material_profile_set_usage = ifc4_file.create_entity(
-        type="IfcMaterialProfileSetUsage",
-        ForProfileSet=material_profile_set,
+    material_profile_set_usage = (
+        bim2fem.ifcplus.api.material.add_material_profile_set_usage(
+            profile_set=material_profile_set,
+            cardinal_point=10,
+            check_for_duplicate=True,
+        )
     )
 
     ifcopenshell.api.material.assign_material(
@@ -285,6 +283,14 @@ def create_curved_structural_curve_member(
         products=[structural_curve_member],
         material=material_profile_set_usage,
     )
+
+    ifcopenshell.api.structural.assign_structural_analysis_model(
+        file=structural_analysis_model.file,
+        products=[structural_curve_member],
+        structural_analysis_model=structural_analysis_model,
+    )
+
+    structural_curve_member.ObjectPlacement = structural_analysis_model.SharedPlacement
 
     horizontal_curve = bim2fem.ifcplus.util.geometry.HorizontalCurve.from_PC_and_PT_and_CC(
         point_on_center_of_curvature_side=point_defining_plane_of_arc_and_center_of_curvature_side,
@@ -387,6 +393,12 @@ def create_structural_surface_member(
 
     ifc4_file = materials[0].file
 
+    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
+        materials=materials,
+        thicknesses=thicknesses,
+        check_for_duplicate=True,
+    )
+
     if structural_surface_member is None:
         structural_surface_member = ifcopenshell.api.root.create_entity(
             file=ifc4_file,
@@ -398,6 +410,26 @@ def create_structural_surface_member(
         name = f"StructuralSurfaceMember-{structural_surface_member.id()}"
         structural_surface_member.Name = name
 
+    total_thickness = 0.0
+    for material_layer in material_layer_set.MaterialLayers:
+        total_thickness += material_layer.LayerThickness
+
+    material_layer_set_usage = (
+        bim2fem.ifcplus.api.material.add_material_layer_set_usage(
+            layer_set=material_layer_set,
+            layer_set_direction="AXIS3",
+            direction_sense="POSITIVE",
+            offset_from_reference_line=-total_thickness / 2,
+            check_for_duplicate=True,
+        )
+    )
+
+    ifcopenshell.api.material.assign_material(
+        file=ifc4_file,
+        products=[structural_surface_member],
+        material=material_layer_set_usage,
+    )
+
     ifcopenshell.api.structural.assign_structural_analysis_model(
         file=structural_analysis_model.file,
         products=[structural_surface_member],
@@ -406,30 +438,6 @@ def create_structural_surface_member(
 
     structural_surface_member.ObjectPlacement = (
         structural_analysis_model.SharedPlacement
-    )
-
-    material_layer_set = bim2fem.ifcplus.api.material.add_material_layer_set(
-        materials=materials,
-        thicknesses=thicknesses,
-        check_for_duplicate=True,
-    )
-
-    total_thickness = 0.0
-    for material_layer in material_layer_set.MaterialLayers:
-        total_thickness += material_layer.LayerThickness
-
-    material_layer_set_usage = ifc4_file.create_entity(
-        type="IfcMaterialLayerSetUsage",
-        ForLayerSet=material_layer_set,
-        LayerSetDirection="AXIS3",
-        DirectionSense="POSITIVE",
-        OffsetFromReferenceLine=-total_thickness / 2,
-    )
-
-    ifcopenshell.api.material.assign_material(
-        file=ifc4_file,
-        products=[structural_surface_member],
-        material=material_layer_set_usage,
     )
 
     structural_surface_member.Thickness = total_thickness
@@ -775,7 +783,7 @@ def translate_structural_point_connection(
         vertex_point.VertexGeometry = new_cartesian_point
 
 
-def divide_structural_curve_member(
+def divide_structural_curve_member_old(
     structural_curve_member: ifcopenshell.entity_instance,
     division_locations_as_proportions_of_length: list[float],
 ) -> list[ifcopenshell.entity_instance]:
@@ -886,13 +894,13 @@ def divide_structural_curve_member(
 
     segment_1 = structural_curve_member
 
-    edge_1 = segment_1.Representation.Representations[0].Items[0]
+    # edge_1 = segment_1.Representation.Representations[0].Items[0]
 
     segment_2 = new_structural_curve_members[0]
 
     edge_2 = segment_2.Representation.Representations[0].Items[0]
 
-    edge_1.EdgeEnd = edge_2.EdgeStart
+    # edge_1.EdgeEnd = edge_2.EdgeStart
 
     start_node_of_segment_2 = (
         bim2fem.ifcplus.util.structural.get_structural_point_connection_of_vertex_point(
@@ -900,17 +908,173 @@ def divide_structural_curve_member(
         )
     )
 
-    for connection_relationship in segment_1.ConnectedBy:
-        if not connection_relationship.is_a("IfcRelConnectsStructuralMember"):
-            continue
-        if (
-            connection_relationship.RelatedStructuralConnection
-            == original_end_node_of_whole_member
-        ):
-            connection_relationship.RelatedStructuralConnection = (
-                start_node_of_segment_2
-            )
+    merge_two_structural_point_connections_together(
+        replaced_structural_point_connection=original_end_node_of_whole_member,
+        replacing_structural_point_connection=start_node_of_segment_2,
+    )
+
+    # for connection_relationship in segment_1.ConnectedBy:
+    #     if not connection_relationship.is_a("IfcRelConnectsStructuralMember"):
+    #         continue
+    #     if (
+    #         connection_relationship.RelatedStructuralConnection
+    #         == original_end_node_of_whole_member
+    #     ):
+    #         connection_relationship.RelatedStructuralConnection = (
+    #             start_node_of_segment_2
+    #         )
 
     new_structural_curve_members = [segment_1] + new_structural_curve_members
+
+    return new_structural_curve_members
+
+
+def divide_structural_curve_member(
+    structural_curve_member: ifcopenshell.entity_instance,
+    division_locations_as_proportions_of_length: list[float],
+) -> list[ifcopenshell.entity_instance]:
+
+    if len(division_locations_as_proportions_of_length) == 0:
+        return [structural_curve_member]
+
+    if all(0.0 < num < 1.0 for num in division_locations_as_proportions_of_length):
+        division_locations_as_proportions_of_length = sorted(
+            division_locations_as_proportions_of_length
+        )
+    else:
+        raise ValueError(
+            "All elements in the list must be between 0.0 and 1.0 (exclusive)"
+        )
+
+    original_start_point, original_end_point, original_orientation_point = (
+        bim2fem.ifcplus.util.structural.get_coordinates_of_points_of_linear_structural_curve_member(
+            linear_structural_curve_member=structural_curve_member
+        )
+    )
+
+    length_of_original_member = float(
+        np.linalg.norm(np.array(original_end_point) - np.array(original_start_point))
+    )
+
+    original_x_axis = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=original_start_point,
+        p2=original_end_point,
+    )
+
+    original_z_axis = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
+        p1=original_start_point,
+        p2=original_orientation_point,
+    )
+
+    product_assigned_to = (
+        bim2fem.ifcplus.util.structural.get_assigned_product_of_structural_item(
+            structural_item=structural_curve_member
+        )
+    )
+
+    material_profile_set = ifcopenshell.util.element.get_material(
+        element=structural_curve_member,
+        should_skip_usage=True,
+    )
+    material_profile_set = cast(ifcopenshell.entity_instance, material_profile_set)
+    profile_def = material_profile_set.MaterialProfiles[0].Profile
+    material = material_profile_set.MaterialProfiles[0].Material
+
+    structural_analysis_model = bim2fem.ifcplus.util.structural.get_structural_analysis_model_of_structural_item(
+        structural_item=structural_curve_member
+    )
+
+    structural_analysis_model = cast(
+        ifcopenshell.entity_instance, structural_analysis_model
+    )
+
+    new_end_points = []
+    for (
+        division_location_as_proportion_of_length
+    ) in division_locations_as_proportions_of_length + [1.0]:
+        new_end_point = tuple(
+            (
+                np.array(original_start_point)
+                + np.array(original_x_axis)
+                * division_location_as_proportion_of_length
+                * length_of_original_member
+            ).tolist()
+        )
+        new_end_points.append(new_end_point)
+
+    new_structural_curve_members = []
+    new_start_point = original_start_point
+    for new_end_point in new_end_points:
+
+        new_orientation_point = tuple(
+            (np.array(new_start_point) + np.array(original_z_axis) * 1.0).tolist()
+        )
+
+        new_structural_curve_member = (
+            bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
+                start_point=new_start_point,
+                end_point=new_end_point,
+                orientation_point=new_orientation_point,
+                profile=profile_def,
+                material=material,
+                structural_analysis_model=structural_analysis_model,
+                product_to_be_assigned_to=product_assigned_to,
+            )
+        )
+
+        new_structural_curve_members.append(new_structural_curve_member)
+
+        new_start_point = new_end_point
+
+    start_node_of_original_member, end_node_of_original_member = (
+        bim2fem.ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+            linear_structural_curve_member=structural_curve_member,
+        )
+    )
+
+    first_new_segment = new_structural_curve_members[0]
+
+    start_node_of_first_new_segment, _ = (
+        bim2fem.ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+            linear_structural_curve_member=first_new_segment,
+        )
+    )
+
+    last_new_segment = new_structural_curve_members[-1]
+
+    _, end_node_of_last_new_segment = (
+        bim2fem.ifcplus.util.structural.get_structural_point_connections_of_linear_structural_curve_member(
+            linear_structural_curve_member=last_new_segment,
+        )
+    )
+
+    merge_two_structural_point_connections_together(
+        replaced_structural_point_connection=start_node_of_original_member,
+        replacing_structural_point_connection=start_node_of_first_new_segment,
+    )
+
+    merge_two_structural_point_connections_together(
+        replaced_structural_point_connection=end_node_of_original_member,
+        replacing_structural_point_connection=end_node_of_last_new_segment,
+    )
+
+    ifc4sav_file = structural_curve_member.file
+
+    for rel_connects_structural_member in structural_curve_member.ConnectedBy:
+        ifc4sav_file.remove(inst=rel_connects_structural_member)
+
+    old_product_definition_shape = structural_curve_member.Representation
+
+    old_representation_shape = old_product_definition_shape.Representations[0]
+
+    old_edge = old_representation_shape.Items[0]
+
+    ifc4sav_file.remove(inst=old_edge)
+
+    ifc4sav_file.remove(inst=old_representation_shape)
+
+    ifc4sav_file.remove(inst=old_product_definition_shape)
+
+    ifc4sav_file.remove(inst=structural_curve_member)
 
     return new_structural_curve_members

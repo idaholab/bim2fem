@@ -108,7 +108,6 @@ def convert_linear_frame_member_to_linear_structural_curve_member(
             frame_member_from_source_file=linear_frame_member_from_source_file,
             frame_member_copied_to_destination_file=building_element_copied_to_destination_file,
         )
-    # else:
 
     return structural_curve_member
 
@@ -214,10 +213,12 @@ def convert_frame_member_to_fem_for_case_1(
                 parameterized_profile_def=extruded_area_solid.SweptArea
             )
         )
-        origin_in_global_coordinates = (
-            transformation_matrix
-            @ np.array(list(local_origin_of_swept_area) + [0.0, 1.0])
-        )[:3]
+        origin_in_global_coordinates = tuple(
+            (
+                transformation_matrix
+                @ np.array(list(local_origin_of_swept_area) + [0.0, 1.0])
+            )[:3].tolist()
+        )
         local_x_axis_in_global_coordinates = tuple(
             transformation_matrix[:3, :3]
             @ np.array(list(local_x_axis_of_swept_area) + [0.0])
@@ -295,9 +296,7 @@ def convert_frame_member_to_fem_for_case_1(
                 )
             )
             return None
-        origin_in_global_coordinates = tuple(
-            [float(val) for val in transformation_matrix[:3, 3]]
-        )
+        origin_in_global_coordinates = tuple(transformation_matrix[:3, 3].tolist())
         local_y_axis_in_global_coordinates = (
             bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                 vector1=extrusion_direction_in_global_coordinates,
@@ -305,35 +304,31 @@ def convert_frame_member_to_fem_for_case_1(
             )
         )
 
-    # Calculate points for StructuralCurveMember
-    p1 = tuple(float(val) for val in origin_in_global_coordinates)
-    assert len(p1) == 3
+    start_point = origin_in_global_coordinates
+
     unit_scale = ifcopenshell.util.unit.calculate_unit_scale(
         ifc_file=frame_member_from_source_file.file
     )
-    p2 = tuple(
-        float(val)
-        for val in (
+
+    length_of_frame_member_in_meters = unit_scale * extruded_area_solid.Depth
+
+    end_point = tuple(
+        (
             np.array(origin_in_global_coordinates)
             + np.array(extrusion_direction_in_global_coordinates)
-            * unit_scale
-            * extruded_area_solid.Depth
+            * length_of_frame_member_in_meters
         ).tolist()
     )
-    assert len(p2) == 3
-    p3 = tuple(
-        float(val)
-        for val in (
-            np.array(p1) + np.array(local_y_axis_in_global_coordinates) * 1.0
-        ).tolist()
+
+    orientation_point = tuple(
+        (np.array(start_point) + np.array(local_y_axis_in_global_coordinates)).tolist()
     )
-    assert len(p3) == 3
 
     structural_curve_member = (
         bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
-            start_point=p1,
-            end_point=p2,
-            orientation_point=p3,
+            start_point=start_point,
+            end_point=end_point,
+            orientation_point=orientation_point,
             profile=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,
@@ -559,34 +554,31 @@ def convert_frame_member_to_fem_for_case_2(
         relating_type=element_type,
     )
 
-    p1 = tuple(float(val) for val in origin_in_global_coordinates)
-    assert len(p1) == 3
+    start_point = origin_in_global_coordinates
+
     unit_scale = ifcopenshell.util.unit.calculate_unit_scale(
         ifc_file=frame_member_from_source_file.file
     )
-    p2 = tuple(
-        float(val)
-        for val in (
+
+    length_of_frame_member_in_meters = unit_scale * length_of_frame_member
+
+    end_point = tuple(
+        (
             np.array(origin_in_global_coordinates)
             + np.array(extrusion_direction_in_global_coordinates)
-            * unit_scale
-            * length_of_frame_member
+            * length_of_frame_member_in_meters
         ).tolist()
     )
-    assert len(p2) == 3
-    p3 = tuple(
-        float(val)
-        for val in (
-            np.array(p1) + np.array(local_y_axis_in_global_coordinates) * 1.0
-        ).tolist()
+
+    orientation_point = tuple(
+        (np.array(start_point) + np.array(local_y_axis_in_global_coordinates)).tolist()
     )
-    assert len(p3) == 3
 
     structural_curve_member = (
         bim2fem.ifcplus.api.structural.create_linear_structural_curve_member(
-            start_point=p1,
-            end_point=p2,
-            orientation_point=p3,
+            start_point=start_point,
+            end_point=end_point,
+            orientation_point=orientation_point,
             profile=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,
