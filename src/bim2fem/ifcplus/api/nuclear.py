@@ -17,6 +17,9 @@ import ifcopenshell.api.geometry
 import ifcopenshell.api.material
 import ifcopenshell.util.representation
 from typing import cast
+import numpy as np
+import ifcopenshell.api.system
+import bim2fem.ifcplus.api.system
 
 
 def create_nuclear_reactor_containment_structure(
@@ -307,3 +310,234 @@ def create_reactor_box(
     )
 
     return reactor_box
+
+
+def create_reactor_pressure_vessel(
+    ifc4_file: ifcopenshell.file,
+    scaling_factor_for_size: float = 1.0,
+    # diameter: float = 5.0,
+    # overall_height: float = 12.5,
+    reactor_pressure_vessel: ifcopenshell.entity_instance | None = None,
+    name: str | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
+    reactor_coolant_system: ifcopenshell.entity_instance | None = None,
+    place_object_relative_to_parent: bool = False,
+) -> ifcopenshell.entity_instance:
+    """Create reactor pressure vessel with default dimensions roughly corresponding to
+    3500 MWth thermal capacity."""
+
+    if reactor_pressure_vessel is None:
+        reactor_pressure_vessel = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcTank",
+            name=name,
+            predefined_type="USERDEFINED",
+        )
+        reactor_pressure_vessel.ObjectType = "REACTOR_PRESSURE_VESSEL"
+
+    outlet_port_diameter = 1.07 * scaling_factor_for_size
+
+    inlet_port_diameter = 0.76 * scaling_factor_for_size
+
+    diameter = 5.0 * scaling_factor_for_size
+
+    overall_height = 12.5 * scaling_factor_for_size
+
+    cylindrical_body_height = overall_height - diameter / 2.0 - diameter / 2.0
+
+    inlet_port_protrusion_length = 0.5
+
+    point_at_center_of_bottom_sphere = (
+        inlet_port_protrusion_length + diameter / 2.0,
+        diameter / 2.0,
+        diameter / 2.0,
+    )
+
+    point_at_center_of_top_sphere = tuple(
+        (
+            np.array(point_at_center_of_bottom_sphere)
+            + np.array([0.0, 0.0, cylindrical_body_height])
+        ).tolist()
+    )
+
+    bottom_sphere = bim2fem.ifcplus.api.geometry.add_sphere(
+        ifc4_file=ifc4_file,
+        repositioned_origin=point_at_center_of_bottom_sphere,
+        radius=diameter / 2.0,
+    )
+
+    top_sphere = bim2fem.ifcplus.api.geometry.add_sphere(
+        ifc4_file=ifc4_file,
+        repositioned_origin=point_at_center_of_top_sphere,
+        radius=diameter / 2.0,
+    )
+
+    both_spheres_combined = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=bottom_sphere,
+        second_items=[top_sphere],
+        operator="UNION",
+    )[-1]
+
+    cylinder_for_subtraction = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=diameter / 2.0,
+            extrusion_depth=cylindrical_body_height,
+            repositioned_origin=point_at_center_of_bottom_sphere,
+        )
+    )
+
+    top_and_bottom_hemispheres = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=both_spheres_combined,
+        second_items=[cylinder_for_subtraction],
+        operator="DIFFERENCE",
+    )[-1]
+
+    cylinder_for_body = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=diameter / 2.0,
+            extrusion_depth=cylindrical_body_height,
+            repositioned_origin=point_at_center_of_bottom_sphere,
+        )
+    )
+
+    rpv_body_and_ends = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=top_and_bottom_hemispheres,
+        second_items=[cylinder_for_body],
+        operator="UNION",
+    )[-1]
+
+    inlet_elevation = 9 / 12.5 * overall_height
+
+    inlet_port_origin = tuple(
+        (
+            np.array(point_at_center_of_bottom_sphere)
+            - np.array([1.0, 0.0, 0.0])
+            * (diameter / 2.0 + inlet_port_protrusion_length)
+            + np.array([0.0, 0.0, 1.0]) * (inlet_elevation - diameter / 2.0)
+        ).tolist()
+    )
+
+    inlet_port_z_axis = (1.0, 0.0, 0.0)
+
+    inlet_port_x_axis = (0.0, 1.0, 0.0)
+
+    cylinder_for_inlet_port = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=inlet_port_diameter / 2.0,
+            extrusion_depth=inlet_port_protrusion_length + diameter / 4.0,
+            repositioned_origin=inlet_port_origin,
+            repositioned_z_axis=inlet_port_z_axis,
+            repositioned_x_axis=inlet_port_x_axis,
+        )
+    )
+
+    outlet_elevation = 9 / 12.5 * overall_height
+
+    outlet_port_origin = tuple(
+        (
+            np.array(point_at_center_of_bottom_sphere)
+            + np.array([1.0, 0.0, 0.0])
+            * (diameter / 2.0 + inlet_port_protrusion_length)
+            + np.array([0.0, 0.0, 1.0]) * (outlet_elevation - diameter / 2.0)
+        ).tolist()
+    )
+
+    outlet_port_z_axis = (1.0, 0.0, 0.0)
+
+    outlet_port_x_axis = (0.0, 1.0, 0.0)
+
+    cylinder_for_outlet_port = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=outlet_port_diameter / 2.0,
+            extrusion_depth=inlet_port_protrusion_length + diameter / 4.0,
+            repositioned_origin=outlet_port_origin,
+            repositioned_z_axis=tuple((np.array(outlet_port_z_axis) * -1).tolist()),
+            repositioned_x_axis=tuple((np.array(outlet_port_x_axis) * -1).tolist()),
+        )
+    )
+
+    rpv_body_and_ends_and_ports = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=rpv_body_and_ends,
+        second_items=[
+            cylinder_for_inlet_port,
+            cylinder_for_outlet_port,
+        ],
+        operator="UNION",
+    )[-1]
+
+    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        boolean_result_or_primitive=rpv_body_and_ends_and_ports,
+    )
+
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcShapeRepresentation",
+        representation_identifier="Body",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
+        items=[csg_solid],
+    )
+
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=reactor_pressure_vessel,
+        representation=shape_representation,
+    )
+
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[reactor_pressure_vessel],
+            relating_structure=parent,
+        )
+
+    bim2fem.ifcplus.api.placement.edit_object_placement(
+        product=reactor_pressure_vessel,
+        repositioned_origin=(0.0, 0.0, 0.0),
+        repositioned_z_axis=(0.0, 0.0, 1.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
+        place_object_relative_to_parent=place_object_relative_to_parent,
+    )
+
+    if isinstance(reactor_coolant_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[reactor_pressure_vessel],
+            system=reactor_coolant_system,
+        )
+
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=inlet_port_origin,
+        port_z_axis_in_distribution_element_coordinates=inlet_port_z_axis,
+        port_x_axis_in_distribution_element_coordinates=inlet_port_x_axis,
+        distribution_element=reactor_pressure_vessel,
+        flow_direction="SINK",
+        predefined_type="DUCT",
+        distribution_system=reactor_coolant_system,
+    )
+
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=outlet_port_origin,
+        port_z_axis_in_distribution_element_coordinates=outlet_port_z_axis,
+        port_x_axis_in_distribution_element_coordinates=outlet_port_x_axis,
+        distribution_element=reactor_pressure_vessel,
+        flow_direction="SOURCE",
+        predefined_type="DUCT",
+        distribution_system=reactor_coolant_system,
+    )
+
+    return reactor_pressure_vessel
