@@ -20,6 +20,7 @@ from typing import cast
 import numpy as np
 import ifcopenshell.api.system
 import bim2fem.ifcplus.api.system
+import ifcopenshell.api.pset_template
 
 
 def create_nuclear_reactor_containment_structure(
@@ -541,3 +542,39 @@ def create_reactor_pressure_vessel(
     )
 
     return reactor_pressure_vessel
+
+
+def create_INL_nuclear_property_set_templte(
+    ifc4_file: ifcopenshell.file,
+) -> ifcopenshell.entity_instance:
+
+    inl_pset_template = ifcopenshell.api.pset_template.add_pset_template(
+        file=ifc4_file,
+        name="INL_pset_template",
+    )
+    ifcopenshell.api.pset_template.add_prop_template(
+        file=ifc4_file,
+        pset_template=inl_pset_template,
+        name="ThermalPowerCapacity",
+        primary_measure_type="IfcPowerMeasure",
+    )
+    ifcopenshell.api.pset_template.add_prop_template(
+        file=ifc4_file,
+        pset_template=inl_pset_template,
+        name="DesignPressure",
+        primary_measure_type="IfcPressureMeasure",
+    )
+    ifcopenshell.api.pset_template.add_prop_template(
+        file=ifc4_file,
+        pset_template=inl_pset_template,
+        name="DesignTemperature",
+        primary_measure_type="IfcThermodynamicTemperatureMeasure",
+    )
+    ifcopenshell.api.pset_template.add_prop_template(
+        file=ifc4_file,
+        pset_template=inl_pset_template,
+        name="ReactorType",
+        primary_measure_type="IfcLabel",
+    )
+
+    return inl_pset_template

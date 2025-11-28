@@ -15,6 +15,7 @@ from pprint import pprint
 import ifcopenshell.api.system
 import bim2fem.ifcplus.util.geometry
 import numpy as np
+import ifcopenshell.api.pset.add_pset
 
 
 class TestCreateNuclearPowerPlantEquipment:
@@ -192,6 +193,12 @@ class TestCreateNuclearPowerPlantEquipment:
         primary_coolant_system.LongName = "Primary Coolant System"
         primary_coolant_system.PredefinedType = "HEATING"
 
+        inl_pset_template = (
+            bim2fem.ifcplus.api.nuclear.create_INL_nuclear_property_set_templte(
+                ifc4_file=ifc4_file,
+            )
+        )
+
         rpv_1 = bim2fem.ifcplus.api.nuclear.create_reactor_pressure_vessel(
             ifc4_file=ifc4_file,
             scaling_factor_for_size=1.0,
@@ -200,6 +207,7 @@ class TestCreateNuclearPowerPlantEquipment:
             reactor_coolant_system=primary_coolant_system,
             place_object_relative_to_parent=True,
         )
+
         bbox_for_rpv_1 = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
             product=rpv_1,
         )
@@ -207,6 +215,20 @@ class TestCreateNuclearPowerPlantEquipment:
         assert np.round(x_dim_for_rpv_1, 1) == 6.0
         assert np.round(y_dim_for_rpv_1, 1) == 5.0
         assert np.round(z_dim_for_rpv_1, 1) == 12.5
+
+        rpv_1_pset = ifcopenshell.api.pset.add_pset(
+            file=ifc4_file,
+            product=rpv_1,
+            name="INL_ReactorPressureVesselCommon",
+        )
+        ifcopenshell.api.pset.edit_pset(
+            file=ifc4_file,
+            pset=rpv_1_pset,
+            properties={
+                "ThermalPowerCapacity": 3500e6,  # Wth
+            },
+            pset_template=inl_pset_template,
+        )
 
         scaling_factor_based_on_reduced_thermal_capacity = (
             bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_reactor_pressure_vessel(

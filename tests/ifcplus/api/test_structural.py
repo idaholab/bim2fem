@@ -532,7 +532,7 @@ class TestStructuralCurveMembers:
 
 class TestMergeStructuralPointConnections:
 
-    def test_create_simple_structure_with_merged_nodes(
+    def test_create_simple_structure(
         self,
     ):
 
@@ -718,9 +718,7 @@ class TestMergeStructuralPointConnections:
 
         assert total_node_count == 8
 
-        output_path = str(
-            OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV_with_merged_nodes.ifc"
-        )
+        output_path = str(OUTPUT_DIR_FOR_STRUCTURAL / "simple_structure_SAV.ifc")
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,

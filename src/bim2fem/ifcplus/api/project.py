@@ -92,67 +92,178 @@ def create_ifc4_file(
         parent=model3d_context,
     )
 
-    length = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="LENGTHUNIT",
-        prefix=None,
+    # length = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="LENGTHUNIT",
+    #     prefix=None,
+    # )
+    # area = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="AREAUNIT",
+    #     prefix=None,
+    # )
+    # volume = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="VOLUMEUNIT",
+    #     prefix=None,
+    # )
+    # mass = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="MASSUNIT",
+    #     prefix="KILO",
+    # )
+    # force = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="FORCEUNIT",
+    #     prefix=None,
+    # )
+    # angle = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="PLANEANGLEUNIT",
+    #     prefix=None,
+    # )
+    # time = ifcopenshell.api.unit.add_si_unit(
+    #     file=ifc4_file,
+    #     unit_type="TIMEUNIT",
+    #     prefix=None,
+    # )
+    # mass_density = ifcopenshell.api.unit.add_derived_unit(
+    #     file=ifc4_file,
+    #     unit_type="MASSDENSITYUNIT",
+    #     userdefinedtype=None,
+    #     attributes={mass: 1, length: -3},
+    # )
+    # modulus_of_elasticity = ifcopenshell.api.unit.add_derived_unit(
+    #     file=ifc4_file,
+    #     unit_type="MODULUSOFELASTICITYUNIT",
+    #     userdefinedtype=None,
+    #     attributes={force: 1, length: -2},
+    # )
+
+    length_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="LENGTHUNIT",
+        Name="METRE",
     )
-    area = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="AREAUNIT",
-        prefix=None,
+    mass_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="MASSUNIT",
+        Name="GRAM",
+        Prefix="KILO",
     )
-    volume = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="VOLUMEUNIT",
-        prefix=None,
+    time_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="TIMEUNIT",
+        Name="SECOND",
     )
-    mass = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="MASSUNIT",
-        prefix="KILO",
+    plane_angle_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="PLANEANGLEUNIT",
+        Name="RADIAN",
     )
-    force = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="FORCEUNIT",
-        prefix=None,
+
+    area_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="AREAUNIT",
+        Name="SQUARE_METRE",
     )
-    angle = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="PLANEANGLEUNIT",
-        prefix=None,
+    volume_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="VOLUMEUNIT",
+        Name="CUBIC_METRE",
     )
-    time = ifcopenshell.api.unit.add_si_unit(
-        file=ifc4_file,
-        unit_type="TIMEUNIT",
-        prefix=None,
+    force_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="FORCEUNIT",
+        Name="NEWTON",
     )
-    mass_density = ifcopenshell.api.unit.add_derived_unit(
-        file=ifc4_file,
-        unit_type="MASSDENSITYUNIT",
-        userdefinedtype=None,
-        attributes={mass: 1, length: -3},
+    pressure_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="PRESSUREUNIT",
+        Name="PASCAL",
     )
-    modulus_of_elasticity = ifcopenshell.api.unit.add_derived_unit(
-        file=ifc4_file,
-        unit_type="MODULUSOFELASTICITYUNIT",
-        userdefinedtype=None,
-        attributes={force: 1, length: -2},
+    power_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="POWERUNIT",
+        Name="WATT",
     )
+    temperature_unit = ifc4_file.create_entity(
+        "IfcSIUnit",
+        UnitType="THERMODYNAMICTEMPERATUREUNIT",
+        Name="KELVIN",
+    )
+
+    mass_density_unit = ifc4_file.create_entity(
+        "IfcDerivedUnit",
+        Elements=[
+            ifc4_file.create_entity(
+                "IfcDerivedUnitElement",
+                Unit=mass_unit,
+                Exponent=1,
+            ),
+            ifc4_file.create_entity(
+                "IfcDerivedUnitElement",
+                Unit=length_unit,
+                Exponent=-3,
+            ),
+        ],
+        UnitType="MASSDENSITYUNIT",
+    )
+
+    modulus_unit = ifc4_file.create_entity(
+        "IfcDerivedUnit",
+        Elements=[
+            ifc4_file.create_entity(
+                "IfcDerivedUnitElement",
+                Unit=force_unit,
+                Exponent=1,
+            ),
+            ifc4_file.create_entity(
+                "IfcDerivedUnitElement",
+                Unit=length_unit,
+                Exponent=-2,
+            ),
+        ],
+        UnitType="MODULUSOFELASTICITYUNIT",
+    )
+
+    thermal_expansion_unit = ifc4_file.create_entity(
+        "IfcDerivedUnit",
+        Elements=[
+            ifc4_file.create_entity(
+                "IfcDerivedUnitElement",
+                Unit=temperature_unit,
+                Exponent=-1,
+            )
+        ],
+        UnitType="THERMALEXPANSIONCOEFFICIENTUNIT",
+    )
+
+    all_units = [
+        length_unit,
+        mass_unit,
+        time_unit,
+        plane_angle_unit,
+        area_unit,
+        volume_unit,
+        force_unit,
+        pressure_unit,
+        power_unit,
+        temperature_unit,
+        mass_density_unit,
+        modulus_unit,
+        thermal_expansion_unit,
+    ]
+
+    # # Create unit assignment
+    # unit_assignment = model.create_entity("IfcUnitAssignment", Units=all_units)
+
+    # # Assign to project
+    # project.UnitsInContext = unit_assignment
 
     ifcopenshell.api.unit.assign_unit(
         file=ifc4_file,
-        units=[
-            length,
-            area,
-            volume,
-            mass,
-            force,
-            angle,
-            time,
-            mass_density,
-            modulus_of_elasticity,
-        ],
+        units=all_units,
     )
 
     return ifc4_file
@@ -283,6 +394,9 @@ def annotate_ifc_spf(
             #     f.write(line)
             elif "IFCRELASSIGNSTOPRODUCT(" in line:
                 f.write("\n/* Product Assignment */\n")
+                f.write(line)
+            elif "IFCPROPERTYSETTEMPLATE(" in line:
+                f.write("\n/* Property Set Template */\n")
                 f.write(line)
 
             else:
