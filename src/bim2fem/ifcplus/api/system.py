@@ -41,12 +41,15 @@ def create_distribution_port(
     flow_direction: FLOW_DIRECTION,
     predefined_type: DISTRIBUTION_PORT_PREDEFINED_TYPE,
     distribution_system: ifcopenshell.entity_instance | None = None,
+    name: str | None = None,
 ) -> ifcopenshell.entity_instance:
 
     distribution_port = ifcopenshell.api.system.add_port(
         file=ifc4_file,
         element=distribution_element,
     )
+
+    distribution_port.Name = name
 
     distribution_port.FlowDirection = flow_direction
 

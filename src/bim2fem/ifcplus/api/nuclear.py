@@ -21,6 +21,7 @@ import numpy as np
 import ifcopenshell.api.system
 import bim2fem.ifcplus.api.system
 import ifcopenshell.api.pset_template
+import bim2fem.ifcplus.api.profile
 
 
 def create_nuclear_reactor_containment_structure(
@@ -316,8 +317,6 @@ def create_reactor_box(
 def create_reactor_pressure_vessel(
     ifc4_file: ifcopenshell.file,
     scaling_factor_for_size: float = 1.0,
-    # diameter: float = 5.0,
-    # overall_height: float = 12.5,
     reactor_pressure_vessel: ifcopenshell.entity_instance | None = None,
     name: str | None = None,
     parent: ifcopenshell.entity_instance | None = None,
@@ -336,22 +335,18 @@ def create_reactor_pressure_vessel(
         )
         reactor_pressure_vessel.ObjectType = "REACTOR_PRESSURE_VESSEL"
 
-    outlet_port_diameter = 1.07 * scaling_factor_for_size
-
-    inlet_port_diameter = 0.76 * scaling_factor_for_size
-
-    diameter = 5.0 * scaling_factor_for_size
-
+    rpv_outlet_nozzle_diameter = 1.07 * scaling_factor_for_size
+    rpv_inlet_nozzle_diameter = 0.76 * scaling_factor_for_size
+    body_diameter = 5.0 * scaling_factor_for_size
     overall_height = 12.5 * scaling_factor_for_size
 
-    cylindrical_body_height = overall_height - diameter / 2.0 - diameter / 2.0
-
+    cylindrical_body_height = overall_height - body_diameter / 2.0 - body_diameter / 2.0
     inlet_port_protrusion_length = 0.5
 
     point_at_center_of_bottom_sphere = (
-        inlet_port_protrusion_length + diameter / 2.0,
-        diameter / 2.0,
-        diameter / 2.0,
+        inlet_port_protrusion_length + body_diameter / 2.0,
+        body_diameter / 2.0,
+        body_diameter / 2.0,
     )
 
     point_at_center_of_top_sphere = tuple(
@@ -364,13 +359,13 @@ def create_reactor_pressure_vessel(
     bottom_sphere = bim2fem.ifcplus.api.geometry.add_sphere(
         ifc4_file=ifc4_file,
         repositioned_origin=point_at_center_of_bottom_sphere,
-        radius=diameter / 2.0,
+        radius=body_diameter / 2.0,
     )
 
     top_sphere = bim2fem.ifcplus.api.geometry.add_sphere(
         ifc4_file=ifc4_file,
         repositioned_origin=point_at_center_of_top_sphere,
-        radius=diameter / 2.0,
+        radius=body_diameter / 2.0,
     )
 
     both_spheres_combined = ifcopenshell.api.geometry.add_boolean(
@@ -383,7 +378,7 @@ def create_reactor_pressure_vessel(
     cylinder_for_subtraction = (
         bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
-            radius=diameter / 2.0,
+            radius=body_diameter / 2.0,
             extrusion_depth=cylindrical_body_height,
             repositioned_origin=point_at_center_of_bottom_sphere,
         )
@@ -399,7 +394,7 @@ def create_reactor_pressure_vessel(
     cylinder_for_body = (
         bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
-            radius=diameter / 2.0,
+            radius=body_diameter / 2.0,
             extrusion_depth=cylindrical_body_height,
             repositioned_origin=point_at_center_of_bottom_sphere,
         )
@@ -418,8 +413,8 @@ def create_reactor_pressure_vessel(
         (
             np.array(point_at_center_of_bottom_sphere)
             - np.array([1.0, 0.0, 0.0])
-            * (diameter / 2.0 + inlet_port_protrusion_length)
-            + np.array([0.0, 0.0, 1.0]) * (inlet_elevation - diameter / 2.0)
+            * (body_diameter / 2.0 + inlet_port_protrusion_length)
+            + np.array([0.0, 0.0, 1.0]) * (inlet_elevation - body_diameter / 2.0)
         ).tolist()
     )
 
@@ -430,8 +425,8 @@ def create_reactor_pressure_vessel(
     cylinder_for_inlet_port = (
         bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
-            radius=inlet_port_diameter / 2.0,
-            extrusion_depth=inlet_port_protrusion_length + diameter / 4.0,
+            radius=rpv_inlet_nozzle_diameter / 2.0,
+            extrusion_depth=inlet_port_protrusion_length + body_diameter / 4.0,
             repositioned_origin=inlet_port_origin,
             repositioned_z_axis=inlet_port_z_axis,
             repositioned_x_axis=inlet_port_x_axis,
@@ -444,8 +439,8 @@ def create_reactor_pressure_vessel(
         (
             np.array(point_at_center_of_bottom_sphere)
             + np.array([1.0, 0.0, 0.0])
-            * (diameter / 2.0 + inlet_port_protrusion_length)
-            + np.array([0.0, 0.0, 1.0]) * (outlet_elevation - diameter / 2.0)
+            * (body_diameter / 2.0 + inlet_port_protrusion_length)
+            + np.array([0.0, 0.0, 1.0]) * (outlet_elevation - body_diameter / 2.0)
         ).tolist()
     )
 
@@ -456,8 +451,8 @@ def create_reactor_pressure_vessel(
     cylinder_for_outlet_port = (
         bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
             ifc4_file=ifc4_file,
-            radius=outlet_port_diameter / 2.0,
-            extrusion_depth=inlet_port_protrusion_length + diameter / 4.0,
+            radius=rpv_outlet_nozzle_diameter / 2.0,
+            extrusion_depth=inlet_port_protrusion_length + body_diameter / 4.0,
             repositioned_origin=outlet_port_origin,
             repositioned_z_axis=tuple((np.array(outlet_port_z_axis) * -1).tolist()),
             repositioned_x_axis=tuple((np.array(outlet_port_x_axis) * -1).tolist()),
@@ -526,8 +521,9 @@ def create_reactor_pressure_vessel(
         port_x_axis_in_distribution_element_coordinates=inlet_port_x_axis,
         distribution_element=reactor_pressure_vessel,
         flow_direction="SINK",
-        predefined_type="DUCT",
+        predefined_type="PIPE",
         distribution_system=reactor_coolant_system,
+        name="RPV Inlet",
     )
 
     bim2fem.ifcplus.api.system.create_distribution_port(
@@ -537,8 +533,9 @@ def create_reactor_pressure_vessel(
         port_x_axis_in_distribution_element_coordinates=outlet_port_x_axis,
         distribution_element=reactor_pressure_vessel,
         flow_direction="SOURCE",
-        predefined_type="DUCT",
+        predefined_type="PIPE",
         distribution_system=reactor_coolant_system,
+        name="RPV Outlet",
     )
 
     return reactor_pressure_vessel
@@ -578,3 +575,401 @@ def create_INL_nuclear_property_set_templte(
     )
 
     return inl_pset_template
+
+
+def create_steam_generator(
+    ifc4_file: ifcopenshell.file,
+    scaling_factor_for_size: float = 1.0,
+    steam_generator: ifcopenshell.entity_instance | None = None,
+    name: str | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
+    reactor_coolant_system: ifcopenshell.entity_instance | None = None,
+    secondary_coolant_system: ifcopenshell.entity_instance | None = None,
+    place_object_relative_to_parent: bool = False,
+) -> ifcopenshell.entity_instance:
+    """Create reactor pressure vessel with default dimensions roughly corresponding to
+    3500 MWth thermal capacity."""
+
+    if steam_generator is None:
+        steam_generator = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcHeatExchanger",
+            name=name,
+            predefined_type="USERDEFINED",
+        )
+        steam_generator.ObjectType = "STEAM_GENERATOR"
+
+    diameter_of_primary_inlet_nozzle = 1.07 * scaling_factor_for_size
+    diameter_primary_outlet_nozzle = 0.76 * scaling_factor_for_size
+
+    diameter_of_steam_outlet = 0.6 * scaling_factor_for_size
+    diameter_of_feedwater_inlet = 0.4 * scaling_factor_for_size
+
+    diameter_of_lower_section = 2.0 * scaling_factor_for_size
+    diameter_of_upper_section = 3.5 * scaling_factor_for_size
+
+    height_of_lower_section = 4.0 * scaling_factor_for_size
+    height_of_transition_section = 3.0 * scaling_factor_for_size
+    height_of_upper_section = 14.0 * scaling_factor_for_size
+
+    radius_of_lower_section = diameter_of_lower_section / 2.0
+    radius_of_upper_section = diameter_of_upper_section / 2.0
+
+    protrusion_length_of_primary_inlet_nozzle = 0.5
+
+    location_of_bottom_of_sg = (
+        max(
+            [
+                radius_of_upper_section,
+                radius_of_lower_section + protrusion_length_of_primary_inlet_nozzle,
+            ]
+        ),
+        0.0 + radius_of_upper_section,
+        0.0,
+    )
+
+    location_of_center_of_bottom_sphere = tuple(
+        (
+            np.array(location_of_bottom_of_sg)
+            + np.array([0.0, 0.0, 1.0]) * radius_of_lower_section
+        ).tolist()
+    )
+    sphere_of_bottom = bim2fem.ifcplus.api.geometry.add_sphere(
+        ifc4_file=ifc4_file,
+        radius=radius_of_lower_section,
+        repositioned_origin=location_of_center_of_bottom_sphere,
+    )
+
+    cylinder_for_lower_section_for_subtracting = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_lower_section,
+            extrusion_depth=height_of_lower_section - radius_of_lower_section,
+            repositioned_origin=location_of_center_of_bottom_sphere,
+        )
+    )
+
+    hemisphere_of_bottom = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=sphere_of_bottom,
+        second_items=[cylinder_for_lower_section_for_subtracting],
+        operator="DIFFERENCE",
+    )[-1]
+
+    cylinder_for_lower_section_for_adding = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_lower_section,
+            extrusion_depth=height_of_lower_section - radius_of_lower_section,
+            repositioned_origin=location_of_center_of_bottom_sphere,
+        )
+    )
+
+    origin_of_primary_inlet_nozzle = tuple(
+        (
+            np.array(location_of_bottom_of_sg)
+            + np.array([0.0, 0.0, 1.0]) * 1 / 2 * height_of_lower_section
+            - np.array([1.0, 0.0, 0.0])
+            * (radius_of_lower_section + protrusion_length_of_primary_inlet_nozzle)
+        ).tolist()
+    )
+    radius_of_primary_inlet_nozzle = diameter_of_primary_inlet_nozzle / 2.0
+    z_axis_of_primary_inlet_nozzle = (1.0, 0.0, 0.0)
+    x_axis_of_primary_inlet_nozzle = (0.0, 1.0, 0.0)
+    cylinder_for_primary_inlet_nozzle = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_primary_inlet_nozzle,
+            extrusion_depth=protrusion_length_of_primary_inlet_nozzle
+            + 1 / 4 * radius_of_lower_section,
+            repositioned_origin=origin_of_primary_inlet_nozzle,
+            repositioned_z_axis=z_axis_of_primary_inlet_nozzle,
+            repositioned_x_axis=x_axis_of_primary_inlet_nozzle,
+        )
+    )
+
+    protrusion_length_of_primary_outlet_nozzle = 0.5
+    origin_of_primary_outlet_nozzle = tuple(
+        (
+            np.array(location_of_bottom_of_sg)
+            + np.array([0.0, 0.0, 1.0]) * 1 / 2 * height_of_lower_section
+            + np.array([1.0, 0.0, 0.0])
+            * (radius_of_lower_section + protrusion_length_of_primary_outlet_nozzle)
+        ).tolist()
+    )
+    radius_of_primary_outlet_nozzle = diameter_primary_outlet_nozzle / 2.0
+    z_axis_of_primary_outlet_nozzle = (1.0, 0.0, 0.0)
+    x_axis_of_primary_outlet_nozzle = (0.0, 1.0, 0.0)
+    neg_z_axis_of_primary_outlet_nozzle = tuple(
+        (np.array(z_axis_of_primary_outlet_nozzle) * -1).tolist()
+    )
+    neg_x_axis_of_primary_outlet_nozzle = tuple(
+        (np.array(x_axis_of_primary_outlet_nozzle) * -1).tolist()
+    )
+    cylinder_for_primary_outlet_nozzle = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_primary_outlet_nozzle,
+            extrusion_depth=protrusion_length_of_primary_outlet_nozzle
+            + 1 / 4 * radius_of_lower_section,
+            repositioned_origin=origin_of_primary_outlet_nozzle,
+            repositioned_z_axis=neg_z_axis_of_primary_outlet_nozzle,
+            repositioned_x_axis=neg_x_axis_of_primary_outlet_nozzle,
+        )
+    )
+
+    location_of_bottom_of_transition_section = tuple(
+        (
+            np.array(location_of_bottom_of_sg)
+            + np.array([0.0, 0.0, 1.0]) * height_of_lower_section
+        ).tolist()
+    )
+    cylinder_tapered_for_transition_section = (
+        bim2fem.ifcplus.api.geometry.add_extruded_area_solid_tapered(
+            ifc4_file=ifc4_file,
+            swept_area=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+                ifc4_file=ifc4_file,
+                profile_class="IfcCircleProfileDef",
+                dimensions=[radius_of_lower_section],
+            ),
+            end_swept_area=bim2fem.ifcplus.api.profile.add_parameterized_profile(
+                ifc4_file=ifc4_file,
+                profile_class="IfcCircleProfileDef",
+                dimensions=[radius_of_upper_section],
+            ),
+            depth=height_of_transition_section,
+            repositioned_origin=location_of_bottom_of_transition_section,
+        )
+    )
+
+    location_of_center_of_top_sphere = tuple(
+        (
+            np.array(location_of_bottom_of_transition_section)
+            + np.array([0.0, 0.0, 1.0])
+            * (
+                height_of_transition_section
+                + height_of_upper_section
+                - radius_of_upper_section
+            )
+        ).tolist()
+    )
+    sphere_of_top = bim2fem.ifcplus.api.geometry.add_sphere(
+        ifc4_file=ifc4_file,
+        radius=radius_of_upper_section,
+        repositioned_origin=location_of_center_of_top_sphere,
+    )
+
+    location_of_bottom_of_upper_section = tuple(
+        (
+            np.array(location_of_bottom_of_transition_section)
+            + np.array([0.0, 0.0, 1.0])
+            * (height_of_transition_section - height_of_transition_section)
+        ).tolist()
+    )
+    cylinder_for_upper_section_for_subtracting = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_upper_section,
+            extrusion_depth=height_of_upper_section - radius_of_upper_section,
+            repositioned_origin=location_of_bottom_of_upper_section,
+        )
+    )
+
+    hemisphere_for_top = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=sphere_of_top,
+        second_items=[cylinder_for_upper_section_for_subtracting],
+        operator="DIFFERENCE",
+    )[-1]
+
+    cylinder_for_upper_section_for_adding = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_upper_section,
+            extrusion_depth=height_of_upper_section - radius_of_upper_section,
+            repositioned_origin=location_of_bottom_of_upper_section,
+        )
+    )
+
+    protrusion_length_of_steam_outlet = 0.5
+    location_of_top_of_upper_section = tuple(
+        (
+            np.array(location_of_bottom_of_sg)
+            + np.array([0.0, 0.0, 1.0])
+            * (
+                height_of_lower_section
+                + height_of_transition_section
+                + height_of_upper_section
+            )
+        ).tolist()
+    )
+    origin_of_steam_outlet = tuple(
+        (
+            np.array(location_of_top_of_upper_section)
+            + np.array([0.0, 0.0, 1.0]) * protrusion_length_of_steam_outlet
+        ).tolist()
+    )
+    radius_of_steam_outlet = diameter_of_steam_outlet / 2.0
+    z_axis_of_steam_outlet = (0.0, 0.0, 1.0)
+    x_axis_of_steam_outlet = (1.0, 0.0, 0.0)
+    length_of_cylinder_for_steam_outlet = (
+        radius_of_upper_section * 1 / 2 + protrusion_length_of_steam_outlet
+    )
+    origin_of_cylinder_for_steam_outlet = tuple(
+        (
+            np.array(origin_of_steam_outlet)
+            - np.array([0.0, 0.0, 1.0]) * length_of_cylinder_for_steam_outlet
+        ).tolist()
+    )
+    cylinder_for_steam_outlet = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_steam_outlet,
+            extrusion_depth=length_of_cylinder_for_steam_outlet,
+            repositioned_origin=origin_of_cylinder_for_steam_outlet,
+            repositioned_z_axis=z_axis_of_steam_outlet,
+            repositioned_x_axis=x_axis_of_steam_outlet,
+        )
+    )
+
+    protrusion_length_of_feedwater_inlet = 0.3
+    total_height_of_main_body = (
+        height_of_lower_section + height_of_transition_section + height_of_upper_section
+    )
+    height_of_feedwater_inlet = 10 / 21 * total_height_of_main_body
+    origin_of_feedwater_inlet = tuple(
+        (
+            np.array(location_of_bottom_of_sg)
+            + np.array([0.0, 0.0, 1.0]) * height_of_feedwater_inlet
+            + np.array([1.0, 0.0, 0.0])
+            * (radius_of_upper_section + protrusion_length_of_feedwater_inlet)
+        ).tolist()
+    )
+    radius_of_feedwater_inlet = diameter_of_feedwater_inlet / 2.0
+    z_axis_of_feedwater_inlet = (-1.0, 0.0, 0.0)
+    x_axis_of_feedwater_inlet = (0.0, -1.0, 0.0)
+    length_of_cylinder_for_feedwater_inlet = (
+        radius_of_upper_section * 1 / 2 + protrusion_length_of_feedwater_inlet
+    )
+    origin_of_cylinder_for_feedwater_inlet = origin_of_feedwater_inlet
+    cylinder_for_feedwater_inlet = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_feedwater_inlet,
+            extrusion_depth=length_of_cylinder_for_feedwater_inlet,
+            repositioned_origin=origin_of_cylinder_for_feedwater_inlet,
+            repositioned_z_axis=z_axis_of_feedwater_inlet,
+            repositioned_x_axis=x_axis_of_feedwater_inlet,
+        )
+    )
+
+    complete_steam_generator_body = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=hemisphere_of_bottom,
+        second_items=[
+            cylinder_for_lower_section_for_adding,
+            cylinder_tapered_for_transition_section,
+            cylinder_for_upper_section_for_adding,
+            hemisphere_for_top,
+            cylinder_for_primary_inlet_nozzle,
+            cylinder_for_primary_outlet_nozzle,
+            cylinder_for_steam_outlet,
+            cylinder_for_feedwater_inlet,
+        ],
+        operator="UNION",
+    )[-1]
+
+    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        boolean_result_or_primitive=complete_steam_generator_body,
+    )
+
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcShapeRepresentation",
+        representation_identifier="Body",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
+        items=[csg_solid],
+    )
+
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=steam_generator,
+        representation=shape_representation,
+    )
+
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[steam_generator],
+            relating_structure=parent,
+        )
+
+    bim2fem.ifcplus.api.placement.edit_object_placement(
+        product=steam_generator,
+        repositioned_origin=(0.0, 0.0, 0.0),
+        repositioned_z_axis=(0.0, 0.0, 1.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
+        place_object_relative_to_parent=place_object_relative_to_parent,
+    )
+
+    if isinstance(reactor_coolant_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[steam_generator],
+            system=reactor_coolant_system,
+        )
+
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=origin_of_primary_inlet_nozzle,
+        port_z_axis_in_distribution_element_coordinates=z_axis_of_primary_inlet_nozzle,
+        port_x_axis_in_distribution_element_coordinates=x_axis_of_primary_inlet_nozzle,
+        distribution_element=steam_generator,
+        flow_direction="SINK",
+        predefined_type="PIPE",
+        distribution_system=reactor_coolant_system,
+        name="SG Primary Inlet Nozzle",
+    )
+
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=origin_of_primary_outlet_nozzle,
+        port_z_axis_in_distribution_element_coordinates=z_axis_of_primary_outlet_nozzle,
+        port_x_axis_in_distribution_element_coordinates=x_axis_of_primary_outlet_nozzle,
+        distribution_element=steam_generator,
+        flow_direction="SOURCE",
+        predefined_type="PIPE",
+        distribution_system=reactor_coolant_system,
+        name="SG Primary Outlet Nozzle",
+    )
+
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=origin_of_steam_outlet,
+        port_z_axis_in_distribution_element_coordinates=z_axis_of_steam_outlet,
+        port_x_axis_in_distribution_element_coordinates=x_axis_of_steam_outlet,
+        distribution_element=steam_generator,
+        flow_direction="SOURCE",
+        predefined_type="PIPE",
+        distribution_system=secondary_coolant_system,
+        name="SG Steam Outlet",
+    )
+
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=origin_of_feedwater_inlet,
+        port_z_axis_in_distribution_element_coordinates=z_axis_of_feedwater_inlet,
+        port_x_axis_in_distribution_element_coordinates=x_axis_of_feedwater_inlet,
+        distribution_element=steam_generator,
+        flow_direction="SINK",
+        predefined_type="PIPE",
+        distribution_system=secondary_coolant_system,
+        name="SG Feedwater Inlet",
+    )
+
+    return steam_generator
