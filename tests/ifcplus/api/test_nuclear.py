@@ -13,9 +13,8 @@ from typing import cast
 import ifcopenshell
 from pprint import pprint
 import ifcopenshell.api.system
-import bim2fem.ifcplus.util.geometry
-import numpy as np
 import ifcopenshell.api.pset.add_pset
+import pytest
 
 
 class TestCreateNuclearPowerPlantEquipment:
@@ -161,141 +160,10 @@ class TestCreateNuclearPowerPlantEquipment:
         pprint(logger.statements)
         assert len(logger.statements) == 0
 
+    @pytest.mark.parametrize("thermal_power_capacity", [3500e6, 500e6])
     def test_create_reactor_pressure_vessel(
         self,
-    ):
-
-        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
-            model_view_definition="ReferenceView_V1.2",
-            precision=1e-4,
-        )
-
-        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
-
-        site = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcSite",
-            name="Site-01",
-        )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
-            products=[site],
-            relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
-        )
-
-        inl_pset_template = (
-            bim2fem.ifcplus.api.nuclear.create_INL_nuclear_property_set_templte(
-                ifc4_file=ifc4_file,
-            )
-        )
-
-        rcs_1 = ifcopenshell.api.system.add_system(file=ifc4_file)
-        rcs_1.Name = "RCS #1"
-        rcs_1.LongName = "Reactor Coolant System #1"
-        rcs_1.PredefinedType = "HEATING"
-
-        thermal_power_capacity_of_rpv_1 = 3500e6
-        scaling_factor_for_rpv_1 = (
-            bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_steam_generator(
-                thermal_capacity=thermal_power_capacity_of_rpv_1  # Wth
-            )
-        )
-        rpv_1 = bim2fem.ifcplus.api.nuclear.create_reactor_pressure_vessel(
-            ifc4_file=ifc4_file,
-            scaling_factor_for_size=scaling_factor_for_rpv_1,
-            name="Reactor Pressure Vessel #1",
-            parent=site,
-            reactor_coolant_system=rcs_1,
-            place_object_relative_to_parent=True,
-        )
-
-        bbox_for_rpv_1 = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
-            product=rpv_1,
-        )
-        x_dim_for_rpv_1, y_dim_for_rpv_1, z_dim_for_rpv_1 = bbox_for_rpv_1.dimensions
-        assert np.round(x_dim_for_rpv_1, 1) == 6.0
-        assert np.round(y_dim_for_rpv_1, 1) == 5.0
-        assert np.round(z_dim_for_rpv_1, 1) == 12.5
-
-        rpv_1_pset = ifcopenshell.api.pset.add_pset(
-            file=ifc4_file,
-            product=rpv_1,
-            name="INL_ReactorPressureVesselCommon",
-        )
-        ifcopenshell.api.pset.edit_pset(
-            file=ifc4_file,
-            pset=rpv_1_pset,
-            properties={
-                "ThermalPowerCapacity": thermal_power_capacity_of_rpv_1,  # Wth
-            },
-            pset_template=inl_pset_template,
-        )
-
-        rcs_2 = ifcopenshell.api.system.add_system(file=ifc4_file)
-        rcs_2.Name = "RCS #2"
-        rcs_2.LongName = "Reactor Coolant System #2"
-        rcs_2.PredefinedType = "HEATING"
-
-        thermal_power_capacity_of_rpv_2 = 500e6
-        scaling_factor_for_rpv_2 = (
-            bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_reactor_pressure_vessel(
-                thermal_capacity=thermal_power_capacity_of_rpv_2,  # Wth
-            )
-        )
-        rpv_2 = bim2fem.ifcplus.api.nuclear.create_reactor_pressure_vessel(
-            ifc4_file=ifc4_file,
-            scaling_factor_for_size=scaling_factor_for_rpv_2,
-            name="Reactor Pressure Vessel #2",
-            parent=site,
-            reactor_coolant_system=rcs_2,
-            place_object_relative_to_parent=True,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=rpv_2,
-            repositioned_origin=(15.0, 0.0, 0.0),
-            place_object_relative_to_parent=True,
-        )
-        bbox_for_rpv_2 = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
-            product=rpv_2,
-        )
-        x_dim_for_rpv_2, y_dim_for_rpv_2, z_dim_for_rpv_2 = bbox_for_rpv_2.dimensions
-        assert np.round(x_dim_for_rpv_2, 1) == 3.6
-        assert np.round(y_dim_for_rpv_2, 1) == 2.6
-        assert np.round(z_dim_for_rpv_2, 1) == 6.5
-
-        rpv_2_pset = ifcopenshell.api.pset.add_pset(
-            file=ifc4_file,
-            product=rpv_2,
-            name="INL_ReactorPressureVesselCommon",
-        )
-        ifcopenshell.api.pset.edit_pset(
-            file=ifc4_file,
-            pset=rpv_2_pset,
-            properties={
-                "ThermalPowerCapacity": thermal_power_capacity_of_rpv_2,  # Wth
-            },
-            pset_template=inl_pset_template,
-        )
-
-        output_path = str(OUTPUT_DIR_FOR_NUCLEAR / "reactor_pressure_vessels.ifc")
-        bim2fem.ifcplus.api.project.write_to_ifc_spf(
-            ifc4_file=ifc4_file,
-            file_path=output_path,
-            add_annotations=True,
-        )
-
-        logger = ifcopenshell.validate.json_logger()
-        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
-        pprint(logger.statements)
-        assert len(logger.statements) == 0
-
-    def test_create_steam_generator(
-        self,
+        thermal_power_capacity,
     ):
 
         ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
@@ -332,98 +200,130 @@ class TestCreateNuclearPowerPlantEquipment:
         rcs.LongName = "Reactor Coolant System"
         rcs.PredefinedType = "HEATING"
 
-        scs_1 = ifcopenshell.api.system.add_system(file=ifc4_file)
-        scs_1.Name = "SCS #1"
-        scs_1.LongName = "Secondary Coolant System #1"
-        scs_1.PredefinedType = "USERDEFINED"
-        scs_1.ObjectType = "COOLING"
-
-        thermal_power_capacity_of_sg_1 = 3500e6
-        scaling_factor_for_sg_1 = (
+        scaling_factor = (
             bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_steam_generator(
-                thermal_capacity=thermal_power_capacity_of_sg_1  # Wth
+                thermal_capacity=thermal_power_capacity
             )
         )
-        sg_1 = bim2fem.ifcplus.api.nuclear.create_steam_generator(
+
+        rpv = bim2fem.ifcplus.api.nuclear.create_reactor_pressure_vessel(
             ifc4_file=ifc4_file,
-            scaling_factor_for_size=scaling_factor_for_sg_1,
-            name="Steam Generator #1",
+            scaling_factor_for_size=scaling_factor,
             parent=site,
             reactor_coolant_system=rcs,
-            secondary_coolant_system=scs_1,
             place_object_relative_to_parent=True,
         )
-        bbox_for_sg_1 = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
-            product=sg_1,
-        )
-        x_dim_for_sg_1, y_dim_for_sg_1, z_dim_for_sg_1 = bbox_for_sg_1.dimensions
-        assert np.round(x_dim_for_sg_1, 1) == 3.8
-        assert np.round(y_dim_for_sg_1, 1) == 3.5
-        assert np.round(z_dim_for_sg_1, 1) == 21.5
+        rpv.Name = "RPV-1"
+        rpv.Description = "Reactor Pressure Vessel Unit 1"
 
-        sg_1_pset = ifcopenshell.api.pset.add_pset(
+        rpv_pset = ifcopenshell.api.pset.add_pset(
             file=ifc4_file,
-            product=sg_1,
-            name="INL_SteamGeneratorCommon",
+            product=rpv,
+            name="INL_ReactorPressureVesselCommon",
         )
         ifcopenshell.api.pset.edit_pset(
             file=ifc4_file,
-            pset=sg_1_pset,
+            pset=rpv_pset,
             properties={
-                "ThermalPowerCapacity": thermal_power_capacity_of_sg_1,  # Wth
+                "ThermalPowerCapacity": thermal_power_capacity,  # Wth
             },
             pset_template=inl_pset_template,
         )
 
-        scs_2 = ifcopenshell.api.system.add_system(file=ifc4_file)
-        scs_2.Name = "SCS #2"
-        scs_2.LongName = "Secondary Coolant System #2"
-        scs_2.PredefinedType = "USERDEFINED"
-        scs_2.ObjectType = "COOLING"
-
-        thermal_power_capacity_of_sg_2 = 500e6
-        scaling_factor_for_sg_2 = (
-            bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_steam_generator(
-                thermal_capacity=thermal_power_capacity_of_sg_2,  # Wth
-            )
+        output_path = str(
+            OUTPUT_DIR_FOR_NUCLEAR
+            / f"reactor_pressure_vessel_{int(thermal_power_capacity * 1e-6)}_MWth.ifc"
         )
-        sg_2 = bim2fem.ifcplus.api.nuclear.create_steam_generator(
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
-            scaling_factor_for_size=scaling_factor_for_sg_2,
-            name="Steam Generator #2",
-            parent=site,
-            reactor_coolant_system=rcs,
-            secondary_coolant_system=scs_2,
-            place_object_relative_to_parent=True,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+    @pytest.mark.parametrize("thermal_power_capacity", [3500e6, 500e6])
+    def test_create_steam_generator(
+        self,
+        thermal_power_capacity,
+    ):
+
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
         )
         bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=sg_2,
-            repositioned_origin=(15.0, 0.0, 0.0),
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
             place_object_relative_to_parent=True,
         )
-        bbox_for_sg_2 = bim2fem.ifcplus.util.geometry.BoundingBox.from_ifc_product(
-            product=sg_2,
-        )
-        x_dim_for_sg_2, y_dim_for_sg_2, z_dim_for_sg_2 = bbox_for_sg_2.dimensions
-        assert np.round(x_dim_for_sg_2, 1) == 2.2
-        assert np.round(y_dim_for_sg_2, 1) == 1.8
-        assert np.round(z_dim_for_sg_2, 1) == 11.5
 
-        sg_2_pset = ifcopenshell.api.pset.add_pset(
+        inl_pset_template = (
+            bim2fem.ifcplus.api.nuclear.create_INL_nuclear_property_set_templte(
+                ifc4_file=ifc4_file,
+            )
+        )
+
+        rcs = ifcopenshell.api.system.add_system(file=ifc4_file)
+        rcs.Name = "RCS"
+        rcs.LongName = "Reactor Coolant System"
+        rcs.PredefinedType = "HEATING"
+
+        scs = ifcopenshell.api.system.add_system(file=ifc4_file)
+        scs.Name = "SCS"
+        scs.LongName = "Secondary Coolant System"
+        scs.PredefinedType = "USERDEFINED"
+        scs.ObjectType = "COOLING"
+
+        scaling_factor = (
+            bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_steam_generator(
+                thermal_capacity=thermal_power_capacity
+            )
+        )
+
+        sg = bim2fem.ifcplus.api.nuclear.create_steam_generator(
+            ifc4_file=ifc4_file,
+            scaling_factor_for_size=scaling_factor,
+            parent=site,
+            reactor_coolant_system=rcs,
+            secondary_coolant_system=scs,
+            place_object_relative_to_parent=True,
+        )
+
+        sg_pset = ifcopenshell.api.pset.add_pset(
             file=ifc4_file,
-            product=sg_2,
+            product=sg,
             name="INL_SteamGeneratorCommon",
         )
         ifcopenshell.api.pset.edit_pset(
             file=ifc4_file,
-            pset=sg_2_pset,
+            pset=sg_pset,
             properties={
-                "ThermalPowerCapacity": thermal_power_capacity_of_sg_2,  # Wth
+                "ThermalPowerCapacity": thermal_power_capacity,  # Wth
             },
             pset_template=inl_pset_template,
         )
 
-        output_path = str(OUTPUT_DIR_FOR_NUCLEAR / "steam_generators.ifc")
+        output_path = str(
+            OUTPUT_DIR_FOR_NUCLEAR
+            / f"steam_generator_{int(thermal_power_capacity * 1e-6)}_MWth.ifc"
+        )
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
             file_path=output_path,
