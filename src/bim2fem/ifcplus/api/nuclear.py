@@ -414,31 +414,18 @@ def create_reactor_pressure_vessel(
         )
     )
 
-    def rotate_vector_by_135_degrees_about_neg_z_axis(
-        vector: tuple[float, float, float],
-    ) -> tuple[float, float, float]:
-
-        angle = np.radians(135)
-
-        R = np.array(
-            [
-                [np.cos(angle), np.sin(angle), 0],
-                [-np.sin(angle), np.cos(angle), 0],
-                [0, 0, 1],
-            ]
-        )
-
-        v = np.array(vector)
-
-        v_rotated = R @ v
-
-        return tuple(v_rotated.tolist())
-
     z_axes_for_cold_leg_inlets = [
         (-1.0, 0.0, 0.0),
-        (0.0, -1.0, 0.0),
+        (1.0, -1.0, 0.0),
         (1.0, 0.0, 0.0),
+        (-1.0, 1.0, 0.0),
+    ]
+
+    z_axes_for_hot_leg_outlets = [
+        (1.0, 1.0, 0.0),
         (0.0, 1.0, 0.0),
+        (-1.0, -1.0, 0.0),
+        (0.0, -1.0, 0.0),
     ]
 
     solid_bodies_of_ports = []
@@ -447,7 +434,16 @@ def create_reactor_pressure_vessel(
     distance_from_center_of_bottom_sphere_to_port_elevation = (
         elevation_of_ports - radius_of_body
     )
-    for z_axis_for_cold_leg_inlet in z_axes_for_cold_leg_inlets:
+    for z_axis_for_cold_leg_inlet, z_axis_for_hot_leg_outlet in zip(
+        z_axes_for_cold_leg_inlets,
+        z_axes_for_hot_leg_outlets,
+    ):
+        z_axis_for_cold_leg_inlet = bim2fem.ifcplus.util.geometry.unit_normalize_vector(
+            vector=z_axis_for_cold_leg_inlet,
+        )
+        z_axis_for_hot_leg_outlet = bim2fem.ifcplus.util.geometry.unit_normalize_vector(
+            vector=z_axis_for_hot_leg_outlet,
+        )
 
         x_axis_for_cold_leg_inlet = (
             bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
@@ -488,9 +484,6 @@ def create_reactor_pressure_vessel(
             distribution_system=reactor_coolant_system,
         )
 
-        z_axis_for_hot_leg_outlet = rotate_vector_by_135_degrees_about_neg_z_axis(
-            vector=z_axis_for_cold_leg_inlet
-        )
         x_axis_for_hot_leg_outlet = (
             bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
                 vector1=z_axis_global,
