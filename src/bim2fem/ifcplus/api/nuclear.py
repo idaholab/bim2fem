@@ -622,6 +622,12 @@ def create_INL_nuclear_property_set_templte(
         name="ReactorType",
         primary_measure_type="IfcLabel",
     )
+    ifcopenshell.api.pset_template.add_prop_template(
+        file=ifc4_file,
+        pset_template=inl_pset_template,
+        name="FlowRate",
+        primary_measure_type="IfcVolumetricFlowRateMeasure",
+    )
 
     return inl_pset_template
 
@@ -728,15 +734,8 @@ def create_steam_generator(
     diameter_of_steam_outlet = 0.6 * scaling_factor_for_size
     diameter_of_feedwater_inlet = 0.4 * scaling_factor_for_size
 
-    # diameter_of_lower_section = 2.0 * scaling_factor_for_size
-    # diameter_of_upper_section = 3.5 * scaling_factor_for_size
-
     diameter_of_lower_section = 3.65 * scaling_factor_for_size
     diameter_of_upper_section = 4.78 * scaling_factor_for_size
-
-    # height_of_lower_section = 4.0 * scaling_factor_for_size
-    # height_of_transition_section = 3.0 * scaling_factor_for_size
-    # height_of_upper_section = 14.0 * scaling_factor_for_size
 
     height_of_lower_section = 11.8 * scaling_factor_for_size
     height_of_transition_section = 1.4 * scaling_factor_for_size
@@ -1085,3 +1084,183 @@ def create_steam_generator(
         )
 
     return steam_generator
+
+
+def create_reactor_coolant_pump(
+    ifc4_file: ifcopenshell.file,
+    scale_factor: float = 1.0,
+    reactor_coolant_pump: ifcopenshell.entity_instance | None = None,
+    parent: ifcopenshell.entity_instance | None = None,
+    reactor_coolant_system: ifcopenshell.entity_instance | None = None,
+    place_object_relative_to_parent: bool = False,
+) -> ifcopenshell.entity_instance:
+    """Create reactor coolant pump with default dimensions roughly corresponding to
+    5.5 m^3/s flow rate.
+    """
+
+    if reactor_coolant_pump is None:
+        reactor_coolant_pump = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcPump",
+            predefined_type="USERDEFINED",
+        )
+        reactor_coolant_pump.ObjectType = "REACTOR_COOLANT_PUMP"
+
+    height_of_lower_section = 2.4 * scale_factor
+    height_of_upper_section = 4.0 * scale_factor
+
+    diameter_of_lower_section = 2.1 * scale_factor
+    diameter_of_upper_section = 1.5 * scale_factor
+
+    diameter_of_inlet = 0.55 * scale_factor
+    diameter_of_outlet = 0.55 * scale_factor
+
+    length_of_nozzle = 0.5
+
+    radius_of_lower_section = diameter_of_lower_section / 2.0
+    radius_of_upper_section = diameter_of_upper_section / 2.0
+    radius_of_inlet = diameter_of_inlet / 2.0
+    radius_of_outlet = diameter_of_outlet / 2.0
+
+    elevation_of_outlet = 1.0
+
+    point_at_bottom_of_lower_section = (
+        radius_of_lower_section,
+        radius_of_lower_section,
+        length_of_nozzle,
+    )
+    point_at_bottom_of_upper_section = (
+        radius_of_lower_section,
+        radius_of_lower_section,
+        length_of_nozzle + height_of_lower_section,
+    )
+
+    cylinder_for_lower_section = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_lower_section,
+            extrusion_depth=height_of_lower_section,
+            repositioned_origin=point_at_bottom_of_lower_section,
+        )
+    )
+
+    cylinder_for_upper_section = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_upper_section,
+            extrusion_depth=height_of_upper_section,
+            repositioned_origin=point_at_bottom_of_upper_section,
+        )
+    )
+
+    z_axis_of_inlet = (0.0, 0.0, 1.0)
+    x_axis_of_inlet = (1.0, 0.0, 0.0)
+    origin_of_inlet = (radius_of_lower_section, radius_of_lower_section, 0.0)
+    cylinder_for_inlet = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_inlet,
+            extrusion_depth=length_of_nozzle,
+            repositioned_origin=origin_of_inlet,
+            repositioned_z_axis=z_axis_of_inlet,
+            repositioned_x_axis=x_axis_of_inlet,
+        )
+    )
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=origin_of_inlet,
+        port_z_axis_in_distribution_element_coordinates=z_axis_of_inlet,
+        port_x_axis_in_distribution_element_coordinates=x_axis_of_inlet,
+        distribution_element=reactor_coolant_pump,
+        flow_direction="SINK",
+        predefined_type="PIPE",
+        distribution_system=reactor_coolant_system,
+    )
+
+    z_axis_of_outlet = (1.0, 0.0, 0.0)
+    x_axis_of_outlet = (0.0, 1.0, 0.0)
+    origin_of_outlet = (
+        radius_of_lower_section + radius_of_lower_section + length_of_nozzle,
+        radius_of_lower_section,
+        elevation_of_outlet,
+    )
+    neg_z_axis_of_steam_outlet = tuple((np.array(z_axis_of_outlet) * -1).tolist())
+    neg_x_axis_of_steam_outlet = tuple((np.array(x_axis_of_outlet) * -1).tolist())
+    cylinder_for_outlet = (
+        bim2fem.ifcplus.api.geometry.add_cylindrical_extruded_area_solid(
+            ifc4_file=ifc4_file,
+            radius=radius_of_outlet,
+            extrusion_depth=length_of_nozzle + 1 / 2 * radius_of_lower_section,
+            repositioned_origin=origin_of_outlet,
+            repositioned_z_axis=neg_z_axis_of_steam_outlet,
+            repositioned_x_axis=neg_x_axis_of_steam_outlet,
+        )
+    )
+    bim2fem.ifcplus.api.system.create_distribution_port(
+        ifc4_file=ifc4_file,
+        port_origin_in_distribution_element_coordinates=origin_of_outlet,
+        port_z_axis_in_distribution_element_coordinates=z_axis_of_outlet,
+        port_x_axis_in_distribution_element_coordinates=x_axis_of_outlet,
+        distribution_element=reactor_coolant_pump,
+        flow_direction="SOURCE",
+        predefined_type="PIPE",
+        distribution_system=reactor_coolant_system,
+    )
+
+    complete_rcp = ifcopenshell.api.geometry.add_boolean(
+        file=ifc4_file,
+        first_item=cylinder_for_lower_section,
+        second_items=[
+            cylinder_for_upper_section,
+            cylinder_for_inlet,
+            cylinder_for_outlet,
+        ],
+        operator="UNION",
+    )[-1]
+
+    csg_solid = bim2fem.ifcplus.api.geometry.add_csg_solid(
+        boolean_result_or_primitive=complete_rcp,
+    )
+
+    shape_representation = bim2fem.ifcplus.api.geometry.add_shape_model(
+        ifc4_file=ifc4_file,
+        shape_model_class="IfcShapeRepresentation",
+        representation_identifier="Body",
+        representation_type=cast(
+            str,
+            ifcopenshell.util.representation.guess_type(items=[csg_solid]),
+        ),
+        context_type="Model",
+        target_view="MODEL_VIEW",
+        items=[csg_solid],
+    )
+
+    ifcopenshell.api.geometry.assign_representation(
+        file=ifc4_file,
+        product=reactor_coolant_pump,
+        representation=shape_representation,
+    )
+
+    if isinstance(parent, ifcopenshell.entity_instance):
+        ifcopenshell.api.spatial.assign_container(
+            file=ifc4_file,
+            products=[reactor_coolant_pump],
+            relating_structure=parent,
+        )
+
+    bim2fem.ifcplus.api.placement.edit_object_placement(
+        product=reactor_coolant_pump,
+        repositioned_origin=(0.0, 0.0, 0.0),
+        repositioned_z_axis=(0.0, 0.0, 1.0),
+        repositioned_x_axis=(1.0, 0.0, 0.0),
+        place_object_relative_to_parent=place_object_relative_to_parent,
+    )
+
+    if isinstance(reactor_coolant_system, ifcopenshell.entity_instance):
+        ifcopenshell.api.system.assign_system(
+            file=ifc4_file,
+            products=[reactor_coolant_pump],
+            system=reactor_coolant_system,
+        )
+
+    return reactor_coolant_pump

@@ -21,3 +21,14 @@ def get_scaling_factor_for_steam_generator(
     scaling_factor = (thermal_capacity / baseline_thermal_capacity) ** (1 / 3)
 
     return scaling_factor
+
+
+def get_scaling_factor_for_reactor_coolant_pump(
+    flow_rate: float = 5.5,  # m^3/s
+) -> float:
+
+    baseline_flow_rate = 5.5
+
+    scaling_factor = (flow_rate / baseline_flow_rate) ** (1 / 3)
+
+    return scaling_factor

@@ -15,6 +15,7 @@ from pprint import pprint
 import ifcopenshell.api.system
 import ifcopenshell.api.pset.add_pset
 import pytest
+import numpy as np
 
 
 class TestCreateNuclearPowerPlantEquipment:
@@ -323,6 +324,89 @@ class TestCreateNuclearPowerPlantEquipment:
         output_path = str(
             OUTPUT_DIR_FOR_NUCLEAR
             / f"steam_generator_{int(thermal_power_capacity * 1e-6)}_MWth.ifc"
+        )
+        bim2fem.ifcplus.api.project.write_to_ifc_spf(
+            ifc4_file=ifc4_file,
+            file_path=output_path,
+            add_annotations=True,
+        )
+
+        logger = ifcopenshell.validate.json_logger()
+        ifcopenshell.validate.validate(output_path, logger, express_rules=True)
+        pprint(logger.statements)
+        assert len(logger.statements) == 0
+
+    @pytest.mark.parametrize("flow_rate", [5.5, 0.79])
+    def test_create_reactor_coolant_pump(
+        self,
+        flow_rate,
+    ):
+
+        ifc4_file = bim2fem.ifcplus.api.project.create_ifc4_file(
+            model_view_definition="ReferenceView_V1.2",
+            precision=1e-4,
+        )
+
+        project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+
+        site = ifcopenshell.api.root.create_entity(
+            file=ifc4_file,
+            ifc_class="IfcSite",
+            name="Site-01",
+        )
+        ifcopenshell.api.aggregate.assign_object(
+            file=ifc4_file,
+            products=[site],
+            relating_object=project,
+        )
+        bim2fem.ifcplus.api.placement.edit_object_placement(
+            product=site,
+            repositioned_origin=(1.0, 1.0, 0.0),
+            place_object_relative_to_parent=True,
+        )
+
+        inl_pset_template = (
+            bim2fem.ifcplus.api.nuclear.create_INL_nuclear_property_set_templte(
+                ifc4_file=ifc4_file,
+            )
+        )
+
+        rcs = ifcopenshell.api.system.add_system(file=ifc4_file)
+        rcs.Name = "RCS"
+        rcs.LongName = "Reactor Coolant System"
+        rcs.PredefinedType = "HEATING"
+
+        scale_factor = (
+            bim2fem.ifcplus.util.nuclear.get_scaling_factor_for_reactor_coolant_pump(
+                flow_rate=flow_rate
+            )
+        )
+
+        rcp = bim2fem.ifcplus.api.nuclear.create_reactor_coolant_pump(
+            ifc4_file=ifc4_file,
+            scale_factor=scale_factor,
+            parent=site,
+            reactor_coolant_system=rcs,
+            place_object_relative_to_parent=True,
+        )
+
+        rcp_pset = ifcopenshell.api.pset.add_pset(
+            file=ifc4_file,
+            product=rcp,
+            name="INL_ReactorCoolantPumpCommon",
+        )
+        ifcopenshell.api.pset.edit_pset(
+            file=ifc4_file,
+            pset=rcp_pset,
+            properties={
+                "FlowRate": flow_rate,  # m^3/s
+            },
+            pset_template=inl_pset_template,
+        )
+
+        output_path = str(
+            OUTPUT_DIR_FOR_NUCLEAR
+            / f"reactor_coolant_pump_{np.round(flow_rate, 2)}_cumecs.ifc"
         )
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
             ifc4_file=ifc4_file,
