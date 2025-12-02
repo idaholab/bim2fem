@@ -421,11 +421,25 @@ def create_reactor_pressure_vessel(
         (-1.0, 1.0, 0.0),
     ]
 
+    names_for_cold_leg_inlets = [
+        "CL-A",
+        "CL-B",
+        "CL-C",
+        "CL-D",
+    ]
+
     z_axes_for_hot_leg_outlets = [
         (1.0, 1.0, 0.0),
         (0.0, 1.0, 0.0),
         (-1.0, -1.0, 0.0),
         (0.0, -1.0, 0.0),
+    ]
+
+    names_for_hot_leg_inlets = [
+        "HL-A",
+        "HL-B",
+        "HL-C",
+        "HL-D",
     ]
 
     solid_bodies_of_ports = []
@@ -434,9 +448,16 @@ def create_reactor_pressure_vessel(
     distance_from_center_of_bottom_sphere_to_port_elevation = (
         elevation_of_ports - radius_of_body
     )
-    for z_axis_for_cold_leg_inlet, z_axis_for_hot_leg_outlet in zip(
+    for (
+        z_axis_for_cold_leg_inlet,
+        z_axis_for_hot_leg_outlet,
+        name_for_cold_leg_inlet,
+        name_for_hot_leg_inlet,
+    ) in zip(
         z_axes_for_cold_leg_inlets,
         z_axes_for_hot_leg_outlets,
+        names_for_cold_leg_inlets,
+        names_for_hot_leg_inlets,
     ):
         z_axis_for_cold_leg_inlet = bim2fem.ifcplus.util.geometry.unit_normalize_vector(
             vector=z_axis_for_cold_leg_inlet,
@@ -473,7 +494,7 @@ def create_reactor_pressure_vessel(
             )
         )
         solid_bodies_of_ports.append(cylinder_for_inlet_port)
-        bim2fem.ifcplus.api.system.create_distribution_port(
+        cl_port = bim2fem.ifcplus.api.system.create_distribution_port(
             ifc4_file=ifc4_file,
             port_origin_in_distribution_element_coordinates=origin_of_cold_leg_inlet,
             port_z_axis_in_distribution_element_coordinates=z_axis_for_cold_leg_inlet,
@@ -483,6 +504,7 @@ def create_reactor_pressure_vessel(
             predefined_type="PIPE",
             distribution_system=reactor_coolant_system,
         )
+        cl_port.Name = name_for_cold_leg_inlet
 
         x_axis_for_hot_leg_outlet = (
             bim2fem.ifcplus.util.geometry.calculate_cross_product_of_two_vectors(
@@ -517,7 +539,7 @@ def create_reactor_pressure_vessel(
             )
         )
         solid_bodies_of_ports.append(cylinder_for_outlet_port)
-        bim2fem.ifcplus.api.system.create_distribution_port(
+        hl_port = bim2fem.ifcplus.api.system.create_distribution_port(
             ifc4_file=ifc4_file,
             port_origin_in_distribution_element_coordinates=origin_of_hot_leg_outlet,
             port_z_axis_in_distribution_element_coordinates=z_axis_for_hot_leg_outlet,
@@ -527,6 +549,7 @@ def create_reactor_pressure_vessel(
             predefined_type="PIPE",
             distribution_system=reactor_coolant_system,
         )
+        hl_port.Name = name_for_hot_leg_inlet
 
     complete_rpv = ifcopenshell.api.geometry.add_boolean(
         file=ifc4_file,
@@ -782,8 +805,7 @@ def create_steam_generator(
     point_at_bottom_of_upper_section = tuple(
         (
             np.array(point_at_bottom_of_transition_section)
-            + np.array([0.0, 0.0, 1.0])
-            * (height_of_transition_section - height_of_transition_section)
+            + np.array([0.0, 0.0, 1.0]) * height_of_transition_section
         ).tolist()
     )
     point_at_top_of_upper_section = tuple(
@@ -827,18 +849,19 @@ def create_steam_generator(
         )
     )
 
+    thickness = radius_of_lower_section * 0.10
     cylinder_tapered_for_transition_section = (
         bim2fem.ifcplus.api.geometry.add_extruded_area_solid_tapered(
             ifc4_file=ifc4_file,
             swept_area=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
-                profile_class="IfcCircleProfileDef",
-                dimensions=[radius_of_lower_section],
+                profile_class="IfcCircleHollowProfileDef",
+                dimensions=[radius_of_lower_section, thickness],
             ),
             end_swept_area=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
-                profile_class="IfcCircleProfileDef",
-                dimensions=[radius_of_upper_section],
+                profile_class="IfcCircleHollowProfileDef",
+                dimensions=[radius_of_upper_section, thickness],
             ),
             depth=height_of_transition_section,
             repositioned_origin=point_at_bottom_of_transition_section,
