@@ -11,7 +11,7 @@ import bim2fem.ifcplus.api.material
 import ifcopenshell.api.root
 import bim2fem.ifcplus.api.structural
 import numpy as np
-from bim2fem.ifcplus.util.geometry import TriangularMesh
+from bim2fem.core.geom_helpers import TriangularMesh
 import ifcopenshell.api.spatial
 import bim2fem.ifcplus.api.element_type
 import ifcopenshell.api.type
@@ -173,7 +173,7 @@ def convert_planar_wall_or_slab_to_structural_surface_members(
             thicknesses=[thickness],
             materials=[material],
             structural_analysis_model=structural_analysis_model,
-            corresponding_product=planar_building_element_copied_to_destination_file,
+            product_assigned_to=planar_building_element_copied_to_destination_file,
         )
         structural_items.append(structural_items)
 

@@ -279,13 +279,18 @@ def add_material_layer_set(
                 break
             if len(old_thicknesses) != len(thicknesses):
                 break
+            materials_match = True
+            thicknesses_match = True
             for old_material, material in zip(old_materials, materials):
                 if old_material != material:
+                    materials_match = False
                     break
             for old_thickness, thickness in zip(old_thicknesses, thicknesses):
                 if old_thickness != thickness:
+                    thicknesses_match = False
                     break
-            return old_material_layer_set
+            if materials_match and thicknesses_match:
+                return old_material_layer_set
 
     if name is None:
         total_thickness = float(np.round(sum(thicknesses), numeric_scale))

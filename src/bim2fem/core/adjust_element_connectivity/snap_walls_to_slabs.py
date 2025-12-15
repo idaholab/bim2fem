@@ -1,14 +1,12 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
-
 import ifcopenshell
-import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.util.structural
 import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
 import bim2fem.ifcplus.util.material
-from bim2fem.ifcplus.util.geometry import convert_3pt_ndarray_to_tuple_of_floats
+import bim2fem.core.geom_helpers
 
 
 def snap_walls_to_slabs(
@@ -87,7 +85,7 @@ def snap_walls_to_slabs(
             # )
 
             wall_and_slab_are_perpendicular, _ = (
-                bim2fem.ifcplus.util.geometry.planes_are_right_angled(
+                bim2fem.core.geom_helpers.planes_are_right_angled(
                     a1=np.array(original_coordinates_of_wall[0]),
                     b1=np.array(original_coordinates_of_wall[1]),
                     c1=np.array(original_coordinates_of_wall[2]),
@@ -111,13 +109,13 @@ def snap_walls_to_slabs(
                 ]
             )
 
-            a_min, a_max = bim2fem.ifcplus.util.geometry.aabb_from_points(
+            a_min, a_max = bim2fem.core.geom_helpers.aabb_from_points(
                 points=original_coordinates_of_wall
             )
-            b_min, b_max = bim2fem.ifcplus.util.geometry.aabb_from_points(
+            b_min, b_max = bim2fem.core.geom_helpers.aabb_from_points(
                 points=original_coordinates_of_slab
             )
-            overlap, _ = bim2fem.ifcplus.util.geometry.aabb_overlap_3d(
+            overlap, _ = bim2fem.core.geom_helpers.aabb_overlap_3d(
                 a_min=a_min,
                 a_max=a_max,
                 b_min=b_min,
@@ -138,7 +136,7 @@ def snap_walls_to_slabs(
             for slab_edge in slab_edges:
 
                 slab_edge_is_parallel_to_wall, _, _ = (
-                    bim2fem.ifcplus.util.geometry.line_parallel_to_triangle_plane(
+                    bim2fem.core.geom_helpers.line_parallel_to_triangle_plane(
                         p0=slab_edge[0],
                         p1=slab_edge[1],
                         a=original_coordinates_of_wall[0],
@@ -151,7 +149,7 @@ def snap_walls_to_slabs(
 
                 coordinates_of_slab_node = slab_edge[0]
                 projected_slab_node_coordinates, _, signed_distance, inside, _ = (
-                    bim2fem.ifcplus.util.geometry.project_point_onto_triangle_plane_and_test_inside(
+                    bim2fem.core.geom_helpers.project_point_onto_triangle_plane_and_test_inside(
                         p=np.array(coordinates_of_slab_node),
                         a=np.array(original_coordinates_of_wall[0]),
                         b=np.array(original_coordinates_of_wall[1]),
@@ -187,9 +185,7 @@ def snap_walls_to_slabs(
                 for node_that_needs_translation in nodes_that_need_translation:
                     bim2fem.ifcplus.api.structural.translate_structural_point_connection(
                         structural_point_connection=node_that_needs_translation,
-                        translation=convert_3pt_ndarray_to_tuple_of_floats(
-                            translation_for_wall
-                        ),
+                        translation=tuple(translation_for_wall.tolist()),
                     )
 
                 for connected_wall in connected_walls:

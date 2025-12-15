@@ -1,13 +1,13 @@
 # Copyright 2025, Battelle Energy Alliance, LLC All Rights Reserved
 
 import ifcopenshell
-import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.util.structural
 import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
 import bim2fem.ifcplus.util.profile
 import bim2fem.ifcplus.util.material
+import bim2fem.core.geom_helpers
 
 
 def snap_floor_beam_systems(
@@ -128,7 +128,7 @@ def snap_floor_beam_systems(
 
             # Project Beam Node onto slab and test inside
             projected_beam_node_coordinates, _, signed_distance, inside, _ = (
-                bim2fem.ifcplus.util.geometry.project_point_onto_triangle_plane_and_test_inside(
+                bim2fem.core.geom_helpers.project_point_onto_triangle_plane_and_test_inside(
                     p=np.array(beam_node_coordinates),
                     a=np.array(slab_coordinates[0]),
                     b=np.array(slab_coordinates[1]),

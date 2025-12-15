@@ -13,7 +13,7 @@ import ifcopenshell.util.representation
 import ifcopenshell.util.placement
 import numpy as np
 import bim2fem.ifcplus.util.representation
-from bim2fem.ifcplus.util.geometry import TriangularMesh
+from bim2fem.core.geom_helpers import TriangularMesh
 import bim2fem.core.convert.classify_beam_shape
 import ifcopenshell.util.unit
 import bim2fem.ifcplus.api.element_type
@@ -332,7 +332,7 @@ def convert_frame_member_to_fem_for_case_1(
             profile=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,
-            product_to_be_assigned_to=frame_member_copied_to_destination_file,
+            product_assigned_to=frame_member_copied_to_destination_file,
         )
     )
 
@@ -582,7 +582,7 @@ def convert_frame_member_to_fem_for_case_2(
             profile=profile_def,
             material=material,
             structural_analysis_model=structural_analysis_model,
-            product_to_be_assigned_to=frame_member_copied_to_destination_file,
+            product_assigned_to=frame_member_copied_to_destination_file,
         )
     )
 

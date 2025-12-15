@@ -69,22 +69,18 @@ def assign_structural_items_to_product(
     return rel
 
 
-def add_structural_analysis_model(
+def add_structural_analysis_model_v2(
     ifc4_file: ifcopenshell.file,
-    name: str | None = None,
-    predefined_type: str | None = "LOADING_3D",
 ):
     """Create IfcStructuralAnalysisModel"""
 
-    structural_analysis_model = ifcopenshell.api.root.create_entity(
-        file=ifc4_file,
-        ifc_class="IfcStructuralAnalysisModel",
-        name=name,
-        predefined_type=predefined_type,
+    structural_analysis_model = (
+        ifcopenshell.api.structural.add_structural_analysis_model(
+            file=ifc4_file,
+        )
     )
 
     shared_placement = ifc4_file.createIfcLocalPlacement()
-
     shared_placement.RelativePlacement = ifc4_file.createIfcAxis2Placement3D(
         ifc4_file.createIfcCartesianPoint((0.0, 0.0, 0.0)),
         ifc4_file.createIfcDirection((0.0, 0.0, 1.0)),
@@ -93,7 +89,10 @@ def add_structural_analysis_model(
 
     structural_analysis_model.SharedPlacement = shared_placement
 
-    project = ifc4_file.by_type(type="IfcProject", include_subtypes=False)[0]
+    project = ifc4_file.by_type(
+        type="IfcProject",
+        include_subtypes=False,
+    )[0]
 
     ifcopenshell.api.project.assign_declaration(
         file=ifc4_file,
@@ -111,9 +110,7 @@ def create_linear_structural_curve_member(
     profile: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
     structural_analysis_model: ifcopenshell.entity_instance,
-    structural_curve_member: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    product_to_be_assigned_to: ifcopenshell.entity_instance | None = None,
+    product_assigned_to: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
     """Create Linear IfcStructuralCurveMember"""
 
@@ -125,16 +122,13 @@ def create_linear_structural_curve_member(
         check_for_duplicate=True,
     )
 
-    if structural_curve_member is None:
-        structural_curve_member = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcStructuralCurveMember",
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
-        if name is None:
-            name = f"StructuralCurveMember-{structural_curve_member.id()}"
-            structural_curve_member.Name = name
+    structural_curve_member = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcStructuralCurveMember",
+        predefined_type="NOTDEFINED",
+    )
+    name = f"StructuralCurveMember-{structural_curve_member.id()}"
+    structural_curve_member.Name = name
 
     material_profile_set_usage = (
         bim2fem.ifcplus.api.material.add_material_profile_set_usage(
@@ -216,7 +210,6 @@ def create_linear_structural_curve_member(
         structural_point_connection = create_structural_point_connection(
             vertex_point=vertex_point,
             structural_analysis_model=structural_analysis_model,
-            name=None,
         )
         ifcopenshell.api.structural.add_structural_member_connection(
             file=ifc4_file,
@@ -224,11 +217,11 @@ def create_linear_structural_curve_member(
             related_structural_connection=structural_point_connection,
         )
 
-    if product_to_be_assigned_to:
+    if product_assigned_to:
         assign_structural_items_to_product(
             file=ifc4_file,
             structural_items=[structural_curve_member],
-            product=product_to_be_assigned_to,
+            product=product_assigned_to,
         )
 
     return structural_curve_member
@@ -245,9 +238,7 @@ def create_curved_structural_curve_member(
     profile: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
     structural_analysis_model: ifcopenshell.entity_instance,
-    structural_curve_member: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    product_to_be_assigned_to: ifcopenshell.entity_instance | None = None,
+    product_assigned_to: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
     """Create Curved IfcStructuralCurveMember"""
 
@@ -259,16 +250,13 @@ def create_curved_structural_curve_member(
         check_for_duplicate=True,
     )
 
-    if structural_curve_member is None:
-        structural_curve_member = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcStructuralCurveMember",
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
-        if name is None:
-            name = f"StructuralCurveMember-{structural_curve_member.id()}"
-            structural_curve_member.Name = name
+    structural_curve_member = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcStructuralCurveMember",
+        predefined_type="NOTDEFINED",
+    )
+    name = f"StructuralCurveMember-{structural_curve_member.id()}"
+    structural_curve_member.Name = name
 
     material_profile_set_usage = (
         bim2fem.ifcplus.api.material.add_material_profile_set_usage(
@@ -361,7 +349,6 @@ def create_curved_structural_curve_member(
         structural_point_connection = create_structural_point_connection(
             vertex_point=vertex_point,
             structural_analysis_model=structural_analysis_model,
-            name=None,
         )
         ifcopenshell.api.structural.add_structural_member_connection(
             file=ifc4_file,
@@ -369,11 +356,11 @@ def create_curved_structural_curve_member(
             related_structural_connection=structural_point_connection,
         )
 
-    if product_to_be_assigned_to:
+    if product_assigned_to:
         assign_structural_items_to_product(
             file=ifc4_file,
             structural_items=[structural_curve_member],
-            product=product_to_be_assigned_to,
+            product=product_assigned_to,
         )
 
     return structural_curve_member
@@ -385,9 +372,7 @@ def create_structural_surface_member(
     thicknesses: list[float],
     structural_analysis_model: ifcopenshell.entity_instance,
     inner_profiles: list[list[tuple[float, float, float]]] = [],
-    structural_surface_member: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    corresponding_product: ifcopenshell.entity_instance | None = None,
+    product_assigned_to: ifcopenshell.entity_instance | None = None,
 ) -> ifcopenshell.entity_instance:
     """Create IfcStructuralSurfaceMember"""
 
@@ -399,16 +384,13 @@ def create_structural_surface_member(
         check_for_duplicate=True,
     )
 
-    if structural_surface_member is None:
-        structural_surface_member = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcStructuralSurfaceMember",
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
-    if name is None and structural_surface_member.Name is None:
-        name = f"StructuralSurfaceMember-{structural_surface_member.id()}"
-        structural_surface_member.Name = name
+    structural_surface_member = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcStructuralSurfaceMember",
+        predefined_type="NOTDEFINED",
+    )
+    name = f"StructuralSurfaceMember-{structural_surface_member.id()}"
+    structural_surface_member.Name = name
 
     total_thickness = 0.0
     for material_layer in material_layer_set.MaterialLayers:
@@ -491,7 +473,6 @@ def create_structural_surface_member(
         structural_point_connection = create_structural_point_connection(
             vertex_point=vertex_point,
             structural_analysis_model=structural_analysis_model,
-            name=None,
         )
         ifcopenshell.api.structural.add_structural_member_connection(
             file=ifc4_file,
@@ -503,7 +484,6 @@ def create_structural_surface_member(
             structural_point_connection = create_structural_point_connection(
                 vertex_point=vertex_point,
                 structural_analysis_model=structural_analysis_model,
-                name=None,
             )
             ifcopenshell.api.structural.add_structural_member_connection(
                 file=ifc4_file,
@@ -511,11 +491,11 @@ def create_structural_surface_member(
                 related_structural_connection=structural_point_connection,
             )
 
-    if corresponding_product:
+    if product_assigned_to:
         assign_structural_items_to_product(
             file=ifc4_file,
             structural_items=[structural_surface_member],
-            product=corresponding_product,
+            product=product_assigned_to,
         )
 
     return structural_surface_member
@@ -524,7 +504,6 @@ def create_structural_surface_member(
 def create_structural_point_connection(
     vertex_point: ifcopenshell.entity_instance,
     structural_analysis_model: ifcopenshell.entity_instance,
-    name: str | None = None,
 ) -> ifcopenshell.entity_instance:
     """Create IfcStructuralPointConnection"""
 
@@ -533,11 +512,9 @@ def create_structural_point_connection(
     structural_point_connection = ifcopenshell.api.root.create_entity(
         file=ifc4_file,
         ifc_class="IfcStructuralPointConnection",
-        name=name,
     )
-    if name is None:
-        name = f"Node-{structural_point_connection.id()}"
-        structural_point_connection.Name = name
+    name = f"Node-{structural_point_connection.id()}"
+    structural_point_connection.Name = name
 
     ifcopenshell.api.structural.assign_structural_analysis_model(
         file=structural_analysis_model.file,
@@ -878,7 +855,7 @@ def divide_structural_curve_member_old(
                     profile=profile_def,
                     material=material,
                     structural_analysis_model=structural_analysis_model,
-                    product_to_be_assigned_to=product_assigned_to,
+                    product_assigned_to=product_assigned_to,
                 )
             )
 
@@ -1018,7 +995,7 @@ def divide_structural_curve_member(
                 profile=profile_def,
                 material=material,
                 structural_analysis_model=structural_analysis_model,
-                product_to_be_assigned_to=product_assigned_to,
+                product_assigned_to=product_assigned_to,
             )
         )
 
