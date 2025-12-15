@@ -13,9 +13,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 import json
 import ifcopenshell
 import bim2fem.ifcplus.api.project
-import bim2fem.core.convert_ifc_to_fem
-from bim2fem.core.snap.adjust_element_connectivity_of_building_fem import (
-    adjust_element_connectivity_of_ifc4_sav_file,
+from bim2fem.core.convert.convert_frame_structure_to_fem import (
+    convert_frame_structure_to_fem,
+)
+from bim2fem.core.adjust_element_connectivity.adjust_element_connectivity_of_frame_structure import (
+    adjust_element_connectivity_of_frame_structure,
 )
 from flask import (
     Flask,
@@ -37,8 +39,8 @@ app = Flask(
 JOB_OPTIONS = [
     # "View IFC File",
     # "Convert IFC to GLB",
-    "Convert IFC to Finite Element Model",
-    # "Adjust Element Connectivity of Finite Element Model",
+    "Convert Frame Structure to Finite Element Model",
+    "Adjust Element Connectivity of Finite Element Model",
 ]
 
 PATH_TO_INPUT_DIRECTORY = Path(__file__).parent / "input"
@@ -84,7 +86,7 @@ def index():
         elif selected_job == "Convert IFC to GLB":
             return "This feature is currently unavailable"
             # return redirect(location=url_for(endpoint="convert_to_glb"))
-        elif selected_job == "Convert IFC to Finite Element Model":
+        elif selected_job == "Convert Frame Structure to Finite Element Model":
             # return redirect(location=url_for(endpoint="convert_to_fem"))
             return "This feature is currently unavailable"
         elif selected_job == "Adjust Element Connectivity of Finite Element Model":
@@ -136,16 +138,15 @@ def convert_to_fem():
         ifc_source_file = ifcopenshell.open(input_ifc_file_path)
         assert isinstance(ifc_source_file, ifcopenshell.file)
         assert region == "Europe" or region == "UnitedStates"
-        ifc4_sav_file = bim2fem.core.convert_ifc_to_fem.convert_ifc_to_fem(
+        ifc4_sav_file = convert_frame_structure_to_fem(
             ifc4_source_file=ifc_source_file,
-            element_selection_query=element_selection_query,
             element_deselection_query=element_deselection_query,
             region=region,
         )
 
         # Adjust Element Connectivity
         if snap_option == "Yes":
-            ifc4_sav_file = adjust_element_connectivity_of_ifc4_sav_file(
+            ifc4_sav_file = adjust_element_connectivity_of_frame_structure(
                 ifc4_sav_file=ifc4_sav_file,
                 execute_snap_frame_members=True,
                 execute_snap_floor_beam_systems=True,

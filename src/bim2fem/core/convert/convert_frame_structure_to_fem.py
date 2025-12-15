@@ -17,7 +17,7 @@ from bim2fem.ifcplus import REGION
 import bim2fem.ifcplus.api.structural
 import ifcopenshell.api.root
 import ifcopenshell.api.aggregate
-import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.geometry
 
 
 def convert_frame_structure_to_fem(
@@ -44,16 +44,13 @@ def convert_frame_structure_to_fem(
         ifc_class="IfcSite",
         name="Spatial Container for Elements",
     )
-
     ifcopenshell.api.aggregate.assign_object(
         file=ifc4_destination_file,
         products=[site],
         relating_object=project,
     )
-
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=site,
-        place_object_relative_to_parent=True,
     )
 
     all_elements_from_source_file = ifcopenshell.util.selector.filter_elements(
@@ -76,7 +73,6 @@ def convert_frame_structure_to_fem(
                 elements=all_elements_from_source_file,
             )
         )
-        print("debug")
     else:
         deselected_elements_from_source_file = set()
 
@@ -117,9 +113,8 @@ def convert_frame_structure_to_fem(
     )
 
     structural_analysis_model = (
-        bim2fem.ifcplus.api.structural.add_structural_analysis_model(
+        bim2fem.ifcplus.api.structural.add_structural_analysis_model_v2(
             ifc4_file=ifc4_destination_file,
-            name=None,
         )
     )
 

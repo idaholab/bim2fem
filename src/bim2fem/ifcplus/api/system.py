@@ -2,12 +2,13 @@
 
 import ifcopenshell.api.system
 import ifcopenshell.util.system
-import bim2fem.ifcplus.api.distribution_element
 import bim2fem.ifcplus.util.geometry
 import numpy as np
-import bim2fem.ifcplus.util.system
-import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.geometry
 from typing import Literal
+import ifcopenshell.util.element
+import bim2fem.ifcplus.api.material
+import bim2fem.ifcplus.api.piping
 
 FLOW_DIRECTION = Literal[
     "SINK",
@@ -33,78 +34,76 @@ ELBOW_RADIUS_TYPE = Literal[
 
 
 def create_distribution_port(
-    ifc4_file: ifcopenshell.file,
-    port_origin_in_distribution_element_coordinates: tuple[float, float, float],
-    port_z_axis_in_distribution_element_coordinates: tuple[float, float, float],
-    port_x_axis_in_distribution_element_coordinates: tuple[float, float, float],
     distribution_element: ifcopenshell.entity_instance,
     flow_direction: FLOW_DIRECTION,
     predefined_type: DISTRIBUTION_PORT_PREDEFINED_TYPE,
-    distribution_system: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
+    distribution_system: ifcopenshell.entity_instance,
+    location: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
 ) -> ifcopenshell.entity_instance:
+
+    ifc4_file = distribution_system.file
 
     distribution_port = ifcopenshell.api.system.add_port(
         file=ifc4_file,
         element=distribution_element,
     )
-
-    distribution_port.Name = name
-
-    distribution_port.FlowDirection = flow_direction
-
-    distribution_port.PredefinedType = predefined_type
-
-    if isinstance(distribution_system, ifcopenshell.entity_instance):
-        distribution_port.SystemType = distribution_system.PredefinedType
-
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=distribution_port,
-        repositioned_origin=port_origin_in_distribution_element_coordinates,
-        repositioned_z_axis=port_z_axis_in_distribution_element_coordinates,
-        repositioned_x_axis=port_x_axis_in_distribution_element_coordinates,
-        place_object_relative_to_parent=True,
+    )
+    distribution_port.FlowDirection = flow_direction
+    distribution_port.PredefinedType = predefined_type
+    distribution_port.SystemType = distribution_system.PredefinedType
+
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=distribution_port,
+        repositioned_location=location,
+        repositioned_z_axis=z_axis,
+        repositioned_x_axis=x_axis,
+    )
+
+    distribution_port.ObjectPlacement.PlacementRelTo = (
+        distribution_element.ObjectPlacement
     )
 
     return distribution_port
 
 
 def create_pipe_run_from_polyline(
-    ifc4_file: ifcopenshell.file,
     polyline: list[tuple[float, float, float]],
-    nominal_diameter: float,
+    outer_diameter: float,
     thickness: float,
     material: ifcopenshell.entity_instance,
     distribution_system: ifcopenshell.entity_instance,
     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
     branch_name: str = "Pipe Run",
-    spatial_element: ifcopenshell.entity_instance | None = None,
-    place_objects_relative_to_parent: bool = False,
 ) -> list[ifcopenshell.entity_instance]:
     """Create a single path pipe run composed of IfcPipeSegments and
     IfcPipeFittings (Elbows)."""
+
+    ifc4_file = distribution_system.file
 
     if len(polyline) < 2:
         return []
 
     if len(polyline) == 2:
-        pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
-            ifc4_file=ifc4_file,
+        pipe_segment = bim2fem.ifcplus.api.piping.create_pipe_segment(
             start_point=polyline[0],
             end_point=polyline[1],
-            nominal_diameter=nominal_diameter,
+            outer_diameter=outer_diameter,
             thickness=thickness,
             material=material,
-            name=f"Pipe #1 of {branch_name}",
-            parent=spatial_element,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=place_objects_relative_to_parent,
         )
+        pipe_segment.Name = f"Pipe #1 of {branch_name}"
         return [pipe_segment]
 
     polyline = bim2fem.ifcplus.util.geometry.filter_out_colinear_points_from_polyline(
         polyline=polyline,
     )
+
+    nominal_diameter = outer_diameter - thickness
 
     if elbow_radius_type == "LONG":
         radius_of_curvature = 1.5 * nominal_diameter
@@ -118,49 +117,44 @@ def create_pipe_run_from_polyline(
     for index in range(len(polyline)):
 
         if index + 2 == len(polyline):
-            last_pipe_segment = (
-                bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
-                    ifc4_file=ifc4_file,
-                    start_point=pipe_segment_start_point,
-                    end_point=polyline[-1],
-                    nominal_diameter=nominal_diameter,
-                    thickness=thickness,
-                    material=material,
-                    name=f"Pipe #{[index + 1]} of {branch_name}",
-                    parent=spatial_element,
-                    distribution_system=distribution_system,
-                    place_object_relative_to_parent=place_objects_relative_to_parent,
-                )
+            last_pipe_segment = bim2fem.ifcplus.api.piping.create_pipe_segment(
+                start_point=pipe_segment_start_point,
+                end_point=polyline[-1],
+                outer_diameter=outer_diameter,
+                thickness=thickness,
+                material=material,
+                distribution_system=distribution_system,
             )
+            last_pipe_segment.Name = f"Pipe #{[index + 1]} of {branch_name}"
             piping_elements += [last_pipe_segment]
             break
 
+        p1 = polyline[index]
+        p2 = polyline[index + 1]
+        p3 = polyline[index + 2]
+        radius_of_curvature = radius_of_curvature
         horizontal_curve = (
             bim2fem.ifcplus.util.geometry.HorizontalCurve.from_3pt_polyline(
-                first_point=polyline[index],
-                second_point=polyline[index + 1],
-                third_point=polyline[index + 2],
+                first_point=p1,
+                second_point=p2,
+                third_point=p3,
                 radius_of_curvature=radius_of_curvature,
             )
         )
 
         pipe_segment_end_point = horizontal_curve.point_of_curvature
 
-        pipe_segment = bim2fem.ifcplus.api.distribution_element.create_pipe_segment(
-            ifc4_file=ifc4_file,
+        pipe_segment = bim2fem.ifcplus.api.piping.create_pipe_segment(
             start_point=pipe_segment_start_point,
             end_point=pipe_segment_end_point,
-            nominal_diameter=nominal_diameter,
+            outer_diameter=outer_diameter,
             thickness=thickness,
             material=material,
-            name=f"Pipe #{[index + 1]} of {branch_name}",
-            parent=spatial_element,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=place_objects_relative_to_parent,
         )
+        pipe_segment.Name = f"Pipe #{[index + 1]} of {branch_name}"
 
-        elbow = bim2fem.ifcplus.api.distribution_element.create_elbow(
-            ifc4_file=ifc4_file,
+        elbow = bim2fem.ifcplus.api.piping.create_elbow(
             start_point=horizontal_curve.point_of_curvature,
             end_point=horizontal_curve.point_of_tangency,
             point_defining_plane_of_arc_and_center_of_curvature_side=horizontal_curve.center_of_curvature,
@@ -168,11 +162,9 @@ def create_pipe_run_from_polyline(
             nominal_diameter=nominal_diameter,
             thickness=thickness,
             material=material,
-            name=f"Elbow #{[index + 1]} of {branch_name}",
-            parent=spatial_element,
             distribution_system=distribution_system,
-            place_object_relative_to_parent=place_objects_relative_to_parent,
         )
+        elbow.Name = f"Elbow #{[index + 1]} of {branch_name}"
 
         piping_elements += [pipe_segment, elbow]
 
@@ -210,92 +202,140 @@ def create_pipe_run_from_polyline(
     return piping_elements
 
 
-def connect_two_distribution_ports_via_pipe_run(
-    ifc4_file: ifcopenshell.file,
+def connect_two_distribution_ports_via_dumb_piping(
     source_port: ifcopenshell.entity_instance,
     sink_port: ifcopenshell.entity_instance,
-    nominal_diameter: float,
+    outer_diameter: float,
     thickness: float,
-    material: ifcopenshell.entity_instance,
+    material: ifcopenshell.entity_instance | None,
     distribution_system: ifcopenshell.entity_instance,
     elbow_radius_type: ELBOW_RADIUS_TYPE = "LONG",
     branch_name: str = "Unnamed Branch",
-    spatial_element: ifcopenshell.entity_instance | None = None,
+    polyline: list[tuple[float, float, float]] | None = None,
 ) -> list[ifcopenshell.entity_instance]:
     """Connect two IfcDistributionPorts using a pipe run formed via no
     intelligent method."""
 
-    source_port_origin = bim2fem.ifcplus.util.system.get_port_location(
-        distribution_port=source_port,
-    )
-    source_port_z_axis = bim2fem.ifcplus.util.system.get_port_z_axis(
-        distribution_port=source_port
-    )
+    ifc4_file = distribution_system.file
 
-    sink_port_origin = bim2fem.ifcplus.util.system.get_port_location(
-        distribution_port=sink_port,
-    )
-    sink_port_z_axis = bim2fem.ifcplus.util.system.get_port_z_axis(
-        distribution_port=sink_port
-    )
+    if polyline is None:
 
-    outer_diameter_of_piping = nominal_diameter + thickness
+        source_port_origin = (
+            bim2fem.ifcplus.util.geometry.get_location_in_global_coordinates(
+                product=source_port,
+            )
+        )
+        sink_port_origin = (
+            bim2fem.ifcplus.util.geometry.get_location_in_global_coordinates(
+                product=sink_port,
+            )
+        )
+        source_port_z_axis = (
+            bim2fem.ifcplus.util.geometry.get_z_axis_in_global_coordinates(
+                product=source_port,
+            )
+        )
+        sink_port_z_axis = (
+            bim2fem.ifcplus.util.geometry.get_z_axis_in_global_coordinates(
+                product=sink_port,
+            )
+        )
 
-    second_point = tuple(
-        (
-            np.array(source_port_origin)
-            + np.array(source_port_z_axis) * 1.5 * outer_diameter_of_piping
-        ).tolist()
-    )
+        direction_vector_0_to_1 = tuple(
+            (np.array(source_port_z_axis) * 1.5 * outer_diameter).tolist()
+        )
+        direction_vector_4_to_5 = tuple(
+            (np.array(sink_port_z_axis) * 1.5 * outer_diameter).tolist()
+        )
 
-    penultimate_point = tuple(
-        (
-            np.array(sink_port_origin)
-            + -1 * np.array(sink_port_z_axis) * 1.5 * outer_diameter_of_piping
-        ).tolist()
-    )
+        point_0 = source_port_origin
+        point_5 = sink_port_origin
 
-    delta_x_between_second_and_penultimate_point = (
-        np.array(penultimate_point) - np.array(second_point)
-    )[0]
+        point_1 = tuple(
+            (np.array(point_0) + np.array(direction_vector_0_to_1)).tolist()
+        )
+        point_4 = tuple(
+            (np.array(point_5) + -1 * np.array(direction_vector_4_to_5)).tolist()
+        )
 
-    delta_y_between_second_and_penultimate_point = (
-        np.array(penultimate_point) - np.array(second_point)
-    )[1]
+        point_4_minus_point_1 = tuple((np.array(point_4) - np.array(point_1)).tolist())
+        dx, dy, dz = point_4_minus_point_1
 
-    third_point = tuple(
-        (
-            np.array(second_point)
-            + np.array([delta_x_between_second_and_penultimate_point, 0.0, 0.0])
-        ).tolist()
-    )
+        direction_vector_1_to_2 = (dx, 0.0, 0.0)
+        direction_vector_2_to_3 = (0.0, dy, 0.0)
+        direction_vector_3_to_4 = (0.0, 0.0, dz)
 
-    fourth_point = tuple(
-        (
-            np.array(third_point)
-            + np.array([0.0, delta_y_between_second_and_penultimate_point, 0.0])
-        ).tolist()
-    )
+        angle_a = bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
+            vector1=direction_vector_0_to_1,
+            vector2=direction_vector_1_to_2,
+        )
+        angle_a_is_180d = np.round(abs(angle_a - np.pi), 4) == 0.0
+
+        angle_b = bim2fem.ifcplus.util.geometry.calculate_angle_between_two_vectors(
+            vector1=direction_vector_3_to_4,
+            vector2=direction_vector_4_to_5,
+        )
+        angle_b_is_180d = np.round(abs(angle_b - np.pi), 4) == 0.0
+
+        if angle_a_is_180d:
+            direction_vector_1_to_2, direction_vector_2_to_3 = (
+                direction_vector_2_to_3,
+                direction_vector_1_to_2,
+            )
+        if angle_b_is_180d:
+            direction_vector_2_to_3, direction_vector_3_to_4 = (
+                direction_vector_3_to_4,
+                direction_vector_2_to_3,
+            )
+
+        polyline = [point_0]
+        for direction_vector in [
+            direction_vector_0_to_1,
+            direction_vector_1_to_2,
+            direction_vector_2_to_3,
+            direction_vector_3_to_4,
+            direction_vector_4_to_5,
+        ]:
+            prev_point = polyline[-1]
+            new_point = tuple(
+                (np.array(prev_point) + np.array(direction_vector)).tolist()
+            )
+            polyline.append(new_point)
+        print("debug")
+
+    if material is None:
+        material = bim2fem.ifcplus.api.material.add_material_with_structural_properties(
+            ifc4_file=ifc4_file,
+            name="Galvanized Steel",
+            category="steel",
+            mass_density=7850.0,
+            young_modulus=200.0e9,
+            poisson_ratio=0.3,
+            thermal_expansion_coefficient=1.2e-6,
+            check_for_duplicate=True,
+        )
 
     piping_elements = create_pipe_run_from_polyline(
-        ifc4_file=ifc4_file,
-        polyline=[
-            source_port_origin,
-            second_point,
-            third_point,
-            fourth_point,
-            penultimate_point,
-            sink_port_origin,
-        ],
-        nominal_diameter=nominal_diameter,
+        polyline=polyline,
+        outer_diameter=outer_diameter,
         thickness=thickness,
         material=material,
         elbow_radius_type=elbow_radius_type,
         branch_name=branch_name,
-        spatial_element=spatial_element,
         distribution_system=distribution_system,
-        place_objects_relative_to_parent=False,
     )
+
+    for port in [source_port, sink_port]:
+        for rel in port.ConnectedTo or []:
+            history = rel.OwnerHistory
+            ifc4_file.remove(rel)
+            if history:
+                ifcopenshell.util.element.remove_deep2(ifc4_file, history)
+        for rel in port.ConnectedFrom or []:
+            history = rel.OwnerHistory
+            ifc4_file.remove(rel)
+            if history:
+                ifcopenshell.util.element.remove_deep2(ifc4_file, history)
 
     first_pipe_segment = piping_elements[0]
     last_pipe_segment = piping_elements[-1]

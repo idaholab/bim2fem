@@ -2,13 +2,13 @@
 
 
 import ifcopenshell
-import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.util.structural
 import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
 import bim2fem.ifcplus.util.project
 import bim2fem.ifcplus.util.profile
+import bim2fem.core.geom_helpers
 
 
 def snap_frame_members(
@@ -151,7 +151,7 @@ def divide_structural_curve_members_at_intersection_points_on_spans_with_other_m
             (
                 start_point_of_connecting_line,
                 end_point_of_connecting_line,
-            ) = bim2fem.ifcplus.util.geometry.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
+            ) = bim2fem.core.geom_helpers.calculate_endpoint_coordinates_of_shortest_line_connecting_two_lines(
                 coordinates_of_start_of_line_1=start_point_of_indivisble_member,
                 coordinates_of_end_of_line_1=end_point_of_indivisble_member,
                 coordinates_of_start_of_line_2=start_point_of_divisble_member,
@@ -424,7 +424,7 @@ def snap_sets_of_structural_curve_members_together(
                 )
 
                 # Get coordinates of VertexPoint projected onto Edge
-                projected_coordinates_of_structural_point_connection = bim2fem.ifcplus.util.geometry.calculate_coordinates_of_point_projected_onto_line(
+                projected_coordinates_of_structural_point_connection = bim2fem.core.geom_helpers.calculate_coordinates_of_point_projected_onto_line(
                     point=coordinates_of_structural_point_connection,
                     start_point_of_line=start_point_of_static_member,
                     end_point_of_line=end_point_of_static_member,

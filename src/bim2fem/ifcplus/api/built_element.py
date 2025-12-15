@@ -27,9 +27,8 @@ import ifcopenshell.api.material
 import bim2fem.ifcplus.api.element_type
 import ifcopenshell
 import ifcopenshell.api.geometry
-import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.geometry
 import ifcopenshell.api.root
-import ifcopenshell.api.spatial
 import bim2fem.ifcplus.api.geometry
 import bim2fem.ifcplus.api.material
 import ifcopenshell.util.representation
@@ -54,10 +53,6 @@ def create_linear_frame_member(
     orientation_point: tuple[float, float, float],
     profile: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
-    frame_member: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    parent: ifcopenshell.entity_instance | None = None,
-    place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """
     Add a linear, prismatic, and homogenous IfcBeam or IfcColumn or IfcMember with
@@ -83,7 +78,6 @@ def create_linear_frame_member(
     )
 
     element_type_class = frame_member_class + "Type"
-
     element_type = (
         bim2fem.ifcplus.api.element_type.add_element_type_for_material_profile_set(
             ifc_class=element_type_class,
@@ -93,13 +87,14 @@ def create_linear_frame_member(
         )
     )
 
-    if frame_member is None:
-        frame_member = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class=frame_member_class,
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
+    frame_member = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class=frame_member_class,
+        predefined_type="NOTDEFINED",
+    )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=frame_member,
+    )
 
     ifcopenshell.api.type.assign_type(
         file=ifc4_file,
@@ -161,19 +156,11 @@ def create_linear_frame_member(
         representation=shape_representation,
     )
 
-    if isinstance(parent, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[frame_member],
-            relating_structure=parent,
-        )
-
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=frame_member,
-        repositioned_origin=start_point,
+        repositioned_location=start_point,
         repositioned_z_axis=z_axis,
         repositioned_x_axis=x_axis,
-        place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
     return frame_member
@@ -190,10 +177,6 @@ def create_curved_frame_member(
     radius_of_curvature: float,
     profile: ifcopenshell.entity_instance,
     material: ifcopenshell.entity_instance,
-    frame_member: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    parent: ifcopenshell.entity_instance | None = None,
-    place_object_relative_to_parent: bool = False,
 ) -> ifcopenshell.entity_instance:
     """
     Add a curved, prismatic, and homogenous IfcBeam or IfcColumn or IfcMember with
@@ -229,13 +212,14 @@ def create_curved_frame_member(
         )
     )
 
-    if frame_member is None:
-        frame_member = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class=frame_member_class,
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
+    frame_member = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class=frame_member_class,
+        predefined_type="NOTDEFINED",
+    )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=frame_member,
+    )
 
     ifcopenshell.api.type.assign_type(
         file=ifc4_file,
@@ -325,19 +309,11 @@ def create_curved_frame_member(
         representation=shape_representation,
     )
 
-    if isinstance(parent, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[frame_member],
-            relating_structure=parent,
-        )
-
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=frame_member,
-        repositioned_origin=start_point,
+        repositioned_location=start_point,
         repositioned_z_axis=z_axis,
         repositioned_x_axis=x_axis,
-        place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
     return frame_member
@@ -347,9 +323,9 @@ def create_opening_element(
     voided_element: ifcopenshell.entity_instance,
     profile: ifcopenshell.entity_instance,
     depth: float,  # Extrusion depth in the local z direction of the opening element
-    origin_relative_to_voided_element: tuple[float, float, float] = (0.0, 0.0, 0.0),
-    z_axis_relative_to_voided_element: tuple[float, float, float] = (0.0, 0.0, 1.0),
-    x_axis_relative_to_voided_element: tuple[float, float, float] = (1.0, 0.0, 0.0),
+    location: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
 ):
 
     ifc4_file = voided_element.file
@@ -359,6 +335,9 @@ def create_opening_element(
         ifc_class="IfcOpeningElement",
         name=None,
         predefined_type=None,
+    )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=opening_element,
     )
 
     extruded_area_solid = bim2fem.ifcplus.api.geometry.add_extruded_area_solid(
@@ -393,18 +372,14 @@ def create_opening_element(
     rel_voids_element.RelatingBuildingElement = voided_element
     rel_voids_element.RelatedOpeningElement = opening_element
 
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=opening_element,
-        place_object_relative_to_parent=False,
+        repositioned_location=location,
+        repositioned_z_axis=z_axis,
+        repositioned_x_axis=x_axis,
     )
+
     opening_element.ObjectPlacement.PlacementRelTo = voided_element.ObjectPlacement
-    opening_element.ObjectPlacement.RelativePlacement = (
-        ifc4_file.createIfcAxis2Placement3D(
-            ifc4_file.createIfcCartesianPoint(origin_relative_to_voided_element),
-            ifc4_file.createIfcDirection(z_axis_relative_to_voided_element),
-            ifc4_file.createIfcDirection(x_axis_relative_to_voided_element),
-        )
-    )
 
     return opening_element
 
@@ -416,10 +391,6 @@ def create_linear_wall(
     height: float,
     materials: list[ifcopenshell.entity_instance],
     thicknesses: list[float],
-    wall: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    parent: ifcopenshell.entity_instance | None = None,
-    place_object_relative_to_parent: bool = False,
 ):
     """Add straight IfcWall with IfcMaterialLayerSetUsage based on two points in
     XY space."""
@@ -442,13 +413,14 @@ def create_linear_wall(
         )
     )
 
-    if wall is None:
-        wall = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcWall",
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
+    wall = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcWall",
+        predefined_type="NOTDEFINED",
+    )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=wall,
+    )
 
     ifcopenshell.api.type.assign_type(
         file=ifc4_file,
@@ -517,19 +489,11 @@ def create_linear_wall(
         representation=shape_representation,
     )
 
-    if isinstance(parent, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[wall],
-            relating_structure=parent,
-        )
-
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=wall,
-        repositioned_origin=start_point_3d,
+        repositioned_location=start_point_3d,
         repositioned_x_axis=tuple(vector_from_start_point_to_end_point.tolist()),
         repositioned_z_axis=(0.0, 0.0, 1.0),
-        place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
     return wall
@@ -544,12 +508,8 @@ def create_curved_wall(
     height: float,
     materials: list[ifcopenshell.entity_instance],
     thicknesses: list[float],
-    wall: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    parent: ifcopenshell.entity_instance | None = None,
-    place_object_relative_to_parent: bool = False,
 ):
-    """Add curved IfcWall with IfcMaterialLayerSetUsage based on a horizontal curve."""
+    """Add curved IfcWall."""
 
     ifc4_file = materials[0].file
 
@@ -573,17 +533,18 @@ def create_curved_wall(
         )
     )
 
-    if wall is None:
-        wall = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcWall",
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
+    curved_wall = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcWall",
+        predefined_type="NOTDEFINED",
+    )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=curved_wall,
+    )
 
     ifcopenshell.api.type.assign_type(
         file=ifc4_file,
-        related_objects=[wall],
+        related_objects=[curved_wall],
         relating_type=wall_type,
     )
 
@@ -593,7 +554,7 @@ def create_curved_wall(
 
     rel_associates_material = ifcopenshell.api.material.assign_material(
         file=ifc4_file,
-        products=[wall],
+        products=[curved_wall],
         type="IfcMaterialLayerSetUsage",
         material=None,
     )
@@ -727,7 +688,7 @@ def create_curved_wall(
     arbitrary_closed_profile_def = ifc4_file.create_entity(
         type="IfcArbitraryClosedProfileDef",
         ProfileType="AREA",
-        ProfileName=name,
+        ProfileName=None,
         OuterCurve=indexed_polycurve,
     )
 
@@ -752,41 +713,38 @@ def create_curved_wall(
 
     ifcopenshell.api.geometry.assign_representation(
         file=ifc4_file,
-        product=wall,
+        product=curved_wall,
         representation=shape_representation,
     )
-
-    if isinstance(parent, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[wall],
-            relating_structure=parent,
-        )
 
     unit_vector_from_PC_to_PI = bim2fem.ifcplus.util.geometry.calculate_unit_direction_vector_between_two_points(
         p1=middle_horizontal_curve.point_of_curvature,
         p2=middle_horizontal_curve.point_of_intersection,
     )
-    bim2fem.ifcplus.api.placement.edit_object_placement(
-        product=wall,
-        repositioned_origin=middle_horizontal_curve.point_of_curvature,
+    # bim2fem.ifcplus.api.geometry.edit_object_placement(
+    #     product=wall,
+    #     repositioned_origin=middle_horizontal_curve.point_of_curvature,
+    #     repositioned_x_axis=unit_vector_from_PC_to_PI,
+    #     repositioned_z_axis=(0.0, 0.0, 1.0),
+    #     place_object_relative_to_parent=place_object_relative_to_parent,
+    # )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=curved_wall,
+        repositioned_location=middle_horizontal_curve.point_of_curvature,
         repositioned_x_axis=unit_vector_from_PC_to_PI,
         repositioned_z_axis=(0.0, 0.0, 1.0),
-        place_object_relative_to_parent=place_object_relative_to_parent,
     )
 
-    return wall
+    return curved_wall
 
 
 def create_slab(
     profile: ifcopenshell.entity_instance,
-    point_at_placement_of_slab_profile: tuple[float, float, float],
     materials: list[ifcopenshell.entity_instance],
     thicknesses: list[float],
-    slab: ifcopenshell.entity_instance | None = None,
-    name: str | None = None,
-    parent: ifcopenshell.entity_instance | None = None,
-    place_object_relative_to_parent: bool = False,
+    location: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
 ):
 
     ifc4_file = materials[0].file
@@ -807,13 +765,14 @@ def create_slab(
         )
     )
 
-    if slab is None:
-        slab = ifcopenshell.api.root.create_entity(
-            file=ifc4_file,
-            ifc_class="IfcSlab",
-            name=name,
-            predefined_type="NOTDEFINED",
-        )
+    slab = ifcopenshell.api.root.create_entity(
+        file=ifc4_file,
+        ifc_class="IfcSlab",
+        predefined_type="NOTDEFINED",
+    )
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+        product=slab,
+    )
 
     ifcopenshell.api.type.assign_type(
         file=ifc4_file,
@@ -857,19 +816,11 @@ def create_slab(
         representation=shape_representation,
     )
 
-    if isinstance(parent, ifcopenshell.entity_instance):
-        ifcopenshell.api.spatial.assign_container(
-            file=ifc4_file,
-            products=[slab],
-            relating_structure=parent,
-        )
-
-    bim2fem.ifcplus.api.placement.edit_object_placement(
+    bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
         product=slab,
-        repositioned_origin=point_at_placement_of_slab_profile,
-        repositioned_x_axis=(1.0, 0.0, 0.0),
-        repositioned_z_axis=(0.0, 0.0, 1.0),
-        place_object_relative_to_parent=place_object_relative_to_parent,
+        repositioned_location=location,
+        repositioned_z_axis=z_axis,
+        repositioned_x_axis=x_axis,
     )
 
     return slab

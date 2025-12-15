@@ -2,13 +2,12 @@
 
 
 import ifcopenshell
-import bim2fem.ifcplus.util.geometry
 import bim2fem.ifcplus.util.structural
 import bim2fem.ifcplus.api.structural
 import ifcopenshell.util.element
 import numpy as np
 import bim2fem.ifcplus.util.material
-from bim2fem.ifcplus.util.geometry import convert_3pt_ndarray_to_tuple_of_floats
+import bim2fem.core.geom_helpers
 
 
 def snap_walls_to_perpendicular_walls(
@@ -65,7 +64,7 @@ def snap_walls_to_perpendicular_walls(
             ]
 
             walls_are_perpendicular, _ = (
-                bim2fem.ifcplus.util.geometry.planes_are_right_angled(
+                bim2fem.core.geom_helpers.planes_are_right_angled(
                     a1=original_coordinates_of_points_of_wall_1[0],
                     b1=original_coordinates_of_points_of_wall_1[1],
                     c1=original_coordinates_of_points_of_wall_1[2],
@@ -89,13 +88,13 @@ def snap_walls_to_perpendicular_walls(
                 ]
             )
 
-            a_min, a_max = bim2fem.ifcplus.util.geometry.aabb_from_points(
+            a_min, a_max = bim2fem.core.geom_helpers.aabb_from_points(
                 points=original_coordinates_of_points_of_wall_1
             )
-            b_min, b_max = bim2fem.ifcplus.util.geometry.aabb_from_points(
+            b_min, b_max = bim2fem.core.geom_helpers.aabb_from_points(
                 points=original_coordinates_of_points_of_wall_2
             )
-            overlap, _ = bim2fem.ifcplus.util.geometry.aabb_overlap_3d(
+            overlap, _ = bim2fem.core.geom_helpers.aabb_overlap_3d(
                 a_min=a_min,
                 a_max=a_max,
                 b_min=b_min,
@@ -107,7 +106,7 @@ def snap_walls_to_perpendicular_walls(
             if not walls_are_close_to_each_other:
                 continue
 
-            p0, dir = bim2fem.ifcplus.util.geometry.plane_intersection_line(
+            p0, dir = bim2fem.core.geom_helpers.plane_intersection_line(
                 a1=original_coordinates_of_points_of_wall_1[0],
                 b1=original_coordinates_of_points_of_wall_1[1],
                 c1=original_coordinates_of_points_of_wall_1[2],
@@ -138,10 +137,10 @@ def snap_walls_to_perpendicular_walls(
                     structural_point_connection=wall_node
                 )
 
-                projected_coordinates_of_wall_node = bim2fem.ifcplus.util.geometry.calculate_coordinates_of_point_projected_onto_line(
+                projected_coordinates_of_wall_node = bim2fem.core.geom_helpers.calculate_coordinates_of_point_projected_onto_line(
                     point=coordinates_of_wall_node,
-                    start_point_of_line=convert_3pt_ndarray_to_tuple_of_floats(p0),
-                    end_point_of_line=convert_3pt_ndarray_to_tuple_of_floats(p1),
+                    start_point_of_line=tuple(p0.tolist()),
+                    end_point_of_line=tuple(p1.tolist()),
                     assume_line_is_finite=False,
                 )
 
@@ -167,7 +166,7 @@ def snap_walls_to_perpendicular_walls(
 
                 bim2fem.ifcplus.api.structural.translate_structural_point_connection(
                     structural_point_connection=wall_node,
-                    translation=convert_3pt_ndarray_to_tuple_of_floats(translation),
+                    translation=tuple(translation.tolist()),
                 )
 
     return ifc4_sav_file

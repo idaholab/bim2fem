@@ -3,17 +3,18 @@
 import ifcopenshell
 import ifcopenshell.validate
 import bim2fem.ifcplus.api.project
-import bim2fem.ifcplus.api.placement
+import bim2fem.ifcplus.api.geometry
 import bim2fem.ifcplus.api.profile
 from tests.conftest import OUTPUT_DIR_FOR_BUILT_ELEMENT
 import ifcopenshell.api.root
-import ifcopenshell.api.aggregate
 import bim2fem.ifcplus.api.built_element
 import bim2fem.ifcplus.api.material
 from typing import cast
 import ifcopenshell.api.profile
 from pprint import pprint
 import numpy as np
+import bim2fem.ifcplus.api.aggregate
+import bim2fem.ifcplus.api.spatial
 
 
 class TestWalls:
@@ -37,15 +38,13 @@ class TestWalls:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -56,6 +55,10 @@ class TestWalls:
                 check_for_duplicate=True,
             )
         )
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -65,37 +68,53 @@ class TestWalls:
                 check_for_duplicate=True,
             )
         )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
+        )
 
-        bim2fem.ifcplus.api.built_element.create_linear_wall(
+        wall_1 = bim2fem.ifcplus.api.built_element.create_linear_wall(
             start_point_2d=(1.0, 1.0),
             end_point_2d=(7.0, 1.0),
             elevation=0.0,
             height=3.0,
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Wall-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+        )
+        wall_1.Name = "Wall #1"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[wall_1],
+            relating_structure=site,
         )
 
-        bim2fem.ifcplus.api.built_element.create_linear_wall(
-            start_point_2d=(1.0 + 8.0, 1.0),
-            end_point_2d=(7.0 + 8.0, 1.0 + 2.0),
+        wall_2 = bim2fem.ifcplus.api.built_element.create_linear_wall(
+            start_point_2d=(9.0, 1.0),
+            end_point_2d=(15.0, 3.0),
             elevation=1.0,
             height=3.0,
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Wall-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+        )
+        wall_2.Name = "Wall #2"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[wall_2],
+            relating_structure=site,
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "straight_walls.ifc")
@@ -129,15 +148,13 @@ class TestWalls:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -148,6 +165,10 @@ class TestWalls:
                 check_for_duplicate=True,
             )
         )
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -157,6 +178,10 @@ class TestWalls:
                 check_for_duplicate=True,
             )
         )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
+        )
 
         wall_1 = bim2fem.ifcplus.api.built_element.create_linear_wall(
             start_point_2d=(1.0, 1.0),
@@ -164,18 +189,23 @@ class TestWalls:
             elevation=0.0,
             height=3.0,
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Wall-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+        )
+        wall_1.Name = "Wall #1"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[wall_1],
+            relating_structure=site,
         )
 
-        opening_depth = 0.10 + 0.10 + 0.20
-
+        wall_thickness = 0.10 + 0.10 + 0.20
         bim2fem.ifcplus.api.built_element.create_opening_element(
             voided_element=wall_1,
             profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
@@ -186,10 +216,10 @@ class TestWalls:
                 check_for_duplicate=True,
                 calculate_mechanical_properties=False,
             ),
-            depth=opening_depth,
-            origin_relative_to_voided_element=(2.0, -opening_depth / 2.0, 1.5),
-            z_axis_relative_to_voided_element=(0.0, 1.0, 0.0),
-            x_axis_relative_to_voided_element=(-1.0, 0.0, 0.0),
+            depth=wall_thickness,
+            location=(2.0, -wall_thickness / 2.0, 1.5),
+            z_axis=(0.0, 1.0, 0.0),
+            x_axis=(-1.0, 0.0, 0.0),
         )
 
         bim2fem.ifcplus.api.built_element.create_opening_element(
@@ -202,26 +232,32 @@ class TestWalls:
                 check_for_duplicate=True,
                 calculate_mechanical_properties=False,
             ),
-            depth=opening_depth,
-            origin_relative_to_voided_element=(4.5, -opening_depth / 2.0, 2.0),
-            z_axis_relative_to_voided_element=(0.0, 1.0, 0.0),
-            x_axis_relative_to_voided_element=(-1.0, 0.0, 0.0),
+            depth=wall_thickness,
+            location=(4.5, -wall_thickness / 2.0, 2.0),
+            z_axis=(0.0, 1.0, 0.0),
+            x_axis=(-1.0, 0.0, 0.0),
         )
 
         wall_2 = bim2fem.ifcplus.api.built_element.create_linear_wall(
-            start_point_2d=(1.0 + 8.0, 1.0),
-            end_point_2d=(7.0 + 8.0, 1.0 + 2.0),
+            start_point_2d=(9.0, 1.0),
+            end_point_2d=(15.0, 3.0),
             elevation=1.0,
             height=3.0,
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Wall-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+        )
+        wall_2.Name = "Wall #2"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[wall_2],
+            relating_structure=site,
         )
 
         bim2fem.ifcplus.api.built_element.create_opening_element(
@@ -234,10 +270,10 @@ class TestWalls:
                 check_for_duplicate=True,
                 calculate_mechanical_properties=False,
             ),
-            depth=opening_depth,
-            origin_relative_to_voided_element=(2.0, -opening_depth / 2.0, 1.5),
-            z_axis_relative_to_voided_element=(0.0, 1.0, 0.0),
-            x_axis_relative_to_voided_element=(-1.0, 0.0, 0.0),
+            depth=wall_thickness,
+            location=(2.0, -wall_thickness / 2.0, 1.5),
+            z_axis=(0.0, 1.0, 0.0),
+            x_axis=(-1.0, 0.0, 0.0),
         )
 
         output_path = str(
@@ -273,15 +309,13 @@ class TestWalls:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -292,6 +326,10 @@ class TestWalls:
                 check_for_duplicate=True,
             )
         )
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -301,8 +339,12 @@ class TestWalls:
                 check_for_duplicate=True,
             )
         )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
+        )
 
-        bim2fem.ifcplus.api.built_element.create_curved_wall(
+        wall_1 = bim2fem.ifcplus.api.built_element.create_curved_wall(
             point_of_curvature_2d=(1.0, 1.0),
             point_on_center_of_curvature_side_2d=(1.0, 1.2),
             point_of_tangency_2d=(7.0, 7.0),
@@ -310,17 +352,23 @@ class TestWalls:
             elevation=0.0,
             height=3.0,
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Wall-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+        )
+        wall_1.Name = "Wall #1"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[wall_1],
+            relating_structure=site,
         )
 
-        bim2fem.ifcplus.api.built_element.create_curved_wall(
+        wall_2 = bim2fem.ifcplus.api.built_element.create_curved_wall(
             point_of_curvature_2d=(1.0 + 10.0, 1.0),
             point_on_center_of_curvature_side_2d=(1.0 + 10.0, 1.8),
             point_of_tangency_2d=(7.0 + 10.0, 7.0),
@@ -328,14 +376,20 @@ class TestWalls:
             elevation=1.0,
             height=3.0,
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Wall-02",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+        )
+        wall_2.Name = "Wall #2"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[wall_2],
+            relating_structure=site,
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "curved_walls.ifc")
@@ -372,15 +426,13 @@ class TestSlabs:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -391,6 +443,10 @@ class TestSlabs:
                 check_for_duplicate=True,
             )
         )
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -400,8 +456,12 @@ class TestSlabs:
                 check_for_duplicate=True,
             )
         )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
+        )
 
-        bim2fem.ifcplus.api.built_element.create_slab(
+        slab_1 = bim2fem.ifcplus.api.built_element.create_slab(
             profile=ifcopenshell.api.profile.add_arbitrary_profile(
                 file=ifc4_file,
                 profile=[
@@ -411,21 +471,26 @@ class TestSlabs:
                     (0.0, 3.0),
                     (0.0, 0.0),
                 ],
-                name=None,
             ),
-            point_at_placement_of_slab_profile=(1.0, 1.0, 0.0),
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Slab-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+            location=(1.0, 1.0, 0.0),
+        )
+        slab_1.Name = "Slab #1"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[slab_1],
+            relating_structure=site,
         )
 
-        bim2fem.ifcplus.api.built_element.create_slab(
+        slab_2 = bim2fem.ifcplus.api.built_element.create_slab(
             profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
                 ifc4_file=ifc4_file,
                 profile_class="IfcRectangleProfileDef",
@@ -434,16 +499,22 @@ class TestSlabs:
                 check_for_duplicate=True,
                 calculate_mechanical_properties=False,
             ),
-            point_at_placement_of_slab_profile=(1.0 + 10.0, 1.0, 0.0 + 1.0),
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Slab-02",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+            location=(1.0 + 10.0, 1.0, 0.0 + 1.0),
+        )
+        slab_2.Name = "Slab #2"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[slab_2],
+            relating_structure=site,
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "slabs.ifc")
@@ -477,15 +548,13 @@ class TestSlabs:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -496,6 +565,10 @@ class TestSlabs:
                 check_for_duplicate=True,
             )
         )
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -504,6 +577,10 @@ class TestSlabs:
                 material_name="S355",
                 check_for_duplicate=True,
             )
+        )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
         )
 
         slab_1 = bim2fem.ifcplus.api.built_element.create_slab(
@@ -516,22 +593,26 @@ class TestSlabs:
                     (0.0, 3.0),
                     (0.0, 0.0),
                 ],
-                name=None,
             ),
-            point_at_placement_of_slab_profile=(1.0, 1.0, 0.0),
             materials=[
-                cast(ifcopenshell.entity_instance, concrete_material),
-                cast(ifcopenshell.entity_instance, steel_material),
-                cast(ifcopenshell.entity_instance, concrete_material),
+                concrete_material,
+                steel_material,
+                concrete_material,
             ],
-            thicknesses=[0.10, 0.10, 0.20],
-            name="Slab-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            thicknesses=[
+                0.10,
+                0.10,
+                0.20,
+            ],
+            location=(1.0, 1.0, 0.0),
+        )
+        slab_1.Name = "Slab #1"
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[slab_1],
+            relating_structure=site,
         )
 
-        opening_depth = 0.10 + 0.10 + 0.20
-
+        slab_thickness = 0.10 + 0.10 + 0.20
         bim2fem.ifcplus.api.built_element.create_opening_element(
             voided_element=slab_1,
             profile=bim2fem.ifcplus.api.profile.add_parameterized_profile(
@@ -542,10 +623,10 @@ class TestSlabs:
                 check_for_duplicate=True,
                 calculate_mechanical_properties=False,
             ),
-            depth=opening_depth,
-            origin_relative_to_voided_element=(2.0, 1.0, 0.0),
-            z_axis_relative_to_voided_element=(0.0, 0.0, 1.0),
-            x_axis_relative_to_voided_element=(1.0, 0.0, 0.0),
+            depth=slab_thickness,
+            location=(2.0, 1.0, 0.0),
+            z_axis=(0.0, 0.0, 1.0),
+            x_axis=(1.0, 0.0, 0.0),
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "slab_with_opening.ifc")
@@ -582,15 +663,13 @@ class TestFrameMembers:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -601,6 +680,10 @@ class TestFrameMembers:
                 check_for_duplicate=True,
             )
         )
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -609,6 +692,10 @@ class TestFrameMembers:
                 material_name="S355",
                 check_for_duplicate=True,
             )
+        )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
         )
 
         x_shift = 0.0
@@ -716,40 +803,39 @@ class TestFrameMembers:
                 "ProfileDef", ""
             )
 
-            bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            beam_1 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
                 frame_member_class="IfcBeam",
                 start_point=(1.0 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + x_shift, 1.0, 0.0),
                 orientation_point=(1.0 + x_shift, 6.0, 1.0),
                 profile=profile,
-                material=cast(ifcopenshell.entity_instance, material),
-                name=f"{prefix}-Beam-01",
-                parent=site,
-                place_object_relative_to_parent=True,
+                material=material,
             )
+            beam_1.Name = f"{prefix}-Beam-A"
 
-            bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            beam_2 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
                 frame_member_class="IfcBeam",
                 start_point=(1.0 + 1.0 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + 1.0 + x_shift, 1.0, 0.0),
                 orientation_point=(1.1 + 1.0 + x_shift, 6.0, 1.0),
                 profile=profile,
-                material=cast(ifcopenshell.entity_instance, material),
-                name=f"{prefix}-Beam-02",
-                parent=site,
-                place_object_relative_to_parent=True,
+                material=material,
             )
+            beam_2.Name = f"{prefix}-Beam-B"
 
-            bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+            beam_3 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
                 frame_member_class="IfcBeam",
                 start_point=(1.0 + 1.0 * 2 + x_shift, 6.0, 0.0),
                 end_point=(1.0 + 1.0 * 2 + x_shift, 1.0, 0.5),
                 orientation_point=(1.1 + 1.0 * 2 + x_shift, 6.0, 1.0),
                 profile=profile,
-                material=cast(ifcopenshell.entity_instance, material),
-                name=f"{prefix}-Beam-03",
-                parent=site,
-                place_object_relative_to_parent=True,
+                material=material,
+            )
+            beam_3.Name = f"{prefix}-Beam-C"
+
+            bim2fem.ifcplus.api.spatial.assign_container_v2(
+                products=[beam_1, beam_2, beam_3],
+                relating_structure=site,
             )
 
             x_shift += 3.0
@@ -785,15 +871,13 @@ class TestFrameMembers:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            repositioned_origin=(1.0, 1.0, 0.0),
-            place_object_relative_to_parent=True,
         )
 
         steel_material = (
@@ -803,6 +887,10 @@ class TestFrameMembers:
                 material_name="S355",
                 check_for_duplicate=True,
             )
+        )
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
         )
 
         profile = bim2fem.ifcplus.api.profile.add_parameterized_profile(
@@ -814,19 +902,17 @@ class TestFrameMembers:
             calculate_mechanical_properties=True,
         )
 
-        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+        beam_1 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
             frame_member_class="IfcBeam",
             start_point=(1.0, 6.0, 0.0),
             end_point=(1.0, 1.0, 0.0),
             orientation_point=(1.0, 6.0, 1.0),
             profile=profile,
-            material=cast(ifcopenshell.entity_instance, steel_material),
-            name=f"Beam-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+            material=steel_material,
         )
+        beam_1.Name = "Beam-01"
 
-        bim2fem.ifcplus.api.built_element.create_curved_frame_member(
+        beam_2 = bim2fem.ifcplus.api.built_element.create_curved_frame_member(
             frame_member_class="IfcBeam",
             start_point=(2.0, 6.0, 0.0),
             end_point=(7.0, 1.0, 0.0),
@@ -838,13 +924,11 @@ class TestFrameMembers:
             ),
             radius_of_curvature=5.0,
             profile=profile,
-            material=cast(ifcopenshell.entity_instance, steel_material),
-            name=f"Beam-02",
-            parent=site,
-            place_object_relative_to_parent=True,
+            material=steel_material,
         )
+        beam_2.Name = "Beam-01"
 
-        bim2fem.ifcplus.api.built_element.create_curved_frame_member(
+        beam_3 = bim2fem.ifcplus.api.built_element.create_curved_frame_member(
             frame_member_class="IfcBeam",
             start_point=(2.0, 6.0, 0.0),
             end_point=(2.0, 6.0 - 5.0, 0.0 + 5.0),
@@ -856,11 +940,9 @@ class TestFrameMembers:
             ),
             radius_of_curvature=5.0,
             profile=profile,
-            material=cast(ifcopenshell.entity_instance, steel_material),
-            name=f"Beam-03",
-            parent=site,
-            place_object_relative_to_parent=True,
+            material=steel_material,
         )
+        beam_3.Name = "Beam-03"
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / f"curved_beams.ifc")
         bim2fem.ifcplus.api.project.write_to_ifc_spf(
@@ -896,14 +978,13 @@ class TestCreateStructure:
             ifc_class="IfcSite",
             name="Site-01",
         )
-        ifcopenshell.api.aggregate.assign_object(
-            file=ifc4_file,
+        bim2fem.ifcplus.api.geometry.edit_object_placement_v2(
+            product=site,
+            repositioned_location=(1.0, 1.0, 0.0),
+        )
+        bim2fem.ifcplus.api.aggregate.assign_object_v2(
             products=[site],
             relating_object=project,
-        )
-        bim2fem.ifcplus.api.placement.edit_object_placement(
-            product=site,
-            place_object_relative_to_parent=True,
         )
 
         concrete_material = (
@@ -914,7 +995,10 @@ class TestCreateStructure:
                 check_for_duplicate=True,
             )
         )
-        concrete_material = cast(ifcopenshell.entity_instance, concrete_material)
+        concrete_material = cast(
+            ifcopenshell.entity_instance,
+            concrete_material,
+        )
 
         steel_material = (
             bim2fem.ifcplus.api.material.add_material_from_standard_library(
@@ -924,7 +1008,10 @@ class TestCreateStructure:
                 check_for_duplicate=True,
             )
         )
-        steel_material = cast(ifcopenshell.entity_instance, steel_material)
+        steel_material = cast(
+            ifcopenshell.entity_instance,
+            steel_material,
+        )
 
         profile = bim2fem.ifcplus.api.profile.add_profile_from_standard_library(
             ifc4_file=ifc4_file,
@@ -932,7 +1019,10 @@ class TestCreateStructure:
             profile_name="HE340A",
             check_for_duplicate=True,
         )
-        profile = cast(ifcopenshell.entity_instance, profile)
+        profile = cast(
+            ifcopenshell.entity_instance,
+            profile,
+        )
 
         col1_bottom = (1.0, 1.0, 0.0)
         col1_top = tuple((np.array(col1_bottom) + np.array([0.0, 0.0, 3.0])).tolist())
@@ -958,59 +1048,50 @@ class TestCreateStructure:
             (np.array(col4_bottom) + np.array([0.0, 1.0, 0.0])).tolist()
         )
 
-        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+        col_1 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
             frame_member_class="IfcColumn",
             start_point=col1_bottom,
             end_point=col1_top,
             orientation_point=col1_orientation,
             profile=profile,
             material=steel_material,
-            name="Column-01",
-            parent=site,
-            place_object_relative_to_parent=True,
         )
+        col_1.Name = "Column-01"
 
-        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+        col_2 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
             frame_member_class="IfcColumn",
             start_point=col2_bottom,
             end_point=col2_top,
             orientation_point=col2_orientation,
             profile=profile,
             material=steel_material,
-            name="Column-02",
-            parent=site,
-            place_object_relative_to_parent=True,
         )
+        col_2.Name = "Column-02"
 
-        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+        col_3 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
             frame_member_class="IfcColumn",
             start_point=col3_bottom,
             end_point=col3_top,
             orientation_point=col3_orientation,
             profile=profile,
             material=steel_material,
-            name="Column-03",
-            parent=site,
-            place_object_relative_to_parent=True,
         )
+        col_3.Name = "Column-03"
 
-        bim2fem.ifcplus.api.built_element.create_linear_frame_member(
+        col_4 = bim2fem.ifcplus.api.built_element.create_linear_frame_member(
             frame_member_class="IfcColumn",
             start_point=col4_bottom,
             end_point=col4_top,
             orientation_point=col4_orientation,
             profile=profile,
             material=steel_material,
-            name="Column-04",
-            parent=site,
-            place_object_relative_to_parent=True,
         )
+        col_4.Name = "Column-04"
 
         point_at_placement_of_slab_profile = tuple(
             (np.array(col1_top) - np.array([0.0, 0.0, 0.2])).tolist()
         )
-
-        bim2fem.ifcplus.api.built_element.create_slab(
+        slab_1 = bim2fem.ifcplus.api.built_element.create_slab(
             profile=ifcopenshell.api.profile.add_arbitrary_profile(
                 file=ifc4_file,
                 profile=[
@@ -1020,9 +1101,8 @@ class TestCreateStructure:
                     (0.0, 5.0),
                     (0.0, 0.0),
                 ],
-                name=None,
             ),
-            point_at_placement_of_slab_profile=point_at_placement_of_slab_profile,
+            location=point_at_placement_of_slab_profile,
             materials=[
                 concrete_material,
                 steel_material,
@@ -1033,9 +1113,12 @@ class TestCreateStructure:
                 0.10,
                 0.20,
             ],
-            name="Slab-01",
-            parent=site,
-            place_object_relative_to_parent=True,
+        )
+        slab_1.Name = "Slab-01"
+
+        bim2fem.ifcplus.api.spatial.assign_container_v2(
+            products=[col_1, col_2, col_3, col_4, slab_1],
+            relating_structure=site,
         )
 
         output_path = str(OUTPUT_DIR_FOR_BUILT_ELEMENT / "simple_structure_RV.ifc")

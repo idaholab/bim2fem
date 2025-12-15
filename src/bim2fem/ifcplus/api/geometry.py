@@ -17,11 +17,50 @@ from ifcopenshell.util.representation import (
 import bim2fem.ifcplus.util.geometry
 
 
-FACE_BOUND_CLASS = Literal["IfcFaceOuterBound", "IfcFaceBound"]
+FACE_BOUND_CLASS = Literal[
+    "IfcFaceOuterBound",
+    "IfcFaceBound",
+]
 
-SHAPE_MODEL_CLASS = Literal["IfcShapeRepresentation", "IfcTopologyRepresentation"]
+SHAPE_MODEL_CLASS = Literal[
+    "IfcShapeRepresentation",
+    "IfcTopologyRepresentation",
+]
 
-BOOLEAN_OPERATOR = Literal["DIFFERENCE", "INTERSECTION", "UNION"]
+BOOLEAN_OPERATOR = Literal[
+    "DIFFERENCE",
+    "INTERSECTION",
+    "UNION",
+]
+
+
+def edit_object_placement_v2(
+    product: ifcopenshell.entity_instance,
+    repositioned_location: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    repositioned_z_axis: tuple[float, float, float] = (0.0, 0.0, 1.0),
+    repositioned_x_axis: tuple[float, float, float] = (1.0, 0.0, 0.0),
+):
+
+    if product.ObjectPlacement is None:
+        ifc4_file = product.file
+        placement = ifc4_file.createIfcLocalPlacement()
+        placement.RelativePlacement = ifc4_file.createIfcAxis2Placement3D(
+            ifc4_file.createIfcCartesianPoint(repositioned_location),
+            ifc4_file.createIfcDirection(repositioned_z_axis),
+            ifc4_file.createIfcDirection(repositioned_x_axis),
+        )
+        product.ObjectPlacement = placement
+
+    else:
+        product.ObjectPlacement.RelativePlacement.Location.Coordinates = (
+            repositioned_location
+        )
+        product.ObjectPlacement.RelativePlacement.Axis.DirectionRatios = (
+            repositioned_z_axis
+        )
+        product.ObjectPlacement.RelativePlacement.RefDirection.DirectionRatios = (
+            repositioned_x_axis
+        )
 
 
 def add_shape_model(
